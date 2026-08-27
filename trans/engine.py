@@ -54,7 +54,7 @@ class Game:
         mode: GameMode = GameMode.FAST,
         seed: int | None = None,
         dealer: int = 0,
-        forbid_exact_total: bool = False,
+        forbid_exact_total: bool = True,
     ) -> None:
         if not MIN_PLAYERS <= len(players) <= MAX_PLAYERS:
             raise ValueError(f"servono da {MIN_PLAYERS} a {MAX_PLAYERS} giocatori")
@@ -68,6 +68,8 @@ class Game:
         self.schedule: list[RoundSpec] = build_schedule(mode)
         self.rng = random.Random(seed)
         self.seed = seed
+        # Regola dell'impiccato: l'ultimo a parlare non puo' pareggiare il conto,
+        # cosi' almeno un giocatore sbaglia per forza la dichiarazione.
         self.forbid_exact_total = forbid_exact_total
 
         self.round_index = 0
@@ -143,14 +145,23 @@ class Game:
     def legal_bids(self, player_index: int) -> list[int]:
         if self.phase is not Phase.BIDDING or player_index != self.turn:
             return []
-        options = list(range(self.spec.cards + 1))
-        if self.forbid_exact_total and self._is_last_bidder(player_index):
-            declared = sum(p.bid for p in self.players if p.bid is not None)
-            forbidden = self.spec.cards - declared
-            options = [b for b in options if b != forbidden]
-        return options
+        forbidden = self.forbidden_bid(player_index)
+        return [b for b in range(self.spec.cards + 1) if b != forbidden]
+
+    def forbidden_bid(self, player_index: int) -> int | None:
+        """La dichiarazione vietata all'ultimo a parlare, se ce n'e' una.
+
+        La somma delle dichiarazioni non puo' fare esattamente il numero di
+        prese in palio: chi chiude il giro deve sbilanciare il conto.
+        """
+        if not self.forbid_exact_total or not self._is_last_bidder(player_index):
+            return None
+        declared = sum(p.bid for p in self.players if p.bid is not None)
+        forbidden = self.spec.cards - declared
+        return forbidden if 0 <= forbidden <= self.spec.cards else None
 
     def _is_last_bidder(self, player_index: int) -> bool:
+        """Si parla da sinistra del mazziere, quindi il mazziere chiude."""
         return player_index == self.dealer
 
     def place_bid(self, player_id: str, value: int) -> None:
@@ -159,6 +170,11 @@ class Game:
             raise IllegalMove("non e' il momento di scommettere")
         if idx != self.turn:
             raise IllegalMove("non e' il tuo turno di scommettere")
+        if value == self.forbidden_bid(idx):
+            raise IllegalMove(
+                f"chiudi tu il giro: con {value} la somma farebbe esattamente "
+                f"{self.spec.cards}, e non e' permesso"
+            )
         if value not in self.legal_bids(idx):
             raise IllegalMove(f"scommessa non valida: {value}")
 
@@ -303,11 +319,13 @@ class Game:
         hand: list[str] = []
         legal_cards: list[str] = []
         legal_bids: list[int] = []
+        forbidden_bid: int | None = None
         if viewer is not None:
             if self.hand_visible_to_owner():
                 hand = [c.code for c in sort_hand(self.players[viewer].hand)]
             legal_cards = [c.code for c in self.legal_cards(viewer)]
             legal_bids = self.legal_bids(viewer)
+            forbidden_bid = self.forbidden_bid(viewer)
 
         return {
             "phase": self.phase.value,
@@ -329,6 +347,7 @@ class Game:
             "hand_hidden": viewer is not None and not self.hand_visible_to_owner(),
             "legal_cards": legal_cards,
             "legal_bids": legal_bids,
+            "forbidden_bid": forbidden_bid,
             "trick": [{"player": i, "card": c.code} for i, c in self.current_trick],
             "lead_suit": self.lead_suit.value if self.lead_suit else None,
             "played": [c.code for c in self.played_cards],

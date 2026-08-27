@@ -24,7 +24,13 @@ Vince la briscola più alta, altrimenti la carta più alta del seme di uscita.
 Chi prende esce nella presa successiva.
 
 **La dichiarazione.** Prima di giocare ognuno dichiara quante prese farà,
-partendo da sinistra del mazziere.
+partendo da sinistra del mazziere — che quindi parla per ultimo.
+
+**Il mazziere non può pareggiare il conto:** la somma delle dichiarazioni non
+può fare esattamente il numero di prese in palio. In cinque, in un round da 5
+carte, se i primi quattro dicono 1 a testa il mazziere non può dire 1: dovrà
+dire 0, oppure 2 o più. Così almeno un giocatore sbaglia per forza, e chiudere
+il giro diventa la posizione più scomoda del tavolo.
 
 | Esito | Punti |
 |---|---|
@@ -113,15 +119,17 @@ python -m trans.simulate --games 200 --levels esperto normale normale facile
 200 partite · Partita veloce (10 round) · 4 giocatori
 
 giocatore       vittorie   punti medi   scommesse ok
-normale-2             67         72.9          56.8%
-esperto-0             70         72.3          58.3%
-normale-1             59         69.8          55.7%
-facile-3              11         35.9          31.2%
+esperto-0             71         69.7          56.4%
+normale-2             60         67.0          51.3%
+normale-1             63         66.5          53.0%
+facile-3              10         38.8          33.7%
 ```
 
-`facile` sta sotto di quaranta punti a partita, mentre fra `normale` ed `esperto`
-il divario è piccolo: l'esperto centra la dichiarazione un paio di punti percentuali
-più spesso, ma su dieci round il caso delle carte pesa ancora parecchio.
+`facile` sta trenta punti sotto agli altri, mentre fra `normale` ed `esperto` il
+divario resta piccolo: su dieci round il caso delle carte pesa ancora parecchio.
+
+Quel 56% va letto ricordando che il mazziere non può pareggiare il conto: **almeno
+un giocatore per round sbaglia sempre**, quindi in quattro il tetto teorico è 75%.
 
 ---
 

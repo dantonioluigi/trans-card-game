@@ -410,19 +410,33 @@
         : "Quante prese farai?";
       const declared = g.players.reduce((s, p) => s + (p.bid || 0), 0);
       const missing = g.players.filter((p) => p.bid === null).length - 1;
-      $("bidSub").textContent = g.round.blind
+      const banned = g.forbidden_bid;
+      const context = g.round.blind
         ? `${g.round.cards} carte coperte. Dichiarate finora: ${declared}.`
-        : `Round da ${g.round.cards} carte. Dichiarate finora: ${declared}` +
-          (missing > 0 ? ` · dopo di te mancano ${missing} giocatori.` : " · sei l'ultimo a parlare.");
+        : `Round da ${g.round.cards} carte. Dichiarate finora: ${declared}.`;
+      $("bidSub").textContent = banned === null || banned === undefined
+        ? context + (missing > 0 ? ` Dopo di te mancano ${missing} giocatori.` : "")
+        : `${context} Chiudi tu il giro: non puoi dire ${banned}, la somma farebbe` +
+          ` esattamente ${g.round.cards}.`;
+
+      // Il numero vietato resta visibile, barrato: sparire e basta confonde.
+      const legal = new Set(g.legal_bids);
       const grid = $("bidGrid");
       grid.innerHTML = "";
-      g.legal_bids.forEach((value) => {
+      for (let value = 0; value <= g.round.cards; value++) {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.textContent = value;
-        btn.onclick = () => send({ type: "bid", value });
+        if (legal.has(value)) {
+          btn.onclick = () => send({ type: "bid", value });
+        } else {
+          btn.disabled = true;
+          btn.className = "banned";
+          btn.title = `Con ${value} la somma delle dichiarazioni farebbe esattamente ` +
+                      `${g.round.cards}: non e' permesso.`;
+        }
         grid.appendChild(btn);
-      });
+      }
     }
 
     // Fine round

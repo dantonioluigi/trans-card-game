@@ -87,15 +87,67 @@ def test_play_is_blocked_until_everyone_has_bid():
     assert game.current_actor() == 1
 
 
-def test_optional_hook_rule_forbids_the_bid_that_makes_the_total_exact():
-    game = make_game(n=3, forbid_exact_total=True)
-    bid_all(game, [3, 2])  # p1 e p2, restano 2 prese
-    assert game.current_actor() == 0  # il mazziere chiude
+def test_the_last_bidder_cannot_make_the_total_exact():
+    game = make_game(n=3)
+    bid_all(game, [3, 2])  # p1 e p2, restano 2 prese sulle 7
+    assert game.current_actor() == 0  # il mazziere chiude il giro
+    assert game.forbidden_bid(0) == 2
     assert 2 not in game.legal_bids(0)
-    with pytest.raises(IllegalMove):
+    with pytest.raises(IllegalMove, match="somma"):
         game.place_bid("p0", 2)
     game.place_bid("p0", 1)
     assert game.phase is Phase.PLAYING
+
+
+def test_five_players_one_trick_each_leaves_the_last_one_stuck():
+    """Il caso raccontato dall'utente: in cinque, con un round da 5 carte."""
+    game = make_game(n=5)
+    while game.spec.cards != 5:
+        finish_round_with_bots(game)
+        game.advance_round()
+    bid_all(game, [1, 1, 1, 1])  # i primi quattro dicono 1: siamo a 4 su 5
+    assert game.forbidden_bid(game.dealer) == 1
+    assert game.legal_bids(game.dealer) == [0, 2, 3, 4, 5]
+    with pytest.raises(IllegalMove):
+        game.place_bid(game.players[game.dealer].id, 1)
+
+
+def test_the_rule_binds_only_whoever_speaks_last():
+    game = make_game(n=4)
+    for i in range(4):
+        # il mazziere e' p0, quindi parla per ultimo
+        assert (game.forbidden_bid(i) is not None) == (i == game.dealer)
+
+
+def test_no_forbidden_bid_when_the_total_is_already_impossible():
+    game = make_game(n=3)
+    bid_all(game, [7, 3])  # gia' 10 dichiarate su 7: nessun numero pareggia
+    assert game.forbidden_bid(0) is None
+    assert game.legal_bids(0) == [0, 1, 2, 3, 4, 5, 6, 7]
+
+
+def test_the_declared_total_never_matches_the_tricks_in_play():
+    """Vale in tutti i round dichiarati, buio compreso."""
+    game = make_game(n=4, mode=GameMode.LONG, seed=3)
+    checked = 0
+    while not game.is_over:
+        if game.phase is Phase.ROUND_OVER:
+            game.advance_round()
+            continue
+        spec = game.spec
+        finish_round_with_bots(game)
+        if spec.has_bidding:
+            assert sum(p.bid for p in game.players) != spec.cards
+            checked += 1
+    assert checked == 18  # 20 round meno i due A PERDERE
+
+
+def test_the_rule_can_be_switched_off():
+    game = make_game(n=3, forbid_exact_total=False)
+    bid_all(game, [3, 2])
+    assert game.forbidden_bid(0) is None
+    game.place_bid("p0", 2)
+    assert sum(p.bid for p in game.players) == 7
 
 
 # ------------------------------------------------------------------- gioco

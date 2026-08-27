@@ -110,6 +110,18 @@ def estimate_tricks(
     return total / samples
 
 
+def _nearest_legal(game: Game, player_index: int, wanted: float) -> int:
+    """La dichiarazione legale piu' vicina a quella che il bot vorrebbe fare.
+
+    Serve soprattutto all'ultimo a parlare, a cui la regola dell'impiccato
+    toglie proprio il numero che pareggerebbe il conto.
+    """
+    options = game.legal_bids(player_index)
+    if not options:
+        raise RuntimeError("nessuna dichiarazione possibile")
+    return min(options, key=lambda b: (abs(b - wanted), b))
+
+
 def choose_bid(game: Game, player_index: int, rng: random.Random | None = None) -> int:
     rng = rng or random.Random()
     player = game.players[player_index]
@@ -119,12 +131,11 @@ def choose_bid(game: Game, player_index: int, rng: random.Random | None = None) 
     if spec.blind_bidding:
         # Al buio non si vede niente: si punta sulla quota equa, con un filo di varianza.
         fair = spec.cards / game.n
-        guess = int(round(fair + rng.uniform(-0.6, 0.6)))
-        return max(0, min(spec.cards, guess))
+        return _nearest_legal(game, player_index, fair + rng.uniform(-0.6, 0.6))
 
     if level == "facile":
         options = game.legal_bids(player_index)
-        naive = max(0, min(spec.cards, int(round(spec.cards / game.n))))
+        naive = spec.cards / game.n
         pool = [b for b in options if abs(b - naive) <= 1] or options
         return rng.choice(pool)
 
@@ -132,11 +143,7 @@ def choose_bid(game: Game, player_index: int, rng: random.Random | None = None) 
     expected = estimate_tricks(
         player.hand, game.n, game.trump, unseen, _SAMPLES[level], rng
     )
-    bid = int(round(expected))
-    options = game.legal_bids(player_index)
-    if bid not in options:
-        bid = min(options, key=lambda b: (abs(b - expected), b))
-    return bid
+    return _nearest_legal(game, player_index, expected)
 
 
 # ---------------------------------------------------------------------- gioco
