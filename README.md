@@ -9,6 +9,12 @@ dove il punto non è prendere tanto, ma prendere **esattamente quanto avevi dett
 Multiplayer online (basta un link) oppure da soli contro i bot. Niente account,
 niente installazioni per chi gioca: si apre il browser e si entra con un codice a 4 lettere.
 
+### 🎴 [Si gioca qui →](https://dantonioluigi.github.io/trans-card-game/)
+
+Quella è la versione **senza server**: apri una stanza, passi il link, e le carte
+viaggiano da browser a browser. Se invece vuoi ospitarti la partita per conto tuo,
+nel repo c'è il server Python completo — vedi [Dove farlo girare](#dove-farlo-girare).
+
 ![tavolo](docs/screenshot.png)
 
 ---
@@ -98,15 +104,38 @@ docker run --rm -p 8000:8000 trans
 
 ## Dove farlo girare
 
-Serve un posto che tenga acceso un processo Python e lasci passare i WebSocket.
-**GitHub Pages non va bene:** serve solo file statici, non esegue niente. È
-l'unico caso in cui servirebbe riscrivere engine e bot in JavaScript, e anche
-allora resterebbe il gioco in solitaria contro i bot — il multiplayer richiede
-comunque un server.
+Ci sono due modi di far girare TRANS, e fanno cose diverse.
 
-Il vincolo che decide tutto: **una sola istanza**. I tavoli vivono nella memoria
-del processo, quindi due repliche dietro lo stesso indirizzo sono due partite
-scollegate. Niente autoscaling, o sessioni sticky se proprio serve.
+### Senza server, su GitHub Pages
+
+È la versione pubblicata: motore, regole e bot girano **dentro il browser**, e
+i giocatori si collegano fra loro in WebRTC. Chi apre la stanza fa da arbitro
+per tutti; il link contiene il codice del tavolo. Nessun processo da tenere
+acceso, nessun costo.
+
+Due cose che non sono gratis, e vanno sapute:
+
+- **Chi apre la stanza deve restare collegato.** Se chiude la scheda, la partita
+  finisce per tutti. Non c'è nessun altro che tenga lo stato.
+- **Il browser dell'host conosce le carte di tutti.** La UI non gliele mostra,
+  ma sono nella memoria della sua pagina: chi sa aprire la console può
+  guardarle. Fra amici è irrilevante; non è a prova di baro come il server.
+
+Serve comunque un intermediario per la presentazione fra i browser — due
+computer non si trovano da soli. TRANS usa il broker pubblico di PeerJS, che
+vede solo la stretta di mano: le carte poi viaggiano dirette.
+
+### Con il server Python
+
+Se le due limitazioni sopra danno fastidio — partite lunghe, gente che entra e
+esce, o semplicemente non fidarsi — il server è l'opzione seria: tiene lui lo
+stato, nessuno vede le carte degli altri, e chi si disconnette ritrova il suo
+posto rientrando.
+
+Serve un posto che tenga acceso un processo Python e lasci passare i WebSocket.
+Il vincolo che decide tutto è **una sola istanza**: i tavoli vivono nella
+memoria del processo, quindi due repliche dietro lo stesso indirizzo sono due
+partite scollegate. Niente autoscaling, o sessioni sticky se proprio serve.
 
 | Dove | Come | Da sapere |
 |---|---|---|
@@ -116,6 +145,7 @@ scollegate. Niente autoscaling, o sessioni sticky se proprio serve.
 | **Kubernetes** | il chart in [`helm/`](helm/trans-card-game/) | Se ne hai già uno. Il chart è già impostato per una replica sola. |
 | **Cloud Run** | `gcloud run deploy` | Funziona, ma va messo `--max-instances=1 --min-instances=1`: con lo scale-to-zero di default le partite muoiono, e con più istanze si sdoppiano. |
 | **Solo per una sera** | `cloudflared tunnel --url http://localhost:8000` | Il server gira sul tuo PC e ottieni un indirizzo pubblico temporaneo da mandare agli amici. Zero hosting. |
+| **GitHub Pages** | workflow [`pages.yml`](.github/workflows/pages.yml) | Gratis e già attivo, ma è la versione peer-to-peer descritta sopra: il server Python non ci gira. |
 
 ### Il più vicino a GitHub Pages: Render
 
@@ -195,11 +225,18 @@ server/         FastAPI: pagina + WebSocket
   room.py       tavoli, lobby, riconnessioni, turni dei bot
   main.py       endpoint HTTP e WebSocket
 web/            client, HTML/CSS/JS senza build step
-tests/          74 test su regole, engine e server
+site/           versione senza server, per GitHub Pages
+  js/engine.js  porto in JS di trans/
+  js/bots.js    porto in JS dei bot
+  js/room.js    il tavolo, dentro il browser dell'host
+  js/net-p2p.js WebRTC fra i giocatori
+  build.py      assembla site/dist da web/ + site/js
+  tests/        confronto JS↔Python e test dell'arbitro
+tests/          80 test su regole, engine e server
 helm/           chart Kubernetes
 render.yaml     blueprint Render (va in radice, lo cerca lì)
 deploy/         fly.toml, docker-compose
-.github/        ci (test, chart, client) e release su tag
+.github/        ci, release su tag, pubblicazione su Pages
 ```
 
 Tre scelte che vale la pena conoscere:
@@ -212,6 +249,30 @@ Tre scelte che vale la pena conoscere:
   anche per il proprietario finché non ha dichiarato.
 - **Lo stato dei tavoli vive in memoria.** Un riavvio azzera le partite in corso: è
   voluto, tiene il deploy a un solo processo senza database.
+- **Il client non sa con chi parla.** `web/app.js` scrive su un trasporto astratto:
+  di default un WebSocket verso il server Python, sulla versione Pages un canale
+  WebRTC verso il browser di chi ha aperto la stanza. I messaggi sono gli stessi,
+  quindi la UI è una sola e non esiste in due copie.
+
+### I due motori restano allineati
+
+Le regole sono scritte due volte — in Python e in JavaScript — ed è esattamente il
+tipo di duplicazione che marcisce in silenzio. Non è lasciata all'attenzione di chi
+modifica.
+
+`site/tests/make_fixtures.py` fa giocare al motore Python sette partite intere (da 2
+a 6 giocatori, entrambe le durate) e registra tutto: le mani distribuite a ogni round,
+ogni mossa, **le mosse che erano legali in quel momento** e i punti di ogni round.
+`site/tests/run.mjs` rigioca quelle partite in JavaScript e pretende che coincidano,
+turno per turno — oltre cinquemila confronti.
+
+In CI il file delle partite registrate viene rigenerato e confrontato con quello nel
+repo: se qualcuno cambia una regola in `trans/` senza riportarla in `site/js/`, la
+build fallisce con la differenza in mano.
+
+I bot invece non si confrontano mossa per mossa, perché usano generatori casuali
+diversi. Su duecento partite per parte danno però le stesse classifiche e le stesse
+percentuali di dichiarazioni centrate a un punto di distanza.
 
 ### Test
 
@@ -224,6 +285,14 @@ Coprono le regole (chi vince una presa, i punteggi, il calendario dei round),
 l'engine (turni, obbligo di seme, mosse illegali, partite complete da 2 a 6 giocatori)
 e il server via WebSocket (lobby, permessi dell'host, privatezza delle mani,
 riconnessione, una partita intera contro i bot).
+
+Il lato JavaScript ha i suoi:
+
+```bash
+python site/tests/make_fixtures.py   # registra le partite dal motore Python
+node site/tests/run.mjs              # il motore JS deve dare gli stessi risultati
+node site/tests/table.mjs            # arbitro P2P: permessi, mani private, partita intera
+```
 
 ---
 

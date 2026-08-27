@@ -42,12 +42,33 @@ jobs:
             --set podDisruptionBudget.enabled=true > /dev/null
 
   web:
-    name: client
+    name: client e motore JS
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: sintassi del client
         run: node --check web/app.js
+
+      - name: le partite registrate sono ancora quelle che il Python produce
+        # Se qualcuno cambia le regole in trans/ senza rigenerare le partite di
+        # riferimento, qui si vede subito: il motore JS starebbe verificando
+        # regole vecchie.
+        run: |
+          python site/tests/make_fixtures.py
+          git diff --exit-code site/tests/fixtures.json
+
+      - name: il motore JS da' gli stessi risultati di quello Python
+        run: node site/tests/run.mjs
+
+      - name: l'arbitro peer-to-peer regge una partita intera
+        run: node site/tests/table.mjs
+
+      - name: il sito statico si assembla
+        run: python site/build.py

@@ -21,7 +21,7 @@
   };
 
   const app = {
-    ws: null,
+    link: null,
     state: null,
     playerId: store.get("pid"),
     name: store.get("name"),
@@ -63,7 +63,30 @@
     return el;
   }
 
-  /* ----------------------------------------------------------- socket -- */
+  /* -------------------------------------------------------- trasporto -- */
+
+  /* La UI non sa con chi sta parlando. Di default apre un WebSocket verso il
+   * server Python; sulla versione statica (GitHub Pages) la pagina installa in
+   * window.TRANS_TRANSPORT un trasporto peer-to-peer che parla lo stesso
+   * identico protocollo. Da qui in giu' il codice e' lo stesso. */
+
+  const websocketTransport = {
+    create(handlers) {
+      const proto = location.protocol === "https:" ? "wss:" : "ws:";
+      const ws = new WebSocket(`${proto}//${location.host}/ws`);
+      ws.onopen = () => handlers.onOpen();
+      ws.onmessage = (event) => handlers.onMessage(JSON.parse(event.data));
+      ws.onclose = () => handlers.onClose();
+      return {
+        send(message) {
+          if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(message));
+        },
+        close() {
+          ws.close();
+        },
+      };
+    },
+  };
 
   function connect(room, name) {
     app.wantConnection = true;
@@ -71,38 +94,49 @@
     app.name = name || app.name;
     store.set("name", app.name);
 
-    const proto = location.protocol === "https:" ? "wss:" : "ws:";
-    const ws = new WebSocket(`${proto}//${location.host}/ws`);
-    app.ws = ws;
+    const transport = window.TRANS_TRANSPORT || websocketTransport;
+    app.link = transport.create({
+      room: app.room || null,
+      name: app.name,
+      playerId: app.playerId || null,
 
-    ws.onopen = () => {
-      app.retry = 500;
-      $("connBanner").hidden = true;
-      ws.send(JSON.stringify({
-        type: "join",
-        room: app.room || null,
-        name: app.name,
-        player_id: app.playerId || null,
-      }));
-    };
+      onOpen: () => {
+        app.retry = 500;
+        $("connBanner").hidden = true;
+        send({
+          type: "join",
+          room: app.room || null,
+          name: app.name,
+          player_id: app.playerId || null,
+        });
+      },
 
-    ws.onmessage = (event) => handleMessage(JSON.parse(event.data));
+      onMessage: handleMessage,
 
-    ws.onclose = () => {
-      app.ws = null;
-      if (!app.wantConnection) return;
-      $("connBanner").hidden = false;
-      setTimeout(() => {
-        if (app.wantConnection) connect(app.room, app.name);
-      }, app.retry);
-      app.retry = Math.min(app.retry * 2, RECONNECT_MAX);
-    };
+      onClose: (reason) => {
+        app.link = null;
+        if (!app.wantConnection) return;
+        // Alcune chiusure non hanno senso da riprovare: stanza inesistente,
+        // host che ha chiuso la scheda, partita gia' cominciata.
+        if (reason && reason.fatal) {
+          app.wantConnection = false;
+          app.state = null;
+          showScreen("home");
+          showHomeError(reason.message || "connessione chiusa");
+          toast(reason.message || "connessione chiusa");
+          return;
+        }
+        $("connBanner").hidden = false;
+        setTimeout(() => {
+          if (app.wantConnection) connect(app.room, app.name);
+        }, app.retry);
+        app.retry = Math.min(app.retry * 2, RECONNECT_MAX);
+      },
+    });
   }
 
   function send(message) {
-    if (app.ws && app.ws.readyState === WebSocket.OPEN) {
-      app.ws.send(JSON.stringify(message));
-    }
+    if (app.link) app.link.send(message);
   }
 
   function handleMessage(msg) {
@@ -188,6 +222,11 @@
       b.classList.toggle("active", b.dataset.mode === state.mode);
       b.disabled = !state.is_host;
     });
+
+    // Presente solo nella versione peer-to-peer: la partita vive nella scheda
+    // dell'host, e va detto a chi la sta tenendo aperta.
+    const hostNote = $("p2pHostNote");
+    if (hostNote) hostNote.hidden = !state.is_host;
 
     const enough = state.seats.length >= state.min_players;
     $("btnStart").disabled = !state.is_host || !enough;
@@ -541,8 +580,8 @@
 
     $("btnLeave").onclick = () => {
       app.wantConnection = false;
-      if (app.ws) app.ws.close();
-      app.ws = null;
+      if (app.link) app.link.close();
+      app.link = null;
       app.state = null;
       app.room = "";
       history.replaceState(null, "", location.pathname);
