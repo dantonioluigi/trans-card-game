@@ -37,6 +37,10 @@ partendo da sinistra del mazziere.
 Dichiarare tanto paga, ma sbagliare di una sola presa azzera quasi tutto: dire 4 e
 farne 4 vale 30, dire 4 e farne 3 ne vale 3.
 
+![la dichiarazione](docs/dichiarazione.png)
+
+Si dichiara guardando le proprie carte — tranne nel round BUIO, dove restano coperte.
+
 **I round.** Si scende di mano in mano — 7 carte a testa, poi 6, 5, 4, 3, 2, 1 —
 e poi arrivano i tre round speciali, tutti da 7 carte:
 
