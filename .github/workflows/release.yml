@@ -1,0 +1,139 @@
+name: release
+
+# Parte da sola quando pushi un tag vX.Y.Z.
+#   git tag v1.0.0 && git push origin v1.0.0
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"   # pre-release: v1.0.0-rc1
+
+permissions:
+  contents: write   # per creare la Release
+  packages: write   # per pubblicare immagine e chart su GHCR
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  # image e chart non dipendono l'uno dall'altro: partono insieme.
+  image:
+    name: immagine docker
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: login su ghcr
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: tag e label
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ !contains(github.ref_name, '-') }}
+
+      - name: build e push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  chart:
+    name: helm chart
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+
+      - name: versione dal tag
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: allinea Chart.yaml al tag
+        run: |
+          version='${{ steps.version.outputs.value }}'
+          sed -i "s/^version: .*/version: ${version}/" helm/trans-card-game/Chart.yaml
+          sed -i "s/^appVersion: .*/appVersion: \"${version}\"/" helm/trans-card-game/Chart.yaml
+          grep -E "^(version|appVersion):" helm/trans-card-game/Chart.yaml
+
+      - run: helm lint helm/trans-card-game
+
+      - name: package
+        run: helm package helm/trans-card-game --destination dist/
+
+      - name: login su ghcr
+        run: |
+          echo '${{ secrets.GITHUB_TOKEN }}' \
+            | helm registry login ${{ env.REGISTRY }} \
+                --username '${{ github.actor }}' --password-stdin
+
+      - name: push del chart come artefatto OCI
+        run: |
+          helm push dist/trans-card-game-${{ steps.version.outputs.value }}.tgz \
+            oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/charts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: helm-chart
+          path: dist/*.tgz
+          if-no-files-found: error
+
+  release:
+    name: github release
+    needs: [image, chart]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: helm-chart
+          path: dist/
+
+      - name: versione dal tag
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: crea la release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: dist/*.tgz
+          body: |
+            ## Come si usa
+
+            Immagine:
+
+            ```bash
+            docker run --rm -p 8000:8000 ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ```
+
+            Chart:
+
+            ```bash
+            helm install trans oci://ghcr.io/${{ github.repository_owner }}/charts/trans-card-game \
+              --version ${{ steps.version.outputs.value }}
+            ```

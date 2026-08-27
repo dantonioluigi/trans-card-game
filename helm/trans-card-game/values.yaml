@@ -1,0 +1,95 @@
+# I tavoli vivono nella memoria del processo: due repliche significano due
+# insiemi di tavoli scollegati, e un giocatore che riconnette puo' finire
+# sul pod sbagliato. Tienilo a 1 finche' non c'e' uno stato condiviso.
+replicaCount: 1
+
+image:
+  repository: ghcr.io/dantonioluigi/trans-card-game
+  # vuoto = usa .Chart.AppVersion
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: false
+  annotations: {}
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  annotations: {}
+
+ingress:
+  enabled: false
+  className: nginx
+  # I WebSocket restano aperti per tutta la partita: senza timeout lunghi
+  # l'ingress chiude la connessione a meta' mano.
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  hosts:
+    - host: trans.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+env: {}
+  # TRANS_LOG_LEVEL: info
+
+extraEnvFrom: []
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 96Mi
+  limits:
+    cpu: "1"
+    memory: 384Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 20
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 2
+  periodSeconds: 10
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+podAnnotations: {}
+podLabels: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []
+
+# Un riavvio azzera le partite in corso: meglio non farlo a meta' mano.
+terminationGracePeriodSeconds: 60
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1

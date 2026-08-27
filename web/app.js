@@ -52,6 +52,11 @@
     return el;
   }
 
+  function suitHtml(code) {
+    const symbol = SUITS[code] || "?";
+    return `<span class="suit${RED.has(code) ? " red" : ""}">${symbol}</span>`;
+  }
+
   function backEl() {
     const el = document.createElement("div");
     el.className = "card back";
@@ -137,7 +142,7 @@
   }
 
   function hideOverlays() {
-    ["bidOverlay", "resultOverlay", "endOverlay"].forEach((id) => { $(id).hidden = true; });
+    ["bidPanel", "resultOverlay", "endOverlay"].forEach((id) => { $(id).hidden = true; });
   }
 
   /* --- lobby --- */
@@ -145,7 +150,7 @@
   function renderLobby(state) {
     $("chipRoom").textContent = "Tavolo " + state.room;
     $("chipRound").textContent = state.mode_label;
-    $("chipTrump").textContent = "Briscola " + SUITS.H;
+    $("chipTrump").innerHTML = "Briscola " + suitHtml("H");
     $("lobbyCode").textContent = state.room;
 
     const list = $("seatList");
@@ -214,7 +219,7 @@
     $("chipRoom").textContent = "Tavolo " + state.room;
     $("chipRound").textContent = `Round ${g.round.number}/${g.round.total} · ${g.round.title}`;
     const trumpChip = $("chipTrump");
-    trumpChip.textContent = g.round.trump ? "Briscola " + SUITS[g.round.trump] : "Senza briscola";
+    trumpChip.innerHTML = g.round.trump ? "Briscola " + suitHtml(g.round.trump) : "Senza briscola";
     trumpChip.classList.toggle("hot", !g.round.trump);
 
     renderSeats(g, me);
@@ -340,12 +345,16 @@
     if (g.phase === "round_over") return "Round concluso.";
     const actor = g.players.find((p) => p.is_turn);
     if (g.phase === "bidding") {
-      return myTurnToBid(g)
-        ? "<b>Tocca a te dichiarare.</b>"
-        : `In attesa della dichiarazione di <b>${escapeHtml(actor ? actor.name : "…")}</b>.`;
+      if (!myTurnToBid(g)) {
+        return `In attesa della dichiarazione di <b>${escapeHtml(actor ? actor.name : "…")}</b>.`;
+      }
+      // Il pannello sopra dice gia' "quante prese?": qui ricordiamo la briscola.
+      return g.round.trump
+        ? `Queste sono le tue carte. Briscola ${suitHtml(g.round.trump)}.`
+        : "Queste sono le tue carte. <b>Nessuna briscola</b> in questo round.";
     }
     if (myTurn) {
-      const lead = g.lead_suit ? ` Seme di uscita: <b>${SUITS[g.lead_suit]}</b>.` : " Esci tu.";
+      const lead = g.lead_suit ? ` Seme di uscita: ${suitHtml(g.lead_suit)}.` : " Esci tu.";
       return "<b>Tocca a te.</b>" + lead;
     }
     return `Gioca <b>${escapeHtml(actor ? actor.name : "…")}</b>.`;
@@ -394,7 +403,7 @@
 
     // Dichiarazione
     const bidding = myTurnToBid(g);
-    $("bidOverlay").hidden = !bidding;
+    $("bidPanel").hidden = !bidding;
     if (bidding) {
       $("bidTitle").textContent = g.round.blind
         ? "Al buio: quante prese?"

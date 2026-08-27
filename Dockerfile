@@ -10,6 +10,9 @@ COPY trans/ trans/
 COPY server/ server/
 COPY web/ web/
 
+# Nessun motivo per girare da root: il chart si aspetta questo uid.
+USER 10001
+
 EXPOSE 8000
 ENV TRANS_HOST=0.0.0.0 TRANS_PORT=8000
 CMD ["python", "-m", "server.main"]

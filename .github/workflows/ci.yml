@@ -1,4 +1,4 @@
-name: test
+name: ci
 
 on:
   push:
@@ -6,9 +6,12 @@ on:
   pull_request:
 
 jobs:
-  pytest:
+  # I tre job girano in parallelo: nessuno dipende dagli altri.
+  test:
+    name: test
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python: ["3.10", "3.12"]
     steps:
@@ -16,7 +19,35 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+          cache: pip
       - run: pip install -r requirements-dev.txt
       - run: python -m pytest
       - name: partite di prova fra bot
         run: python -m trans.simulate --games 20
+
+  chart:
+    name: helm chart
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.2
+      - run: helm lint helm/trans-card-game
+      - name: il chart deve renderizzare anche con l'ingress acceso
+        run: |
+          helm template trans helm/trans-card-game > /dev/null
+          helm template trans helm/trans-card-game \
+            --set ingress.enabled=true \
+            --set podDisruptionBudget.enabled=true > /dev/null
+
+  web:
+    name: client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: sintassi del client
+        run: node --check web/app.js

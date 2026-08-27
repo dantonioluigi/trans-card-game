@@ -286,6 +286,8 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
   min-height: 1.4em; margin-bottom: .35rem;
 }
 .hand-status b { color: var(--gold); }
+.suit { color: var(--ink); font-weight: 700; }
+.suit.red { color: var(--red); }
 
 .hand { display: flex; justify-content: center; gap: .35rem; flex-wrap: wrap; min-height: 1px; }
 .hand .card {
@@ -296,6 +298,25 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 .hand .card.playable { cursor: pointer; }
 .hand .card.playable:hover { transform: translateY(-12px); box-shadow: 0 12px 24px rgba(0, 0, 0, .5); }
 .hand .card.blocked { opacity: .42; filter: saturate(.5); }
+
+/* --- dichiarazione --- */
+
+.bid-panel {
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem 1.5rem; flex-wrap: wrap;
+  margin: 0 auto .6rem; padding: .7rem 1.1rem;
+  width: fit-content; max-width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--gold-dim);
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px rgba(227, 195, 119, .1), var(--shadow);
+  animation: rise .2s ease-out;
+}
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+
+.bid-copy { display: flex; flex-direction: column; gap: .15rem; }
+.bid-title { font-weight: 650; font-size: 1rem; color: var(--gold); }
+.bid-sub { font-size: .78rem; color: var(--ink-dim); }
 
 /* ------------------------------------------------------------- sidebar -- */
 
@@ -349,11 +370,14 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 
 .bid-grid { display: flex; gap: .45rem; flex-wrap: wrap; justify-content: center; }
 .bid-grid button {
-  width: 3rem; height: 3rem; font-size: 1.15rem; font-weight: 700;
+  width: 2.8rem; height: 2.8rem; font-size: 1.1rem; font-weight: 700;
   border-radius: 10px; border: 1px solid var(--panel-line);
   background: var(--bg-soft); color: var(--ink);
+  transition: transform .1s ease, border-color .15s, color .15s;
 }
-.bid-grid button:hover { border-color: var(--gold); color: var(--gold); }
+.bid-grid button:hover {
+  border-color: var(--gold); color: var(--gold); transform: translateY(-2px);
+}
 
 .result-table { width: 100%; border-collapse: collapse; margin: .6rem 0 1rem; font-size: .9rem; }
 .result-table th {
@@ -395,6 +419,8 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
   .log-card { flex: 1 1 220px; min-width: 200px; }
   .chat-form { display: none; }
   .player-seat { width: clamp(72px, 22vw, 110px); font-size: .72rem; padding: .3rem; }
+  .bid-panel { gap: .4rem .8rem; padding: .5rem .7rem; }
+  .bid-copy { align-items: center; text-align: center; }
 }
 
 @media (max-width: 560px) {

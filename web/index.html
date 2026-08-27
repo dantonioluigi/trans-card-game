@@ -95,6 +95,15 @@
       </div>
 
       <div class="hand-area">
+        <!-- La dichiarazione sta qui, non in un overlay: devi poter guardare
+             le tue carte mentre decidi quante prese farai. -->
+        <div class="bid-panel" id="bidPanel" hidden>
+          <div class="bid-copy">
+            <span class="bid-title" id="bidTitle">Quante prese farai?</span>
+            <span class="bid-sub" id="bidSub"></span>
+          </div>
+          <div class="bid-grid" id="bidGrid"></div>
+        </div>
         <div class="hand-status" id="handStatus"></div>
         <div class="hand" id="hand"></div>
       </div>
@@ -119,14 +128,6 @@
 </main>
 
 <!-- ---------------------------------------------------------- OVERLAYS -->
-<div class="overlay" id="bidOverlay" hidden>
-  <div class="dialog">
-    <h2 id="bidTitle">Quante prese farai?</h2>
-    <p class="dialog-sub" id="bidSub"></p>
-    <div class="bid-grid" id="bidGrid"></div>
-  </div>
-</div>
-
 <div class="overlay" id="resultOverlay" hidden>
   <div class="dialog wide-dialog">
     <h2 id="resultTitle">Fine round</h2>

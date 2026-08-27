@@ -1,0 +1,17 @@
+apiVersion: v2
+name: trans-card-game
+description: TRANS — gioco di carte a prese e dichiarazioni, multiplayer via WebSocket
+type: application
+# version e appVersion vengono riscritte dalla pipeline di release a partire dal tag.
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - game
+  - card-game
+  - websocket
+home: https://github.com/dantonioluigi/trans-card-game
+sources:
+  - https://github.com/dantonioluigi/trans-card-game
+maintainers:
+  - name: Luigi D'Antonio
+    email: dantonioluigi98@icloud.com

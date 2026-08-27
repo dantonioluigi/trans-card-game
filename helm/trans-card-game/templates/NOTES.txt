@@ -1,0 +1,26 @@
+TRANS è installato come {{ include "trans.fullname" . }} ({{ include "trans.image" . }}).
+
+{{- if .Values.ingress.enabled }}
+
+Ci si gioca da:
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else }}
+
+Nessun ingress attivo. Per provarlo in locale:
+
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "trans.fullname" . }} 8000:{{ .Values.service.port }}
+
+poi apri http://localhost:8000
+{{- end }}
+
+{{- if gt (int .Values.replicaCount) 1 }}
+
+ATTENZIONE: replicaCount è {{ .Values.replicaCount }}. I tavoli vivono nella
+memoria del processo, quindi ogni replica ha i suoi: due giocatori che entrano
+con lo stesso codice possono finire su pod diversi e non vedersi. Usa una sola
+replica, oppure metti davanti una sessione sticky sull'ingress.
+{{- end }}
