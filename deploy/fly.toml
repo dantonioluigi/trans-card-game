@@ -1,0 +1,36 @@
+# Fly.io — una sola macchina, sempre accesa.
+#
+#   fly launch --copy-config --config deploy/fly.toml --no-deploy
+#   fly deploy --config deploy/fly.toml
+#
+# auto_stop_machines resta false apposta: se Fly spegne la macchina quando non
+# c'e' traffico, i tavoli in memoria spariscono con lei. E la macchina deve
+# restare UNA (`fly scale count 1`): due significherebbero due partite diverse
+# dietro lo stesso indirizzo.
+
+app = "trans-card-game"
+primary_region = "fra"   # fly launch propone la regione piu' vicina a te
+
+[build]
+  dockerfile = "../Dockerfile"
+
+[env]
+  TRANS_LOG_LEVEL = "info"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

@@ -61,6 +61,22 @@ def state_until(ws, predicate):
 # ------------------------------------------------------------------- lobby
 
 
+def test_port_comes_from_TRANS_PORT_then_PORT_then_the_default(monkeypatch):
+    from server.main import listen_port
+
+    monkeypatch.delenv("TRANS_PORT", raising=False)
+    monkeypatch.delenv("PORT", raising=False)
+    assert listen_port() == 8000
+
+    # Gli host tipo Fly o Render passano solo PORT.
+    monkeypatch.setenv("PORT", "10000")
+    assert listen_port() == 10000
+
+    # Se ci sono entrambe vince la nostra.
+    monkeypatch.setenv("TRANS_PORT", "8123")
+    assert listen_port() == 8123
+
+
 def test_health_and_index_are_served(client):
     assert client.get("/health").json()["ok"] is True
     page = client.get("/")

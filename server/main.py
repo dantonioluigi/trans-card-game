@@ -142,15 +142,33 @@ async def websocket_endpoint(ws: WebSocket) -> None:
             registry.sweep()
 
 
+def listen_port() -> int:
+    """Porta di ascolto.
+
+    ``TRANS_PORT`` vince, ma quasi tutti gli host (Fly, Render, Cloud Run,
+    Heroku...) passano la porta in ``PORT``: senza questo fallback il processo
+    ascolta sulla 8000 e la piattaforma lo dichiara morto.
+    """
+    for name in ("TRANS_PORT", "PORT"):
+        value = os.environ.get(name)
+        if value:
+            return int(value)
+    return 8000
+
+
 def main() -> None:
     import uvicorn
 
     uvicorn.run(
         "server.main:app",
         host=os.environ.get("TRANS_HOST", "0.0.0.0"),
-        port=int(os.environ.get("TRANS_PORT", "8000")),
+        port=listen_port(),
         reload=bool(os.environ.get("TRANS_RELOAD")),
         log_level=os.environ.get("TRANS_LOG_LEVEL", "info"),
+        # Dietro il proxy dell'host: senza, uvicorn non si fida di
+        # X-Forwarded-Proto e i log mostrano tutto come http.
+        proxy_headers=True,
+        forwarded_allow_ips=os.environ.get("TRANS_FORWARDED_IPS", "*"),
     )
 
 

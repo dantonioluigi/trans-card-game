@@ -1,0 +1,26 @@
+# Per un VPS tuo, o per farlo girare in casa.
+#
+#   docker compose -f deploy/docker-compose.yml up -d
+#
+# Di default costruisce dal sorgente. Per usare l'immagine gia' pubblicata
+# dalla pipeline, commenta `build` e togli il commento a `image`.
+services:
+  trans:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    # image: ghcr.io/dantonioluigi/trans-card-game:latest
+    container_name: trans
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      TRANS_LOG_LEVEL: info
+    read_only: true
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

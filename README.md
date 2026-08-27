@@ -96,6 +96,35 @@ docker run --rm -p 8000:8000 trans
 
 ---
 
+## Dove farlo girare
+
+Serve un posto che tenga acceso un processo Python e lasci passare i WebSocket.
+**GitHub Pages non va bene:** serve solo file statici, non esegue niente. È
+l'unico caso in cui servirebbe riscrivere engine e bot in JavaScript, e anche
+allora resterebbe il gioco in solitaria contro i bot — il multiplayer richiede
+comunque un server.
+
+Il vincolo che decide tutto: **una sola istanza**. I tavoli vivono nella memoria
+del processo, quindi due repliche dietro lo stesso indirizzo sono due partite
+scollegate. Niente autoscaling, o sessioni sticky se proprio serve.
+
+| Dove | Come | Da sapere |
+|---|---|---|
+| **Fly.io** | `fly deploy --config deploy/fly.toml` | La scelta più semplice: gira l'immagine Docker così com'è. [`deploy/fly.toml`](deploy/fly.toml) tiene la macchina sempre accesa (`auto_stop_machines = false`) perché spegnerla cancella le partite in corso. Ricordati `fly scale count 1`. |
+| **Render** | Blueprint da [`deploy/render.yaml`](deploy/render.yaml) | C'è un piano gratuito, ma il servizio si addormenta dopo ~15 minuti di inattività e il risveglio richiede una trentina di secondi. Ottimo per far provare il gioco, scomodo per una partita organizzata. |
+| **Un VPS** | [`deploy/docker-compose.yml`](deploy/docker-compose.yml) | Cinque euro al mese di Hetzner o simili e non ci pensi più. Metti un reverse proxy davanti (Caddy fa HTTPS da solo) e alza i timeout, se no taglia i WebSocket. |
+| **Kubernetes** | il chart in [`helm/`](helm/trans-card-game/) | Se ne hai già uno. Il chart è già impostato per una replica sola. |
+| **Cloud Run** | `gcloud run deploy` | Funziona, ma va messo `--max-instances=1 --min-instances=1`: con lo scale-to-zero di default le partite muoiono, e con più istanze si sdoppiano. |
+| **Solo per una sera** | `cloudflared tunnel --url http://localhost:8000` | Il server gira sul tuo PC e ottieni un indirizzo pubblico temporaneo da mandare agli amici. Zero hosting. |
+
+I piani gratuiti cambiano spesso: prima di sceglierne uno controlla le condizioni
+del momento.
+
+Qualunque host passi la porta in `PORT`, il server la prende da lì; `TRANS_PORT`
+ha comunque la precedenza.
+
+---
+
 ## I bot
 
 Tre livelli, si scelgono uno per uno quando si aggiungono al tavolo.
@@ -148,6 +177,7 @@ server/         FastAPI: pagina + WebSocket
 web/            client, HTML/CSS/JS senza build step
 tests/          74 test su regole, engine e server
 helm/           chart Kubernetes
+deploy/         fly.toml, render.yaml, docker-compose
 .github/        ci (test, chart, client) e release su tag
 ```
 
