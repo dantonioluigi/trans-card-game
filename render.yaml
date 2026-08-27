@@ -1,0 +1,20 @@
+# Render Blueprint. DEVE stare nella radice del repo: e' li' che Render lo cerca.
+#
+# Dalla dashboard: New → Blueprint → scegli questo repo → Apply.
+# Da quel momento ogni push su main viene ridistribuito da solo.
+#
+# Sul piano free il servizio si spegne dopo circa un quarto d'ora senza
+# traffico e la prima richiesta dopo lo rimette in piedi in una trentina di
+# secondi. Chi apre il link aspetta; le partite lasciate a meta' non tornano.
+services:
+  - type: web
+    name: trans-card-game
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: TRANS_LOG_LEVEL
+        value: info

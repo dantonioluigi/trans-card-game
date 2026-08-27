@@ -111,11 +111,31 @@ scollegate. Niente autoscaling, o sessioni sticky se proprio serve.
 | Dove | Come | Da sapere |
 |---|---|---|
 | **Fly.io** | `fly deploy --config deploy/fly.toml` | La scelta più semplice: gira l'immagine Docker così com'è. [`deploy/fly.toml`](deploy/fly.toml) tiene la macchina sempre accesa (`auto_stop_machines = false`) perché spegnerla cancella le partite in corso. Ricordati `fly scale count 1`. |
-| **Render** | Blueprint da [`deploy/render.yaml`](deploy/render.yaml) | C'è un piano gratuito, ma il servizio si addormenta dopo ~15 minuti di inattività e il risveglio richiede una trentina di secondi. Ottimo per far provare il gioco, scomodo per una partita organizzata. |
+| **Render** | Blueprint da [`render.yaml`](render.yaml) | **Il più simile a GitHub Pages:** colleghi il repo, ogni push ridistribuisce, l'URL è gratuito. Sul piano free però il servizio si spegne dopo ~15 minuti di inattività e il risveglio richiede una trentina di secondi. |
 | **Un VPS** | [`deploy/docker-compose.yml`](deploy/docker-compose.yml) | Cinque euro al mese di Hetzner o simili e non ci pensi più. Metti un reverse proxy davanti (Caddy fa HTTPS da solo) e alza i timeout, se no taglia i WebSocket. |
 | **Kubernetes** | il chart in [`helm/`](helm/trans-card-game/) | Se ne hai già uno. Il chart è già impostato per una replica sola. |
 | **Cloud Run** | `gcloud run deploy` | Funziona, ma va messo `--max-instances=1 --min-instances=1`: con lo scale-to-zero di default le partite muoiono, e con più istanze si sdoppiano. |
 | **Solo per una sera** | `cloudflared tunnel --url http://localhost:8000` | Il server gira sul tuo PC e ottieni un indirizzo pubblico temporaneo da mandare agli amici. Zero hosting. |
+
+### Il più vicino a GitHub Pages: Render
+
+Se quello che cerchi è esattamente l'esperienza di Pages — colleghi il repo,
+pushi, il sito è online e non paghi — la risposta è Render:
+
+1. Vai su [render.com](https://render.com) e collega l'account GitHub.
+2. **New → Blueprint**, scegli `trans-card-game`, **Apply**. Il file
+   [`render.yaml`](render.yaml) in radice dice già tutto: build da `Dockerfile`,
+   health check su `/health`, piano free.
+3. Dopo qualche minuto ti trovi l'indirizzo `https://trans-card-game.onrender.com`
+   (il nome esatto lo assegna Render, potrebbe avere un suffisso).
+4. Da lì in poi ogni push su `main` viene ridistribuito da solo, come Pages.
+
+La differenza con Pages sta nel prezzo del "gratis": il servizio si addormenta
+dopo un quarto d'ora senza traffico. Chi apre il link dopo una pausa aspetta una
+trentina di secondi che il container riparta, e le partite lasciate a metà non
+tornano indietro. Per far provare il gioco a qualcuno va benissimo; se volete
+organizzare una serata, accendetelo qualche minuto prima — oppure prendete il
+piano a pagamento più basso, o Fly, dove la macchina resta accesa.
 
 I piani gratuiti cambiano spesso: prima di sceglierne uno controlla le condizioni
 del momento.
@@ -177,7 +197,8 @@ server/         FastAPI: pagina + WebSocket
 web/            client, HTML/CSS/JS senza build step
 tests/          74 test su regole, engine e server
 helm/           chart Kubernetes
-deploy/         fly.toml, render.yaml, docker-compose
+render.yaml     blueprint Render (va in radice, lo cerca lì)
+deploy/         fly.toml, docker-compose
 .github/        ci (test, chart, client) e release su tag
 ```
 
