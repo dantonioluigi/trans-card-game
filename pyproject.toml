@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trans-card-game"
+version = "1.0.0"
+description = "TRANS — gioco di carte a prese e dichiarazioni, multiplayer online o contro i bot"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Luigi D'Antonio" }]
+keywords = ["carte", "card-game", "multiplayer", "websocket", "bot"]
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27"]
+
+[project.scripts]
+trans-server = "server.main:main"
+
+[tool.setuptools]
+packages = ["trans", "server"]
+
+[tool.setuptools.package-data]
+server = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

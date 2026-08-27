@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TRANS — il gioco di carte</title>
+  <meta name="description" content="TRANS: gioco di carte a prese e scommesse, online o contro i bot.">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♥</text></svg>">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand" id="brand">TRANS<span class="pip">♥&#xFE0E;</span></div>
+  <div class="topbar-info" id="topbarInfo" hidden>
+    <span class="chip" id="chipRoom"></span>
+    <span class="chip" id="chipRound"></span>
+    <span class="chip" id="chipTrump"></span>
+  </div>
+  <div class="topbar-actions">
+    <button class="ghost" id="btnRules" type="button">Regole</button>
+    <button class="ghost" id="btnLeave" type="button" hidden>Esci</button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ------------------------------------------------------------- HOME -->
+  <section id="screenHome" class="screen home">
+    <div class="hero">
+      <h1>TRANS</h1>
+      <p class="tagline">Dichiara quante prese farai. Sbagliare costa.</p>
+    </div>
+
+    <div class="panels">
+      <div class="panel">
+        <h2>Nuovo tavolo</h2>
+        <label for="nameNew">Il tuo nome</label>
+        <input id="nameNew" maxlength="16" placeholder="Luigi" autocomplete="nickname">
+        <button class="primary" id="btnCreate" type="button">Crea tavolo</button>
+        <p class="hint">Ricevi un codice a 4 lettere da passare agli altri. Puoi riempire i posti liberi con i bot.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Entra in un tavolo</h2>
+        <label for="nameJoin">Il tuo nome</label>
+        <input id="nameJoin" maxlength="16" placeholder="Luigi" autocomplete="nickname">
+        <label for="codeJoin">Codice tavolo</label>
+        <input id="codeJoin" maxlength="4" placeholder="ABCD" class="code-input" autocapitalize="characters">
+        <button class="primary" id="btnJoin" type="button">Entra</button>
+      </div>
+    </div>
+    <p class="error" id="homeError" hidden></p>
+  </section>
+
+  <!-- ------------------------------------------------------------ LOBBY -->
+  <section id="screenLobby" class="screen lobby" hidden>
+    <div class="panel wide">
+      <h2>Tavolo <span class="code-badge" id="lobbyCode">----</span></h2>
+      <p class="hint">Condividi il codice, oppure <button class="linklike" id="btnCopyLink" type="button">copia il link d'invito</button>.</p>
+
+      <ul class="seats" id="seatList"></ul>
+
+      <div class="lobby-controls">
+        <div class="control-group" id="botControls">
+          <span class="label">Aggiungi bot</span>
+          <div class="btn-row">
+            <button class="ghost" data-level="facile" type="button">facile</button>
+            <button class="ghost" data-level="normale" type="button">normale</button>
+            <button class="ghost" data-level="esperto" type="button">esperto</button>
+          </div>
+        </div>
+
+        <div class="control-group" id="modeControls">
+          <span class="label">Durata</span>
+          <div class="btn-row">
+            <button class="ghost mode" data-mode="fast" type="button">Veloce · 10 round</button>
+            <button class="ghost mode" data-mode="long" type="button">Lunga · 20 round</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="primary big" id="btnStart" type="button">Inizia la partita</button>
+      <p class="hint" id="lobbyHint"></p>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- GAME -->
+  <section id="screenGame" class="screen game" hidden>
+    <div class="table-area">
+      <div class="felt">
+        <div class="seats-ring" id="seatsRing"></div>
+        <div class="trick" id="trickArea"></div>
+        <div class="table-center" id="tableCenter"></div>
+      </div>
+
+      <div class="hand-area">
+        <div class="hand-status" id="handStatus"></div>
+        <div class="hand" id="hand"></div>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="score-card">
+        <h3>Punteggio</h3>
+        <table class="scores" id="scoreTable"></table>
+      </div>
+      <div class="log-card">
+        <h3>Diario</h3>
+        <div class="log" id="log"></div>
+      </div>
+      <form class="chat-form" id="chatForm">
+        <input id="chatInput" maxlength="200" placeholder="Scrivi al tavolo…" autocomplete="off">
+        <button class="ghost" type="submit">Invia</button>
+      </form>
+    </aside>
+  </section>
+
+</main>
+
+<!-- ---------------------------------------------------------- OVERLAYS -->
+<div class="overlay" id="bidOverlay" hidden>
+  <div class="dialog">
+    <h2 id="bidTitle">Quante prese farai?</h2>
+    <p class="dialog-sub" id="bidSub"></p>
+    <div class="bid-grid" id="bidGrid"></div>
+  </div>
+</div>
+
+<div class="overlay" id="resultOverlay" hidden>
+  <div class="dialog wide-dialog">
+    <h2 id="resultTitle">Fine round</h2>
+    <table class="result-table" id="resultTable"></table>
+    <button class="primary" id="btnNextRound" type="button">Prossimo round</button>
+    <p class="hint" id="resultHint"></p>
+  </div>
+</div>
+
+<div class="overlay" id="endOverlay" hidden>
+  <div class="dialog wide-dialog">
+    <h2>Partita finita</h2>
+    <p class="winner" id="endWinner"></p>
+    <table class="result-table" id="endTable"></table>
+    <button class="primary" id="btnNewGame" type="button">Torna alla lobby</button>
+  </div>
+</div>
+
+<div class="overlay" id="rulesOverlay" hidden>
+  <div class="dialog wide-dialog scrollable">
+    <h2>Le regole</h2>
+    <div class="rules-body">
+      <h3>Il mazzo</h3>
+      <p>52 carte francesi, niente jolly. Valori dal 2 all'asso: <b>2 &lt; 3 &lt; … &lt; 10 &lt; J &lt; Q &lt; K &lt; A</b>. La briscola è sempre <b class="red">cuori ♥&#xFE0E;</b>.</p>
+
+      <h3>La presa</h3>
+      <p>Chi esce sceglie il seme. <b>Sei obbligato a rispondere a quel seme</b> se ce l'hai; se non ce l'hai giochi quello che vuoi, briscola compresa. Vince la briscola più alta, altrimenti la carta più alta del seme di uscita. Chi prende esce nella presa successiva.</p>
+
+      <h3>La scommessa</h3>
+      <p>Prima di giocare, ognuno dichiara quante prese farà.</p>
+      <ul>
+        <li><b>Dichiarazione centrata:</b> 10 punti + 5 per ogni presa dichiarata. Dici 0 e fai 0 → <b>10</b>. Dici 1 e fai 1 → <b>15</b>. Dici 2 e fai 2 → <b>20</b>, e così via.</li>
+        <li><b>Dichiarazione sbagliata:</b> 1 solo punto per ogni presa fatta.</li>
+      </ul>
+
+      <h3>I round</h3>
+      <p>Si scende: 7 carte a testa, poi 6, 5, 4, 3, 2, 1. Poi i tre round speciali, da 7 carte:</p>
+      <ul>
+        <li><b>NO BRISCOLA</b> — non c'è briscola, vince sempre la carta più alta del seme di uscita.</li>
+        <li><b>BUIO</b> — scommetti <i>senza guardare le carte</i>. Le vedi solo dopo che tutti hanno dichiarato.</li>
+        <li><b>A PERDERE</b> — non si scommette: ogni presa che incassi vale <b class="red">−5 punti</b>.</li>
+      </ul>
+      <p><b>Partita veloce:</b> 10 round (7→1 più i tre speciali).<br>
+         <b>Partita lunga:</b> 20 round (la veloce, poi la risalita 1→7 e di nuovo i tre speciali).</p>
+      <p>Vince chi ha più punti alla fine.</p>
+    </div>
+    <button class="primary" id="btnCloseRules" type="button">Chiudi</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<div class="connection" id="connBanner" hidden>Connessione persa — riprovo…</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
