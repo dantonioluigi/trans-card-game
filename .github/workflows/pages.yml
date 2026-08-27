@@ -32,6 +32,11 @@ jobs:
       - name: assembla il sito
         run: python site/build.py
       - uses: actions/configure-pages@v5
+        # Alla prima esecuzione Pages sul repo non esiste ancora e questo passo
+        # fallirebbe: enablement lo fa creare al workflow, senza passare dalle
+        # impostazioni a mano.
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist
