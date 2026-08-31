@@ -31,12 +31,11 @@ jobs:
           python-version: "3.12"
       - name: assembla il sito
         run: python site/build.py
+      # Niente enablement qui. Creando il sito da solo lo faceva nascere in
+      # modalita' "Deploy from a branch", dove GitHub passa il repo dentro
+      # Jekyll e ignora l'artefatto di questo workflow. La sorgente si mette su
+      # "GitHub Actions" nelle impostazioni del repo, una volta sola.
       - uses: actions/configure-pages@v5
-        # Alla prima esecuzione Pages sul repo non esiste ancora e questo passo
-        # fallirebbe: enablement lo fa creare al workflow, senza passare dalle
-        # impostazioni a mano.
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist
