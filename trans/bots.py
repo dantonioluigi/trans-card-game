@@ -149,12 +149,30 @@ def choose_bid(game: Game, player_index: int, rng: random.Random | None = None) 
 # ---------------------------------------------------------------------- gioco
 
 
+def _moon_is_on(game: Game, player_index: int) -> bool:
+    """A perdere, prendere tutte le prese vale +15 invece di -5 a presa.
+
+    Ci si prova solo a colpo sicuro: bisogna non averne ancora persa una e
+    avere in mano solo carte che nessuno puo' battere. Senza questo controllo
+    il bot, a sei prese su sette, giocherebbe per perdere l'ultima e si
+    porterebbe a casa -30 invece di +15.
+    """
+    player = game.players[player_index]
+    if not player.hand:
+        return False
+    played = game.spec.cards - len(player.hand)
+    if player.tricks != played:
+        return False  # una presa gia' persa: la luna e' sfumata
+    level = player.bot_level if player.bot_level in LEVELS else "normale"
+    return all(_is_safe(card, game, player_index, level) for card in player.hand)
+
+
 def _wants_trick(game: Game, player_index: int) -> bool:
     """Se al bot conviene prendere questa presa."""
     spec = game.spec
     player = game.players[player_index]
     if spec.kind is RoundKind.MISERE:
-        return False
+        return _moon_is_on(game, player_index)
     if player.bid is None:
         return False
     needed = player.bid - player.tricks

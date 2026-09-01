@@ -118,6 +118,7 @@ export const HIT_BASE = 10;
 export const HIT_PER_TRICK = 5;
 export const MISS_PER_TRICK = 1;
 export const MISERE_PER_TRICK = -5;
+export const MISERE_SWEEP_BONUS = 15;
 
 export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 6;
@@ -156,11 +157,18 @@ export const MODE_LABELS = {
 };
 
 /**
- * A PERDERE: -5 per presa. Dichiarazione centrata: 10 + 5 per presa dichiarata.
- * Dichiarazione sbagliata: 1 punto per presa fatta.
+ * A PERDERE: -5 per presa, ma chi le prende tutte ribalta il round e incassa
+ * +15. Dichiarazione centrata: 10 + 5 per presa dichiarata. Dichiarazione
+ * sbagliata: 1 punto per presa fatta.
+ *
+ * `cards` e' il numero di prese in palio: serve a riconoscere l'en plein.
  */
-export function scoreRound(kind, bid, tricks) {
-  if (kind === RoundKind.MISERE) return MISERE_PER_TRICK * tricks;
+export function scoreRound(kind, bid, tricks, cards) {
+  if (kind === RoundKind.MISERE) {
+    if (tricks === cards) return MISERE_SWEEP_BONUS;
+    // Senza il caso a zero, -5 * 0 darebbe -0: legale ma brutto da leggere.
+    return tricks === 0 ? 0 : MISERE_PER_TRICK * tricks;
+  }
   if (bid !== null && bid !== undefined && bid === tricks) return HIT_BASE + HIT_PER_TRICK * bid;
   return MISS_PER_TRICK * tricks;
 }
@@ -366,7 +374,7 @@ export class Game {
   _endRound() {
     const spec = this.spec;
     const rows = this.players.map((player) => {
-      const delta = scoreRound(spec.kind, player.bid, player.tricks);
+      const delta = scoreRound(spec.kind, player.bid, player.tricks, spec.cards);
       player.score += delta;
       return {
         player_id: player.id,

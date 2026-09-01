@@ -28904,5 +28904,2667 @@
     }
    ]
   }
+ ],
+ "scoring": [
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 1,
+   "score": 10
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 1,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 1,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 1,
+   "score": 15
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 3,
+   "score": 10
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 3,
+   "score": 15
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 3,
+   "score": 20
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 3,
+   "score": 25
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 5,
+   "score": 10
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 5,
+   "score": 15
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 5,
+   "score": 20
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 5,
+   "score": 25
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 4,
+   "cards": 5,
+   "score": 30
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 5,
+   "cards": 5,
+   "score": 35
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 7,
+   "score": 10
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 6,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 7,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 7,
+   "score": 15
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 6,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 7,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 7,
+   "score": 20
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 6,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 7,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 7,
+   "score": 25
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 6,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 7,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 4,
+   "cards": 7,
+   "score": 30
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 6,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 7,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 5,
+   "cards": 7,
+   "score": 35
+  },
+  {
+   "kind": "normal",
+   "bid": 6,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 7,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "normal",
+   "bid": 6,
+   "tricks": 6,
+   "cards": 7,
+   "score": 40
+  },
+  {
+   "kind": "normal",
+   "bid": 7,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "normal",
+   "bid": 0,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "normal",
+   "bid": 1,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "normal",
+   "bid": 2,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "normal",
+   "bid": 3,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "normal",
+   "bid": 4,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "normal",
+   "bid": 5,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "normal",
+   "bid": 6,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "normal",
+   "bid": 7,
+   "tricks": 7,
+   "cards": 7,
+   "score": 45
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 1,
+   "score": 10
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 1,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 1,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 1,
+   "score": 15
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 3,
+   "score": 10
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 3,
+   "score": 15
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 3,
+   "score": 20
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 3,
+   "score": 25
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 5,
+   "score": 10
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 5,
+   "score": 15
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 5,
+   "score": 20
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 5,
+   "score": 25
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 4,
+   "cards": 5,
+   "score": 30
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 5,
+   "cards": 5,
+   "score": 35
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 7,
+   "score": 10
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 6,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 7,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 7,
+   "score": 15
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 6,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 7,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 7,
+   "score": 20
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 6,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 7,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 7,
+   "score": 25
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 6,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 7,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 4,
+   "cards": 7,
+   "score": 30
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 6,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 7,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 5,
+   "cards": 7,
+   "score": 35
+  },
+  {
+   "kind": "no_trump",
+   "bid": 6,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 7,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "no_trump",
+   "bid": 6,
+   "tricks": 6,
+   "cards": 7,
+   "score": 40
+  },
+  {
+   "kind": "no_trump",
+   "bid": 7,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "no_trump",
+   "bid": 0,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "no_trump",
+   "bid": 1,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "no_trump",
+   "bid": 2,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "no_trump",
+   "bid": 3,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "no_trump",
+   "bid": 4,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "no_trump",
+   "bid": 5,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "no_trump",
+   "bid": 6,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "no_trump",
+   "bid": 7,
+   "tricks": 7,
+   "cards": 7,
+   "score": 45
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 1,
+   "score": 10
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 1,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 1,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 1,
+   "score": 15
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 3,
+   "score": 10
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 3,
+   "score": 15
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 3,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 3,
+   "score": 20
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 3,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 3,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 3,
+   "score": 25
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 5,
+   "score": 10
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 5,
+   "score": 15
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 1,
+   "cards": 5,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 5,
+   "score": 20
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 2,
+   "cards": 5,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 5,
+   "score": 25
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 3,
+   "cards": 5,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 4,
+   "cards": 5,
+   "score": 30
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 4,
+   "cards": 5,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 5,
+   "cards": 5,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 5,
+   "cards": 5,
+   "score": 35
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 0,
+   "cards": 7,
+   "score": 10
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 6,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 7,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 1,
+   "cards": 7,
+   "score": 15
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 6,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 7,
+   "tricks": 1,
+   "cards": 7,
+   "score": 1
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 2,
+   "cards": 7,
+   "score": 20
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 6,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 7,
+   "tricks": 2,
+   "cards": 7,
+   "score": 2
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 3,
+   "cards": 7,
+   "score": 25
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 6,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 7,
+   "tricks": 3,
+   "cards": 7,
+   "score": 3
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 4,
+   "cards": 7,
+   "score": 30
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 6,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 7,
+   "tricks": 4,
+   "cards": 7,
+   "score": 4
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 5,
+   "cards": 7,
+   "score": 35
+  },
+  {
+   "kind": "blind",
+   "bid": 6,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 7,
+   "tricks": 5,
+   "cards": 7,
+   "score": 5
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "blind",
+   "bid": 6,
+   "tricks": 6,
+   "cards": 7,
+   "score": 40
+  },
+  {
+   "kind": "blind",
+   "bid": 7,
+   "tricks": 6,
+   "cards": 7,
+   "score": 6
+  },
+  {
+   "kind": "blind",
+   "bid": 0,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "blind",
+   "bid": 1,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "blind",
+   "bid": 2,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "blind",
+   "bid": 3,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "blind",
+   "bid": 4,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "blind",
+   "bid": 5,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "blind",
+   "bid": 6,
+   "tricks": 7,
+   "cards": 7,
+   "score": 7
+  },
+  {
+   "kind": "blind",
+   "bid": 7,
+   "tricks": 7,
+   "cards": 7,
+   "score": 45
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 0,
+   "cards": 1,
+   "score": 0
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 1,
+   "cards": 1,
+   "score": 15
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 0,
+   "cards": 3,
+   "score": 0
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 1,
+   "cards": 3,
+   "score": -5
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 2,
+   "cards": 3,
+   "score": -10
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 3,
+   "cards": 3,
+   "score": 15
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 0,
+   "cards": 5,
+   "score": 0
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 1,
+   "cards": 5,
+   "score": -5
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 2,
+   "cards": 5,
+   "score": -10
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 3,
+   "cards": 5,
+   "score": -15
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 4,
+   "cards": 5,
+   "score": -20
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 5,
+   "cards": 5,
+   "score": 15
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 0,
+   "cards": 7,
+   "score": 0
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 1,
+   "cards": 7,
+   "score": -5
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 2,
+   "cards": 7,
+   "score": -10
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 3,
+   "cards": 7,
+   "score": -15
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 4,
+   "cards": 7,
+   "score": -20
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 5,
+   "cards": 7,
+   "score": -25
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 6,
+   "cards": 7,
+   "score": -30
+  },
+  {
+   "kind": "misere",
+   "bid": null,
+   "tricks": 7,
+   "cards": 7,
+   "score": 15
+  }
  ]
 }

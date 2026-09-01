@@ -47,21 +47,39 @@ def test_misere_has_no_bidding_and_blind_is_bid_before_looking():
 
 @pytest.mark.parametrize("bid,expected", [(0, 10), (1, 15), (2, 20), (3, 25), (7, 45)])
 def test_hitting_the_bid_pays_ten_plus_five_per_trick(bid, expected):
-    assert score_round(RoundKind.NORMAL, bid=bid, tricks=bid) == expected
+    assert score_round(RoundKind.NORMAL, bid=bid, tricks=bid, cards=7) == expected
 
 
 @pytest.mark.parametrize("bid,tricks", [(0, 2), (3, 1), (1, 4), (5, 0)])
 def test_missing_the_bid_pays_one_per_trick(bid, tricks):
-    assert score_round(RoundKind.NORMAL, bid=bid, tricks=tricks) == tricks
+    assert score_round(RoundKind.NORMAL, bid=bid, tricks=tricks, cards=7) == tricks
 
 
 def test_misere_costs_five_per_trick_and_ignores_the_bid():
-    assert score_round(RoundKind.MISERE, bid=None, tricks=0) == 0
-    assert score_round(RoundKind.MISERE, bid=None, tricks=3) == -15
-    assert score_round(RoundKind.MISERE, bid=2, tricks=2) == -10
+    assert score_round(RoundKind.MISERE, bid=None, tricks=0, cards=7) == 0
+    assert score_round(RoundKind.MISERE, bid=None, tricks=3, cards=7) == -15
+    assert score_round(RoundKind.MISERE, bid=2, tricks=2, cards=7) == -10
+
+
+def test_taking_every_trick_in_misere_pays_instead_of_costing():
+    """La luna: prendere tutto ribalta il round invece di affondarlo."""
+    assert score_round(RoundKind.MISERE, bid=None, tricks=7, cards=7) == 15
+    # Una presa in meno e' il disastro completo: nessun premio di consolazione.
+    assert score_round(RoundKind.MISERE, bid=None, tricks=6, cards=7) == -30
+
+
+def test_the_sweep_bonus_follows_the_round_size():
+    assert score_round(RoundKind.MISERE, bid=None, tricks=3, cards=3) == 15
+    assert score_round(RoundKind.MISERE, bid=None, tricks=3, cards=5) == -15
+
+
+def test_only_misere_has_a_sweep_bonus():
+    # Fare tutte le prese in un round normale non e' un caso speciale.
+    assert score_round(RoundKind.NORMAL, bid=7, tricks=7, cards=7) == 45
+    assert score_round(RoundKind.NORMAL, bid=0, tricks=7, cards=7) == 7
 
 
 def test_special_rounds_score_like_normal_ones():
-    assert score_round(RoundKind.NO_TRUMP, bid=2, tricks=2) == 20
-    assert score_round(RoundKind.BLIND, bid=0, tricks=0) == 10
-    assert score_round(RoundKind.BLIND, bid=4, tricks=2) == 2
+    assert score_round(RoundKind.NO_TRUMP, bid=2, tricks=2, cards=7) == 20
+    assert score_round(RoundKind.BLIND, bid=0, tricks=0, cards=7) == 10
+    assert score_round(RoundKind.BLIND, bid=4, tricks=2, cards=7) == 2

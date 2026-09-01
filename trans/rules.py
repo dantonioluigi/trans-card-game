@@ -23,6 +23,9 @@ MISS_PER_TRICK = 1
 #: Penalita' per presa nel round A PERDERE.
 MISERE_PER_TRICK = -5
 
+#: Chi le prende tutte nel round A PERDERE non paga niente: incassa.
+MISERE_SWEEP_BONUS = 15
+
 
 class RoundKind(Enum):
     NORMAL = "normal"
@@ -106,14 +109,20 @@ def build_schedule(mode: GameMode) -> list[RoundSpec]:
     return [RoundSpec(number=i + 1, cards=c, kind=k) for i, (c, k) in enumerate(plan)]
 
 
-def score_round(kind: RoundKind, bid: int | None, tricks: int) -> int:
+def score_round(kind: RoundKind, bid: int | None, tricks: int, cards: int) -> int:
     """Punti guadagnati (o persi) da un giocatore alla fine di un round.
 
-    - A PERDERE: -5 per ogni presa incassata.
+    - A PERDERE: -5 per ogni presa incassata, ma chi le prende **tutte**
+      ribalta il round e incassa +15 invece di affondare.
     - Scommessa centrata: 10 + 5 x prese dichiarate (0->10, 1->15, 2->20, ...).
     - Scommessa sbagliata: 1 punto per ogni presa fatta.
+
+    ``cards`` e' il numero di prese in palio nel round: serve a riconoscere
+    l'en plein dell'A PERDERE.
     """
     if kind is RoundKind.MISERE:
+        if tricks == cards:
+            return MISERE_SWEEP_BONUS
         return MISERE_PER_TRICK * tricks
     if bid is not None and bid == tricks:
         return HIT_BASE + HIT_PER_TRICK * bid

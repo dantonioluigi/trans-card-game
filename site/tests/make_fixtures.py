@@ -19,7 +19,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
 from trans import bots  # noqa: E402
 from trans.engine import Game, Phase, Player  # noqa: E402
-from trans.rules import GameMode  # noqa: E402
+from trans.rules import GameMode, RoundKind, score_round  # noqa: E402
 
 OUT = pathlib.Path(__file__).parent / "fixtures.json"
 
@@ -81,6 +81,31 @@ def record_game(n_players: int, mode: GameMode, seed: int) -> dict:
     }
 
 
+def scoring_table() -> list[dict]:
+    """Ogni combinazione di punteggio, presa dal Python.
+
+    Le partite registrate coprono quello che i bot capita di fare; questa
+    tabella copre anche quello che non capita quasi mai — la luna dell'A
+    PERDERE, per dirne una.
+    """
+    rows = []
+    for kind in RoundKind:
+        for cards in (1, 3, 5, 7):
+            for tricks in range(cards + 1):
+                bids = [None] if kind is RoundKind.MISERE else list(range(cards + 1))
+                for bid in bids:
+                    rows.append(
+                        {
+                            "kind": kind.value,
+                            "bid": bid,
+                            "tricks": tricks,
+                            "cards": cards,
+                            "score": score_round(kind, bid, tricks, cards),
+                        }
+                    )
+    return rows
+
+
 def main() -> None:
     games = []
     for n in (2, 3, 4, 5, 6):
@@ -88,10 +113,14 @@ def main() -> None:
     games.append(record_game(4, GameMode.LONG, seed=77))
     games.append(record_game(5, GameMode.LONG, seed=1234))
 
-    OUT.write_text(json.dumps({"games": games}, indent=1))
+    scoring = scoring_table()
+    OUT.write_text(json.dumps({"games": games, "scoring": scoring}, indent=1))
     actions = sum(len(r["actions"]) for g in games for r in g["rounds"])
     rounds = sum(len(g["rounds"]) for g in games)
-    print(f"{len(games)} partite · {rounds} round · {actions} mosse → {OUT.name}")
+    print(
+        f"{len(games)} partite · {rounds} round · {actions} mosse "
+        f"· {len(scoring)} punteggi → {OUT.name}"
+    )
 
 
 if __name__ == "__main__":

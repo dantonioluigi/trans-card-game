@@ -12,10 +12,10 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-import { Game, Phase } from "../js/engine.js";
+import { Game, Phase, scoreRound } from "../js/engine.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const { games } = JSON.parse(readFileSync(join(here, "fixtures.json"), "utf8"));
+const { games, scoring } = JSON.parse(readFileSync(join(here, "fixtures.json"), "utf8"));
 
 let checks = 0;
 const failures = [];
@@ -28,6 +28,14 @@ function expect(condition, message) {
 
 function same(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
+}
+
+// La tabella dei punteggi copre anche i casi che nelle partite non capitano
+// quasi mai, come la luna dell'A PERDERE.
+for (const row of scoring) {
+  const mine = scoreRound(row.kind, row.bid, row.tricks, row.cards);
+  expect(mine === row.score,
+         `punteggio diverso per ${row.kind} bid=${row.bid} prese=${row.tricks}/${row.cards} — JS ${mine} vs PY ${row.score}`);
 }
 
 for (const fixture of games) {
@@ -89,4 +97,7 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`✓ motore JS identico a quello Python — ${checks} controlli su ${games.length} partite`);
+console.log(
+  `✓ motore JS identico a quello Python — ${checks} controlli ` +
+    `(${games.length} partite, ${scoring.length} punteggi)`
+);

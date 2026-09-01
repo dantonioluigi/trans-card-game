@@ -237,6 +237,59 @@ def test_blind_round_hides_your_own_hand_until_bids_are_in():
     assert len(snap["hand"]) == 7 and snap["hand_hidden"] is False
 
 
+def test_sweeping_the_misere_round_pays_fifteen():
+    """La luna: chi prende tutte le prese a perdere incassa invece di pagare."""
+    game = make_game(n=2)
+    while game.spec.kind is not RoundKind.MISERE:
+        finish_round_with_bots(game)
+        game.advance_round()
+    for player in game.players:
+        player.is_bot = False
+
+    # p1 ha sette briscole, p0 nemmeno una: p1 le prende tutte per forza.
+    set_hands(game, {
+        "p1": ["AH", "KH", "QH", "JH", "10H", "9H", "8H"],
+        "p0": ["2S", "3S", "4S", "5S", "6S", "7S", "8S"],
+    })
+    before = [p.score for p in game.players]
+    while game.phase is Phase.PLAYING:
+        actor = game.current_actor()
+        assert actor is not None
+        pid = game.players[actor].id
+        game.play_card(pid, game.legal_cards(actor)[0])
+
+    assert game.players[1].tricks == 7 and game.players[0].tricks == 0
+    assert game.players[1].score - before[1] == 15   # le ha prese tutte
+    assert game.players[0].score - before[0] == 0    # non ne ha prese
+
+
+def test_missing_the_sweep_by_one_trick_is_the_worst_outcome():
+    game = make_game(n=2)
+    while game.spec.kind is not RoundKind.MISERE:
+        finish_round_with_bots(game)
+        game.advance_round()
+    for player in game.players:
+        player.is_bot = False
+
+    # p0 tiene l'asso di briscola: strappa una presa, e p1 ne incassa sei.
+    set_hands(game, {
+        "p1": ["KH", "QH", "JH", "10H", "9H", "8H", "7H"],
+        "p0": ["AH", "3H", "4S", "5S", "6S", "7S", "8S"],
+    })
+    before = [p.score for p in game.players]
+    while game.phase is Phase.PLAYING:
+        actor = game.current_actor()
+        assert actor is not None
+        pid = game.players[actor].id
+        legal = game.legal_cards(actor)
+        game.play_card(pid, legal[0])
+
+    assert sum(p.tricks for p in game.players) == 7
+    assert game.players[1].tricks == 6 and game.players[0].tricks == 1
+    assert game.players[1].score - before[1] == -30  # a una presa dalla luna
+    assert game.players[0].score - before[0] == -5
+
+
 def test_advance_round_only_after_the_round_is_over():
     game = make_game(n=3)
     with pytest.raises(IllegalMove):

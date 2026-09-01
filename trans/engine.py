@@ -251,7 +251,7 @@ class Game:
         spec = self.spec
         rows = []
         for player in self.players:
-            delta = score_round(spec.kind, player.bid, player.tricks)
+            delta = score_round(spec.kind, player.bid, player.tricks, spec.cards)
             player.score += delta
             rows.append(
                 {

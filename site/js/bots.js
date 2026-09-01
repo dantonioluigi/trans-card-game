@@ -139,11 +139,27 @@ export function chooseBid(game, playerIndex, random = Math.random) {
 
 /* ------------------------------------------------------------------ gioco */
 
+/**
+ * A perdere, prendere tutte le prese vale +15 invece di -5 a presa.
+ *
+ * Ci si prova solo a colpo sicuro: non averne ancora persa una e avere in mano
+ * solo carte imbattibili. Senza, il bot a sei prese su sette giocherebbe per
+ * perdere l'ultima, portandosi a casa -30 invece di +15.
+ */
+function moonIsOn(game, playerIndex) {
+  const player = game.players[playerIndex];
+  if (!player.hand.length) return false;
+  const played = game.spec.cards - player.hand.length;
+  if (player.tricks !== played) return false; // una presa gia' persa
+  const level = LEVELS.includes(player.botLevel) ? player.botLevel : "normale";
+  return player.hand.every((card) => isSafe(card, game, playerIndex, level));
+}
+
 /** Al bot conviene prendere questa presa? */
 function wantsTrick(game, playerIndex) {
   const spec = game.spec;
   const player = game.players[playerIndex];
-  if (spec.kind === RoundKind.MISERE) return false;
+  if (spec.kind === RoundKind.MISERE) return moonIsOn(game, playerIndex);
   if (player.bid === null) return false;
 
   const needed = player.bid - player.tricks;
