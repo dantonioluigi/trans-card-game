@@ -144,7 +144,15 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 }
 
 .hint { color: var(--ink-dim); font-size: .82rem; margin: .8rem 0 0; line-height: 1.5; }
-.error { color: var(--bad); font-size: .9rem; }
+.error { color: var(--bad); font-size: .9rem; max-width: 44ch; text-align: center; line-height: 1.5; }
+.status { color: var(--gold); font-size: .9rem; }
+.status::after {
+  content: "";
+  display: inline-block; width: .6em; height: .6em; margin-left: .5em;
+  border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%;
+  animation: spin .7s linear infinite; vertical-align: -.05em;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* --------------------------------------------------------------- lobby -- */
 

@@ -91,11 +91,11 @@ function makeSession(table, name, playerId = null) {
   check(host.last("state").game.players.every((p) => p.hand === undefined),
         "lo stato contiene la mano di un altro giocatore");
 
-  // Entrare a partita iniziata non si puo'.
+  // A partita iniziata, senza bot al tavolo, non c'e' posto.
   const late = makeSession(table, "Tardi");
   late.join();
-  check(late.errors().at(-1)?.message.includes("gia' iniziata"),
-        "si e' potuto entrare a partita iniziata");
+  check(late.errors().at(-1)?.message.includes("non ci sono bot"),
+        "senza bot il ritardatario dovrebbe restare fuori");
 
   // Mosse fuori turno o fuori fase.
   host.send({ type: "play", card: "AH" });
@@ -158,6 +158,33 @@ function makeSession(table, name, playerId = null) {
     const total = result.rows.reduce((s, r) => s + r.tricks, 0);
     check(total === spec.cards, `round ${result.roundNumber}: ${total} prese invece di ${spec.cards}`);
   }
+}
+
+/* ------------------------------------- chi arriva tardi prende posto a un bot */
+
+{
+  const table = new Table(newRoomCode());
+  const host = makeSession(table, "Luigi");
+  host.join();
+  host.send({ type: "add_bot", level: "facile" });
+  host.send({ type: "start" });
+
+  const before = table.game.players.map((p) => p.name);
+  check(before[1].startsWith("Bot"), "il secondo posto doveva essere di un bot");
+
+  const late = makeSession(table, "Anna");
+  late.join();
+  check(late.errors().length === 0,
+        `il ritardatario e' stato rifiutato: ${JSON.stringify(late.errors())}`);
+
+  const view = late.last("state");
+  check(view.screen === "game", "il ritardatario non e' entrato in partita");
+  check(view.game.players[view.game.you].name === "Anna", "non ha preso il nome giusto");
+  check(view.game.players[view.game.you].is_bot === false, "risulta ancora un bot");
+  check(view.game.hand.length > 0, "non ha ricevuto le carte del bot");
+  check(table.playsItself(table.seats[1]) === false,
+        "il computer continua a giocare al posto suo");
+  check(table.game.players[1].name === "Anna", "il nome non e' cambiato anche nella partita");
 }
 
 /* ------------------------------------------- l'host che se ne va e ritorna */

@@ -123,8 +123,9 @@ def test_joining_a_missing_room_creates_it_but_a_started_one_is_closed(client):
         state_until(host, lambda s: s["screen"] == "game")
 
         with client.websocket_connect("/ws") as late:
-            late.send_json({"type": "join", "room": code, "name": "Tardi"})
-            assert "gia' iniziata" in next_error(late)["message"]
+            # C'e' un bot al tavolo, quindi il ritardatario ne prende il posto.
+            join(late, "Tardi", room=code)
+            assert next_state(late, tolerate_errors=True)["screen"] == "game"
 
 
 def test_only_the_host_can_add_bots_or_start(client):
@@ -283,6 +284,45 @@ def test_blind_round_hides_the_hand_over_the_wire(client):
             elif g["legal_cards"]:
                 host.send_json({"type": "play", "card": g["legal_cards"][0]})
         assert seen_blind
+
+
+def test_a_latecomer_takes_over_a_bot(client):
+    """Chi arriva a partita iniziata non resta fuori: entra al posto di un bot."""
+    with client.websocket_connect("/ws") as host:
+        code = join(host, "Luigi")["room"]
+        next_state(host)
+        host.send_json({"type": "add_bot", "level": "facile"})
+        next_state(host)
+        host.send_json({"type": "start"})
+        state_until(host, lambda s: s["screen"] == "game")
+
+        with client.websocket_connect("/ws") as late:
+            welcome = join(late, "Anna", room=code)
+            assert welcome["name"] == "Anna"
+            state = next_state(late, tolerate_errors=True)
+            assert state["screen"] == "game"
+            game = state["game"]
+            # Ha preso il posto del bot, con le sue carte.
+            assert game["you"] is not None
+            assert game["players"][game["you"]]["name"] == "Anna"
+            assert game["players"][game["you"]]["is_bot"] is False
+            assert len(game["hand"]) > 0
+            assert [p["name"] for p in game["players"]] == ["Luigi", "Anna"]
+
+
+def test_without_bots_a_started_game_stays_closed(client):
+    with client.websocket_connect("/ws") as a:
+        code = join(a, "Luigi")["room"]
+        next_state(a)
+        with client.websocket_connect("/ws") as b:
+            join(b, "Anna", room=code)
+            next_state(b)
+            next_state(a)
+            a.send_json({"type": "start"})
+            state_until(a, lambda s: s["screen"] == "game")
+            with client.websocket_connect("/ws") as late:
+                late.send_json({"type": "join", "room": code, "name": "Tardi"})
+                assert "non ci sono bot" in next_error(late)["message"]
 
 
 def test_reconnecting_with_the_same_id_gets_the_seat_back(client):

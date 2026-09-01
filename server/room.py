@@ -82,9 +82,9 @@ class Room:
     def is_empty(self) -> bool:
         return self.humans_online() == 0
 
-    def _unique_name(self, wanted: str) -> str:
+    def _unique_name(self, wanted: str, exclude_id: str | None = None) -> str:
         wanted = (wanted or "Ospite").strip()[:16] or "Ospite"
-        taken = {s.name for s in self.seats}
+        taken = {s.name for s in self.seats if s.id != exclude_id}
         if wanted not in taken:
             return wanted
         for i in range(2, 100):
@@ -108,9 +108,13 @@ class Room:
                 raise RoomError("quel posto e' occupato da un bot")
             seat.connected = True
             seat.socket = socket
+        elif self.started:
+            seat = self._take_over_bot(name, socket)
+            if seat is None:
+                raise RoomError(
+                    "partita gia' iniziata e non ci sono bot di cui prendere il posto"
+                )
         else:
-            if self.started:
-                raise RoomError("partita gia' iniziata: non si entra a tavolo aperto")
             if len(self.seats) >= MAX_PLAYERS:
                 raise RoomError(f"tavolo pieno (max {MAX_PLAYERS} giocatori)")
             seat = Seat(
@@ -122,6 +126,28 @@ class Room:
             self.seats.append(seat)
         self._promote_host()
         return seat
+
+    def _take_over_bot(self, name: str, socket: object) -> Seat | None:
+        """Chi arriva a partita iniziata prende il posto di un bot.
+
+        Senza questo, chi apre il tavolo deve aspettare fermo che arrivino
+        tutti: per premere "Inizia" servono due giocatori, e se riempie i posti
+        con i bot poi non entra piu' nessuno.
+        """
+        bot = next((s for s in self.seats if s.is_bot), None)
+        if bot is None:
+            return None
+        was = bot.name
+        bot.is_bot = False
+        bot.name = self._unique_name(name, exclude_id=bot.id)
+        bot.connected = True
+        bot.socket = socket
+        if self.game is not None:
+            player = self.game.players[self.game.index_of(bot.id)]
+            player.is_bot = False
+            player.name = bot.name
+            self.game._log(f"{bot.name} prende il posto di {was}.")
+        return bot
 
     def leave(self, player_id: str) -> None:
         seat = self.seat_by_id(player_id)

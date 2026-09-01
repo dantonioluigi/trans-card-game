@@ -67,9 +67,9 @@ export class Table {
     return this.seats.every((s) => this.playsItself(s));
   }
 
-  _uniqueName(wanted) {
+  _uniqueName(wanted, excludeId = null) {
     let name = (wanted || "Ospite").trim().slice(0, 16) || "Ospite";
-    const taken = new Set(this.seats.map((s) => s.name));
+    const taken = new Set(this.seats.filter((s) => s.id !== excludeId).map((s) => s.name));
     if (!taken.has(name)) return name;
     for (let i = 2; i < 100; i++) {
       if (!taken.has(`${name} ${i}`)) return `${name} ${i}`;
@@ -101,8 +101,12 @@ export class Table {
       if (seat.isBot) throw new TableError("quel posto e' occupato da un bot");
       seat.connected = true;
       seat.sink = sink;
+    } else if (this.started) {
+      seat = this._takeOverBot(name, sink);
+      if (!seat) {
+        throw new TableError("partita gia' iniziata e non ci sono bot di cui prendere il posto");
+      }
     } else {
-      if (this.started) throw new TableError("partita gia' iniziata: non si entra a tavolo aperto");
       if (this.seats.length >= MAX_PLAYERS) throw new TableError(`tavolo pieno (max ${MAX_PLAYERS} giocatori)`);
       seat = {
         id: playerId || newPlayerId(),
@@ -116,6 +120,30 @@ export class Table {
     }
     this._promoteHost();
     return seat;
+  }
+
+  /**
+   * Chi arriva a partita iniziata prende il posto di un bot.
+   *
+   * Senza questo, chi apre il tavolo resta fermo ad aspettare: per premere
+   * "Inizia" servono due giocatori, e se riempie i posti con i bot poi non
+   * entra piu' nessuno.
+   */
+  _takeOverBot(name, sink) {
+    const bot = this.seats.find((s) => s.isBot);
+    if (!bot) return null;
+    const was = bot.name;
+    bot.isBot = false;
+    bot.name = this._uniqueName(name, bot.id);
+    bot.connected = true;
+    bot.sink = sink;
+    if (this.game) {
+      const player = this.game.players[this.game.indexOf(bot.id)];
+      player.isBot = false;
+      player.name = bot.name;
+      this.game._log(`${bot.name} prende il posto di ${was}.`);
+    }
+    return bot;
   }
 
   leave(playerId) {

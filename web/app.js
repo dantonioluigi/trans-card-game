@@ -88,11 +88,33 @@
     },
   };
 
+  /* Collegarsi puo' richiedere qualche secondo, e puo' anche non riuscire mai.
+   * Senza questo, chi preme il bottone vede la pagina immobile e non sa se
+   * stia succedendo qualcosa. */
+  function setBusy(message) {
+    const status = $("homeStatus");
+    if (status) {
+      status.textContent = message;
+      status.hidden = false;
+    }
+    $("homeError").hidden = true;
+    $("btnCreate").disabled = true;
+    $("btnJoin").disabled = true;
+  }
+
+  function clearBusy() {
+    const status = $("homeStatus");
+    if (status) status.hidden = true;
+    $("btnCreate").disabled = false;
+    $("btnJoin").disabled = false;
+  }
+
   function connect(room, name) {
     app.wantConnection = true;
     app.room = room || "";
     app.name = name || app.name;
     store.set("name", app.name);
+    setBusy(app.room ? `Cerco il tavolo ${app.room}…` : "Apro il tavolo…");
 
     const transport = window.TRANS_TRANSPORT || websocketTransport;
     app.link = transport.create({
@@ -122,6 +144,7 @@
           app.wantConnection = false;
           app.state = null;
           showScreen("home");
+          clearBusy();
           showHomeError(reason.message || "connessione chiusa");
           toast(reason.message || "connessione chiusa");
           return;
@@ -147,9 +170,10 @@
       store.set("pid", msg.player_id);
       store.set("name", msg.name);
       history.replaceState(null, "", "#" + msg.room);
+      clearBusy();
       return;
     }
-    if (msg.type === "error") { toast(msg.message); showHomeError(msg.message); return; }
+    if (msg.type === "error") { clearBusy(); toast(msg.message); showHomeError(msg.message); return; }
     if (msg.type === "state") { app.state = msg; render(); return; }
   }
 
@@ -230,11 +254,14 @@
 
     const enough = state.seats.length >= state.min_players;
     $("btnStart").disabled = !state.is_host || !enough;
+    const bots = state.seats.filter((s) => s.is_bot).length;
     $("lobbyHint").textContent = !state.is_host
       ? "Aspetta che l'host faccia partire la partita."
-      : enough
-        ? `${state.seats.length} giocatori al tavolo. ${free} posti liberi.`
-        : `Servono almeno ${state.min_players} giocatori: aggiungi un bot o invita qualcuno.`;
+      : !enough
+        ? `Servono almeno ${state.min_players} giocatori: aggiungi un bot o invita qualcuno.`
+        : bots
+          ? `${state.seats.length} giocatori al tavolo. Puoi partire quando vuoi: chi arriva dopo prende il posto di un bot.`
+          : `${state.seats.length} giocatori al tavolo, ${free} posti liberi. A partita iniziata si entra solo al posto di un bot.`;
   }
 
   function tag(text, extra = "") {
@@ -582,6 +609,7 @@
       app.wantConnection = false;
       if (app.link) app.link.close();
       app.link = null;
+      clearBusy();
       app.state = null;
       app.room = "";
       history.replaceState(null, "", location.pathname);

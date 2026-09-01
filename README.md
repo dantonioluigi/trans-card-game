@@ -29,6 +29,11 @@ ce l'hai in mano; se non ce l'hai giochi quello che vuoi, briscola compresa.
 Vince la briscola più alta, altrimenti la carta più alta del seme di uscita.
 Chi prende esce nella presa successiva.
 
+**Chi arriva tardi.** Per iniziare servono almeno due giocatori, quindi spesso si
+parte con dei bot. Chi entra col codice a partita già cominciata **prende il posto
+di un bot**, con le sue carte e il suo punteggio: nessuno resta fuori per aver
+tardato, e chi ospita non deve restare fermo ad aspettare.
+
 **La dichiarazione.** Prima di giocare ognuno dichiara quante prese farà,
 partendo da sinistra del mazziere — che quindi parla per ultimo.
 
@@ -117,6 +122,13 @@ Due cose che non sono gratis, e vanno sapute:
 
 - **Chi apre la stanza deve restare collegato.** Se chiude la scheda, la partita
   finisce per tutti. Non c'è nessun altro che tenga lo stato.
+- **Serve un intermediario per la presentazione fra i browser.** TRANS usa il
+  broker pubblico di PeerJS. Se è giù, o se la rete che stai usando blocca quel
+  tipo di collegamento (capita in azienda), il gioco lo dice entro dodici
+  secondi invece di restare lì. In quel caso puoi puntare a un broker tuo:
+  `?broker=https://tuo-broker` nell'indirizzo, e
+  [peerjs-server](https://github.com/peers/peerjs-server) è un container da due
+  righe.
 - **Il browser dell'host conosce le carte di tutti.** La UI non gliele mostra,
   ma sono nella memoria della sua pagina: chi sa aprire la console può
   guardarle. Fra amici è irrilevante; non è a prova di baro come il server.
