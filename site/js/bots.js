@@ -140,11 +140,11 @@ export function chooseBid(game, playerIndex, random = Math.random) {
 /* ------------------------------------------------------------------ gioco */
 
 /**
- * A perdere, prendere tutte le prese vale +15 invece di -5 a presa.
+ * A perdere, prendere tutte le prese vale +30 invece di -5 a presa.
  *
  * Ci si prova solo a colpo sicuro: non averne ancora persa una e avere in mano
  * solo carte imbattibili. Senza, il bot a sei prese su sette giocherebbe per
- * perdere l'ultima, portandosi a casa -30 invece di +15.
+ * perdere l'ultima, portandosi a casa -30 invece di +30.
  */
 function moonIsOn(game, playerIndex) {
   const player = game.players[playerIndex];

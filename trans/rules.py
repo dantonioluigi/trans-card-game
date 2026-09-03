@@ -24,7 +24,7 @@ MISS_PER_TRICK = 1
 MISERE_PER_TRICK = -5
 
 #: Chi le prende tutte nel round A PERDERE non paga niente: incassa.
-MISERE_SWEEP_BONUS = 15
+MISERE_SWEEP_BONUS = 30
 
 
 class RoundKind(Enum):
@@ -113,7 +113,7 @@ def score_round(kind: RoundKind, bid: int | None, tricks: int, cards: int) -> in
     """Punti guadagnati (o persi) da un giocatore alla fine di un round.
 
     - A PERDERE: -5 per ogni presa incassata, ma chi le prende **tutte**
-      ribalta il round e incassa +15 invece di affondare.
+      ribalta il round e incassa +30 invece di affondare.
     - Scommessa centrata: 10 + 5 x prese dichiarate (0->10, 1->15, 2->20, ...).
     - Scommessa sbagliata: 1 punto per ogni presa fatta.
 

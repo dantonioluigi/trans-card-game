@@ -259,7 +259,7 @@ def test_sweeping_the_misere_round_pays_fifteen():
         game.play_card(pid, game.legal_cards(actor)[0])
 
     assert game.players[1].tricks == 7 and game.players[0].tricks == 0
-    assert game.players[1].score - before[1] == 15   # le ha prese tutte
+    assert game.players[1].score - before[1] == 30   # le ha prese tutte
     assert game.players[0].score - before[0] == 0    # non ne ha prese
 
 

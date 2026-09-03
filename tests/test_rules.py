@@ -63,13 +63,13 @@ def test_misere_costs_five_per_trick_and_ignores_the_bid():
 
 def test_taking_every_trick_in_misere_pays_instead_of_costing():
     """La luna: prendere tutto ribalta il round invece di affondarlo."""
-    assert score_round(RoundKind.MISERE, bid=None, tricks=7, cards=7) == 15
+    assert score_round(RoundKind.MISERE, bid=None, tricks=7, cards=7) == 30
     # Una presa in meno e' il disastro completo: nessun premio di consolazione.
     assert score_round(RoundKind.MISERE, bid=None, tricks=6, cards=7) == -30
 
 
 def test_the_sweep_bonus_follows_the_round_size():
-    assert score_round(RoundKind.MISERE, bid=None, tricks=3, cards=3) == 15
+    assert score_round(RoundKind.MISERE, bid=None, tricks=3, cards=3) == 30
     assert score_round(RoundKind.MISERE, bid=None, tricks=3, cards=5) == -15
 
 

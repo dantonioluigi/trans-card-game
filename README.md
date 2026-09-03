@@ -53,7 +53,7 @@ il giro diventa la posizione più scomoda del tavolo.
 
 Nel round **A PERDERE** non si dichiara: si pagano 5 punti per ogni presa
 incassata. L'eccezione è la *luna*: chi le prende **tutte** non paga niente e
-incassa **+15**. È una via di fuga stretta — sbagliarne una sola dà il peggior
+incassa **+30**. È una via di fuga stretta — sbagliarne una sola dà il peggior
 punteggio del round — e infatti nelle simulazioni fra bot riesce in meno dell'1%
 dei round a perdere.
 
@@ -71,7 +71,7 @@ e poi arrivano i tre round speciali, tutti da 7 carte:
 |---|---|
 | **NO BRISCOLA** | Non c'è briscola. Vince sempre la carta più alta del seme di uscita. |
 | **BUIO** | Dichiari **senza guardare le tue carte**. Le vedi solo dopo che hanno parlato tutti. |
-| **A PERDERE** | Non si dichiara: ogni presa che incassi vale **−5 punti**. Ma chi le prende **tutte** ribalta il round e incassa **+15**. |
+| **A PERDERE** | Non si dichiara: ogni presa che incassi vale **−5 punti**. Ma chi le prende **tutte** ribalta il round e incassa **+30**. |
 
 **Durata.**
 
@@ -217,9 +217,9 @@ python -m trans.simulate --games 200 --levels esperto normale normale facile
 
 giocatore       vittorie   punti medi   scommesse ok
 esperto-0             71         69.7          56.4%
-normale-2             61         67.7          51.3%
-normale-1             62         66.8          53.0%
-facile-3              10         39.4          33.7%
+normale-2             61         67.9          51.3%
+normale-1             62         66.9          53.0%
+facile-3              10         39.5          33.7%
 ```
 
 `facile` sta trenta punti sotto agli altri, mentre fra `normale` ed `esperto` il

@@ -150,12 +150,12 @@ def choose_bid(game: Game, player_index: int, rng: random.Random | None = None) 
 
 
 def _moon_is_on(game: Game, player_index: int) -> bool:
-    """A perdere, prendere tutte le prese vale +15 invece di -5 a presa.
+    """A perdere, prendere tutte le prese vale +30 invece di -5 a presa.
 
     Ci si prova solo a colpo sicuro: bisogna non averne ancora persa una e
     avere in mano solo carte che nessuno puo' battere. Senza questo controllo
     il bot, a sei prese su sette, giocherebbe per perdere l'ultima e si
-    porterebbe a casa -30 invece di +15.
+    porterebbe a casa -30 invece di +30.
     """
     player = game.players[player_index]
     if not player.hand:
