@@ -362,12 +362,16 @@
     const total = g.players.length;
     const anchor = me == null ? 0 : me;
 
+    // Piu' siamo, meno spazio angolare c'e' fra un posto e l'altro: le carte
+    // vanno spinte verso l'esterno, se no si accavallano.
+    const spread = total <= 4 ? 0.44 : 0.44 + (total - 4) * 0.055;
+
     view.plays.forEach((play, n) => {
       const offset = ((play.player - anchor) % total + total) % total;
       const seat = seatPosition(offset, total);
       const el = cardEl(play.card, play.player === view.winner ? "winning" : "");
-      el.style.left = (50 + (seat.x - 50) * 0.44) + "%";
-      el.style.top = (50 + (seat.y - 50) * 0.44) + "%";
+      el.style.left = (50 + (seat.x - 50) * spread) + "%";
+      el.style.top = (50 + (seat.y - 50) * spread) + "%";
       el.style.setProperty("--rot", ((n * 7) % 13 - 6) + "deg");
       area.appendChild(el);
     });

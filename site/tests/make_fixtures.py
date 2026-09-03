@@ -108,7 +108,7 @@ def scoring_table() -> list[dict]:
 
 def main() -> None:
     games = []
-    for n in (2, 3, 4, 5, 6):
+    for n in (2, 3, 4, 5, 6, 7):
         games.append(record_game(n, GameMode.FAST, seed=100 + n))
     games.append(record_game(4, GameMode.LONG, seed=77))
     games.append(record_game(5, GameMode.LONG, seed=1234))

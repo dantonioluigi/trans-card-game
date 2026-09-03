@@ -130,4 +130,5 @@ def score_round(kind: RoundKind, bid: int | None, tricks: int, cards: int) -> in
 
 
 def max_players_for(cards_each: int) -> int:
+    """Quanti giocatori stanno in un mazzo da 52 con questa mano a testa."""
     return 52 // cards_each

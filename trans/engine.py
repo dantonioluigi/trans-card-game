@@ -11,10 +11,21 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from .cards import Card, Suit, deal, sort_hand, trick_winner
-from .rules import GameMode, RoundKind, RoundSpec, build_schedule, max_players_for, score_round
+from .rules import (
+    MAX_NORMAL_CARDS,
+    GameMode,
+    RoundKind,
+    RoundSpec,
+    build_schedule,
+    max_players_for,
+    score_round,
+)
 
 MIN_PLAYERS = 2
-MAX_PLAYERS = 6
+
+#: Il tetto lo decide il mazzo: la mano piu' lunga e' di 7 carte, e 7 giocatori
+#: ne consumano 49 delle 52. In otto non ci si sta.
+MAX_PLAYERS = max_players_for(MAX_NORMAL_CARDS)
 
 
 class Phase(Enum):

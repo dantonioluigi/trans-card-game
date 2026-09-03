@@ -36,8 +36,16 @@ def bid_all(game: Game, values: list[int]) -> None:
 def test_game_rejects_wrong_player_counts():
     with pytest.raises(ValueError):
         Game([Player(id="p0", name="solo")])
+    # In otto servirebbero 56 carte per il primo round: il mazzo ne ha 52.
     with pytest.raises(ValueError):
-        Game([Player(id=f"p{i}", name=str(i)) for i in range(7)])
+        Game([Player(id=f"p{i}", name=str(i)) for i in range(8)])
+
+
+def test_seven_players_fit_in_the_deck():
+    game = make_game(n=7)
+    assert sum(len(p.hand) for p in game.players) == 49
+    dealt = [c for p in game.players for c in p.hand]
+    assert len(set(dealt)) == 49  # nessuna carta distribuita due volte
 
 
 def test_first_round_deals_seven_cards_each_and_bidding_starts_left_of_dealer():
@@ -327,7 +335,7 @@ def finish_round_with_bots(game: Game, rng=None) -> None:
         bots.act(game, actor, rng)
 
 
-@pytest.mark.parametrize("n", [2, 3, 4, 5, 6])
+@pytest.mark.parametrize("n", [2, 3, 4, 5, 6, 7])
 @pytest.mark.parametrize("mode", [GameMode.FAST, GameMode.LONG])
 def test_full_games_terminate_with_consistent_scores(n, mode):
     game = make_game(n=n, mode=mode, seed=n * 100 + len(mode.value))

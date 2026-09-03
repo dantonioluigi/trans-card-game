@@ -15282,6 +15282,5242 @@
    ]
   },
   {
+   "label": "7 giocatori \u00b7 fast \u00b7 seed 107",
+   "mode": "fast",
+   "dealer": 0,
+   "players": [
+    {
+     "id": "p0",
+     "name": "P0"
+    },
+    {
+     "id": "p1",
+     "name": "P1"
+    },
+    {
+     "id": "p2",
+     "name": "P2"
+    },
+    {
+     "id": "p3",
+     "name": "P3"
+    },
+    {
+     "id": "p4",
+     "name": "P4"
+    },
+    {
+     "id": "p5",
+     "name": "P5"
+    },
+    {
+     "id": "p6",
+     "name": "P6"
+    }
+   ],
+   "rounds": [
+    {
+     "cards": 7,
+     "kind": "normal",
+     "hands": [
+      [
+       "QH",
+       "2H",
+       "10S",
+       "5D",
+       "2D",
+       "KC",
+       "8C"
+      ],
+      [
+       "3H",
+       "AS",
+       "2S",
+       "AD",
+       "JD",
+       "8D",
+       "7D"
+      ],
+      [
+       "8H",
+       "JS",
+       "3S",
+       "4D",
+       "10C",
+       "7C",
+       "6C"
+      ],
+      [
+       "7H",
+       "5H",
+       "KS",
+       "9D",
+       "AC",
+       "QC",
+       "3C"
+      ],
+      [
+       "AH",
+       "KH",
+       "JH",
+       "6H",
+       "QS",
+       "QD",
+       "4C"
+      ],
+      [
+       "9H",
+       "4H",
+       "9S",
+       "7S",
+       "6S",
+       "5S",
+       "10D"
+      ],
+      [
+       "10H",
+       "8S",
+       "6D",
+       "3D",
+       "JC",
+       "9C",
+       "5C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 3,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 0,
+       "legal": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": 1
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "AS",
+       "legal": [
+        "3H",
+        "AS",
+        "2S",
+        "AD",
+        "JD",
+        "8D",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "JS",
+       "legal": [
+        "JS",
+        "3S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "KS",
+       "legal": [
+        "KS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "QS",
+       "legal": [
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "5S",
+       "legal": [
+        "9S",
+        "7S",
+        "6S",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "8S",
+       "legal": [
+        "8S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "10S",
+       "legal": [
+        "10S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "2S",
+       "legal": [
+        "3H",
+        "2S",
+        "AD",
+        "JD",
+        "8D",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "3S",
+       "legal": [
+        "3S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "AC",
+       "legal": [
+        "7H",
+        "5H",
+        "9D",
+        "AC",
+        "QC",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "6H",
+       "legal": [
+        "AH",
+        "KH",
+        "JH",
+        "6H",
+        "QD",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "6S",
+       "legal": [
+        "9S",
+        "7S",
+        "6S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "10H",
+       "legal": [
+        "10H",
+        "6D",
+        "3D",
+        "JC",
+        "9C",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "2H",
+       "legal": [
+        "QH",
+        "2H",
+        "5D",
+        "2D",
+        "KC",
+        "8C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "9C",
+       "legal": [
+        "6D",
+        "3D",
+        "JC",
+        "9C",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "8C",
+       "legal": [
+        "KC",
+        "8C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "AD",
+       "legal": [
+        "3H",
+        "AD",
+        "JD",
+        "8D",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "7C",
+       "legal": [
+        "10C",
+        "7C",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "3C",
+       "legal": [
+        "QC",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "4C",
+       "legal": [
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "4H",
+       "legal": [
+        "9H",
+        "4H",
+        "9S",
+        "7S",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "7S",
+       "legal": [
+        "9H",
+        "9S",
+        "7S",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "5C",
+       "legal": [
+        "6D",
+        "3D",
+        "JC",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "5D",
+       "legal": [
+        "QH",
+        "5D",
+        "2D",
+        "KC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "JD",
+       "legal": [
+        "3H",
+        "JD",
+        "8D",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "10C",
+       "legal": [
+        "8H",
+        "4D",
+        "10C",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "5H",
+       "legal": [
+        "7H",
+        "5H",
+        "9D",
+        "QC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "JH",
+       "legal": [
+        "AH",
+        "KH",
+        "JH",
+        "QD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AH",
+       "legal": [
+        "AH",
+        "KH",
+        "QD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "9H",
+       "legal": [
+        "9H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "6D",
+       "legal": [
+        "6D",
+        "3D",
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "QH",
+       "legal": [
+        "QH"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "3H",
+       "legal": [
+        "3H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "8H",
+       "legal": [
+        "8H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "7H",
+       "legal": [
+        "7H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "KH",
+       "legal": [
+        "KH",
+        "QD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "10D",
+       "legal": [
+        "9S",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "3D",
+       "legal": [
+        "3D",
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "2D",
+       "legal": [
+        "2D",
+        "KC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "8D",
+       "legal": [
+        "8D",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "6C",
+       "legal": [
+        "4D",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "9D",
+       "legal": [
+        "9D",
+        "QC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "QD",
+       "legal": [
+        "QD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "9S",
+       "legal": [
+        "9S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "JC",
+       "legal": [
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "KC",
+       "legal": [
+        "KC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "7D",
+       "legal": [
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "4D",
+       "legal": [
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "QC",
+       "legal": [
+        "QC"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 10
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 15
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 10
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 0
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 3,
+       "tricks": 4,
+       "delta": 4,
+       "total": 4
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 15
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 0,
+       "tricks": 1,
+       "delta": 1,
+       "total": 1
+      }
+     ]
+    },
+    {
+     "cards": 6,
+     "kind": "normal",
+     "hands": [
+      [
+       "KH",
+       "6H",
+       "3H",
+       "AS",
+       "KD",
+       "QC"
+      ],
+      [
+       "7H",
+       "9S",
+       "4S",
+       "9D",
+       "6C",
+       "4C"
+      ],
+      [
+       "JH",
+       "JS",
+       "8S",
+       "3D",
+       "10C",
+       "5C"
+      ],
+      [
+       "10H",
+       "9H",
+       "6S",
+       "10D",
+       "5D",
+       "AC"
+      ],
+      [
+       "AH",
+       "5H",
+       "QS",
+       "5S",
+       "2D",
+       "9C"
+      ],
+      [
+       "4H",
+       "2H",
+       "KS",
+       "10S",
+       "JC",
+       "2C"
+      ],
+      [
+       "7S",
+       "JD",
+       "8D",
+       "7D",
+       "6D",
+       "8C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6
+       ],
+       "forbidden": 3
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "JH",
+       "legal": [
+        "JH",
+        "JS",
+        "8S",
+        "3D",
+        "10C",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "9H",
+       "legal": [
+        "10H",
+        "9H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AH",
+       "legal": [
+        "AH",
+        "5H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "2H",
+       "legal": [
+        "4H",
+        "2H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "6D",
+       "legal": [
+        "7S",
+        "JD",
+        "8D",
+        "7D",
+        "6D",
+        "8C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "6H",
+       "legal": [
+        "KH",
+        "6H",
+        "3H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "7H",
+       "legal": [
+        "7H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "2D",
+       "legal": [
+        "5H",
+        "QS",
+        "5S",
+        "2D",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "4H",
+       "legal": [
+        "4H",
+        "KS",
+        "10S",
+        "JC",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "7D",
+       "legal": [
+        "JD",
+        "8D",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "KD",
+       "legal": [
+        "KD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "9D",
+       "legal": [
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "3D",
+       "legal": [
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "10D",
+       "legal": [
+        "10D",
+        "5D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "2C",
+       "legal": [
+        "KS",
+        "10S",
+        "JC",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "8C",
+       "legal": [
+        "8C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "QC",
+       "legal": [
+        "QC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "6C",
+       "legal": [
+        "6C",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "5C",
+       "legal": [
+        "10C",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "AC",
+       "legal": [
+        "AC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "9C",
+       "legal": [
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "5D",
+       "legal": [
+        "10H",
+        "6S",
+        "5D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "QS",
+       "legal": [
+        "5H",
+        "QS",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "KS",
+       "legal": [
+        "KS",
+        "10S",
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "8D",
+       "legal": [
+        "JD",
+        "8D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "KH",
+       "legal": [
+        "KH",
+        "3H",
+        "AS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "9S",
+       "legal": [
+        "9S",
+        "4S",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "8S",
+       "legal": [
+        "JS",
+        "8S",
+        "10C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "AS",
+       "legal": [
+        "3H",
+        "AS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "4S",
+       "legal": [
+        "4S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "JS",
+       "legal": [
+        "JS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "6S",
+       "legal": [
+        "6S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "5S",
+       "legal": [
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "10S",
+       "legal": [
+        "10S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "7S",
+       "legal": [
+        "7S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "3H",
+       "legal": [
+        "3H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "4C",
+       "legal": [
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "10C",
+       "legal": [
+        "10C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "10H",
+       "legal": [
+        "10H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "5H",
+       "legal": [
+        "5H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "JC",
+       "legal": [
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "JD",
+       "legal": [
+        "JD"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 0,
+       "tricks": 2,
+       "delta": 2,
+       "total": 12
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 25
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 10
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 0,
+       "tricks": 2,
+       "delta": 2,
+       "total": 2
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 19
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 30
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 11
+      }
+     ]
+    },
+    {
+     "cards": 5,
+     "kind": "normal",
+     "hands": [
+      [
+       "8H",
+       "KS",
+       "QS",
+       "5D",
+       "6C"
+      ],
+      [
+       "4H",
+       "KD",
+       "8D",
+       "6D",
+       "AC"
+      ],
+      [
+       "KH",
+       "10S",
+       "JD",
+       "9D",
+       "2C"
+      ],
+      [
+       "3S",
+       "2S",
+       "JC",
+       "9C",
+       "4C"
+      ],
+      [
+       "AH",
+       "9H",
+       "5H",
+       "AD",
+       "10D"
+      ],
+      [
+       "QH",
+       "JS",
+       "6S",
+       "5S",
+       "7C"
+      ],
+      [
+       "3H",
+       "7D",
+       "4D",
+       "8C",
+       "3C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 2,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "3S",
+       "legal": [
+        "3S",
+        "2S",
+        "JC",
+        "9C",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "5H",
+       "legal": [
+        "AH",
+        "9H",
+        "5H",
+        "AD",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "5S",
+       "legal": [
+        "JS",
+        "6S",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "3H",
+       "legal": [
+        "3H",
+        "7D",
+        "4D",
+        "8C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "KS",
+       "legal": [
+        "KS",
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "6D",
+       "legal": [
+        "4H",
+        "KD",
+        "8D",
+        "6D",
+        "AC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "10S",
+       "legal": [
+        "10S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AD",
+       "legal": [
+        "AH",
+        "9H",
+        "AD",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "QH",
+       "legal": [
+        "QH",
+        "JS",
+        "6S",
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "4D",
+       "legal": [
+        "7D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "5D",
+       "legal": [
+        "5D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "8D",
+       "legal": [
+        "KD",
+        "8D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "9D",
+       "legal": [
+        "JD",
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "9C",
+       "legal": [
+        "2S",
+        "JC",
+        "9C",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "6S",
+       "legal": [
+        "JS",
+        "6S",
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "3C",
+       "legal": [
+        "7D",
+        "8C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "QS",
+       "legal": [
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "4H",
+       "legal": [
+        "4H",
+        "KD",
+        "AC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "KH",
+       "legal": [
+        "KH",
+        "JD",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "2S",
+       "legal": [
+        "2S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AH",
+       "legal": [
+        "AH",
+        "9H",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "10D",
+       "legal": [
+        "9H",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "JS",
+       "legal": [
+        "JS",
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "7D",
+       "legal": [
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "8H",
+       "legal": [
+        "8H",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "KD",
+       "legal": [
+        "KD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "JD",
+       "legal": [
+        "JD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "4C",
+       "legal": [
+        "JC",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "6C",
+       "legal": [
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "AC",
+       "legal": [
+        "AC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "2C",
+       "legal": [
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "JC",
+       "legal": [
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "9H",
+       "legal": [
+        "9H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "7C",
+       "legal": [
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "8C",
+       "legal": [
+        "8C"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 27
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 25
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 10
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 12
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 2,
+       "tricks": 3,
+       "delta": 3,
+       "total": 22
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 45
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 11
+      }
+     ]
+    },
+    {
+     "cards": 4,
+     "kind": "normal",
+     "hands": [
+      [
+       "6S",
+       "2S",
+       "KD",
+       "10D"
+      ],
+      [
+       "7H",
+       "4H",
+       "9D",
+       "QC"
+      ],
+      [
+       "QS",
+       "AD",
+       "2D",
+       "8C"
+      ],
+      [
+       "9C",
+       "7C",
+       "6C",
+       "3C"
+      ],
+      [
+       "9H",
+       "3D",
+       "AC",
+       "JC"
+      ],
+      [
+       "8H",
+       "KS",
+       "JD",
+       "6D"
+      ],
+      [
+       "7S",
+       "QD",
+       "4C",
+       "2C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 0,
+       "legal": [
+        0,
+        2,
+        3,
+        4
+       ],
+       "forbidden": 1
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AC",
+       "legal": [
+        "9H",
+        "3D",
+        "AC",
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "8H",
+       "legal": [
+        "8H",
+        "KS",
+        "JD",
+        "6D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "2C",
+       "legal": [
+        "4C",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "2S",
+       "legal": [
+        "6S",
+        "2S",
+        "KD",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "QC",
+       "legal": [
+        "QC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "8C",
+       "legal": [
+        "8C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "3C",
+       "legal": [
+        "9C",
+        "7C",
+        "6C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "6D",
+       "legal": [
+        "KS",
+        "JD",
+        "6D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "QD",
+       "legal": [
+        "QD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "KD",
+       "legal": [
+        "KD",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "9D",
+       "legal": [
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "2D",
+       "legal": [
+        "AD",
+        "2D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "6C",
+       "legal": [
+        "9C",
+        "7C",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "3D",
+       "legal": [
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "10D",
+       "legal": [
+        "6S",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "4H",
+       "legal": [
+        "7H",
+        "4H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "AD",
+       "legal": [
+        "AD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "9C",
+       "legal": [
+        "9C",
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "9H",
+       "legal": [
+        "9H",
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "JD",
+       "legal": [
+        "JD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "7S",
+       "legal": [
+        "7S",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "JC",
+       "legal": [
+        "JC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "KS",
+       "legal": [
+        "KS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "4C",
+       "legal": [
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "6S",
+       "legal": [
+        "6S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "7H",
+       "legal": [
+        "7H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "QS",
+       "legal": [
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "7C",
+       "legal": [
+        "7C"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 0,
+       "tricks": 1,
+       "delta": 1,
+       "total": 28
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 40
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 20
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 22
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 37
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 60
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 21
+      }
+     ]
+    },
+    {
+     "cards": 3,
+     "kind": "normal",
+     "hands": [
+      [
+       "9H",
+       "3H",
+       "5C"
+      ],
+      [
+       "2H",
+       "KD",
+       "6C"
+      ],
+      [
+       "9S",
+       "10D",
+       "QC"
+      ],
+      [
+       "KH",
+       "7H",
+       "7D"
+      ],
+      [
+       "AS",
+       "8S",
+       "8D"
+      ],
+      [
+       "JS",
+       "4S",
+       "AD"
+      ],
+      [
+       "9D",
+       "7C",
+       "4C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        3
+       ],
+       "forbidden": 2
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "4S",
+       "legal": [
+        "JS",
+        "4S",
+        "AD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "4C",
+       "legal": [
+        "9D",
+        "7C",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "5C",
+       "legal": [
+        "9H",
+        "3H",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "KD",
+       "legal": [
+        "2H",
+        "KD",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "9S",
+       "legal": [
+        "9S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "7D",
+       "legal": [
+        "KH",
+        "7H",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "8S",
+       "legal": [
+        "AS",
+        "8S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "QC",
+       "legal": [
+        "10D",
+        "QC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "KH",
+       "legal": [
+        "KH",
+        "7H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AS",
+       "legal": [
+        "AS",
+        "8D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "AD",
+       "legal": [
+        "JS",
+        "AD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "7C",
+       "legal": [
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "9H",
+       "legal": [
+        "9H",
+        "3H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "6C",
+       "legal": [
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "7H",
+       "legal": [
+        "7H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "8D",
+       "legal": [
+        "8D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "JS",
+       "legal": [
+        "JS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "9D",
+       "legal": [
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "3H",
+       "legal": [
+        "3H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "2H",
+       "legal": [
+        "2H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "10D",
+       "legal": [
+        "10D"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 28
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 50
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 0,
+       "tricks": 1,
+       "delta": 1,
+       "total": 21
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 0,
+       "tricks": 2,
+       "delta": 2,
+       "total": 24
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 47
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 70
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 31
+      }
+     ]
+    },
+    {
+     "cards": 2,
+     "kind": "normal",
+     "hands": [
+      [
+       "QD",
+       "AC"
+      ],
+      [
+       "8S",
+       "7D"
+      ],
+      [
+       "QS",
+       "9D"
+      ],
+      [
+       "3D",
+       "KC"
+      ],
+      [
+       "10S",
+       "7S"
+      ],
+      [
+       "JD",
+       "2C"
+      ],
+      [
+       "3S",
+       "10C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "3S",
+       "legal": [
+        "3S",
+        "10C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "AC",
+       "legal": [
+        "QD",
+        "AC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "8S",
+       "legal": [
+        "8S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "QS",
+       "legal": [
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "KC",
+       "legal": [
+        "3D",
+        "KC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "10S",
+       "legal": [
+        "10S",
+        "7S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "JD",
+       "legal": [
+        "JD",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "9D",
+       "legal": [
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "3D",
+       "legal": [
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "7S",
+       "legal": [
+        "7S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "2C",
+       "legal": [
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "10C",
+       "legal": [
+        "10C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "QD",
+       "legal": [
+        "QD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "7D",
+       "legal": [
+        "7D"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 43
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 60
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 0,
+       "tricks": 1,
+       "delta": 1,
+       "total": 22
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 24
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 57
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 80
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 31
+      }
+     ]
+    },
+    {
+     "cards": 1,
+     "kind": "normal",
+     "hands": [
+      [
+       "3D"
+      ],
+      [
+       "5H"
+      ],
+      [
+       "3S"
+      ],
+      [
+       "6C"
+      ],
+      [
+       "10H"
+      ],
+      [
+       "4D"
+      ],
+      [
+       "8S"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 0,
+       "legal": [
+        0,
+        1
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 0,
+       "legal": [
+        0,
+        1
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 0,
+       "legal": [
+        0,
+        1
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 0,
+       "legal": [
+        0,
+        1
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 1,
+       "legal": [
+        0,
+        1
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 0,
+       "legal": [
+        0,
+        1
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 1,
+       "legal": [
+        1
+       ],
+       "forbidden": 0
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "3D",
+       "legal": [
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "5H",
+       "legal": [
+        "5H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "3S",
+       "legal": [
+        "3S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "6C",
+       "legal": [
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "10H",
+       "legal": [
+        "10H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "4D",
+       "legal": [
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "8S",
+       "legal": [
+        "8S"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 53
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 70
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 32
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 34
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 72
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 90
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 31
+      }
+     ]
+    },
+    {
+     "cards": 7,
+     "kind": "no_trump",
+     "hands": [
+      [
+       "KH",
+       "8S",
+       "8D",
+       "6D",
+       "3D",
+       "10C",
+       "9C"
+      ],
+      [
+       "JH",
+       "5H",
+       "5S",
+       "JD",
+       "7D",
+       "4C",
+       "3C"
+      ],
+      [
+       "AH",
+       "7H",
+       "9S",
+       "2S",
+       "AC",
+       "8C",
+       "6C"
+      ],
+      [
+       "6H",
+       "3H",
+       "10S",
+       "6S",
+       "4S",
+       "5D",
+       "2D"
+      ],
+      [
+       "10H",
+       "9H",
+       "KS",
+       "QS",
+       "10D",
+       "KC",
+       "QC"
+      ],
+      [
+       "QH",
+       "8H",
+       "3S",
+       "KD",
+       "QD",
+       "9D",
+       "4D"
+      ],
+      [
+       "4H",
+       "AS",
+       "JS",
+       "7S",
+       "AD",
+       "JC",
+       "5C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 2,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 2,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 2,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 2,
+       "legal": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": 0
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "3C",
+       "legal": [
+        "JH",
+        "5H",
+        "5S",
+        "JD",
+        "7D",
+        "4C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "AC",
+       "legal": [
+        "AC",
+        "8C",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "10S",
+       "legal": [
+        "6H",
+        "3H",
+        "10S",
+        "6S",
+        "4S",
+        "5D",
+        "2D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "QC",
+       "legal": [
+        "KC",
+        "QC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "3S",
+       "legal": [
+        "QH",
+        "8H",
+        "3S",
+        "KD",
+        "QD",
+        "9D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "JC",
+       "legal": [
+        "JC",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "10C",
+       "legal": [
+        "10C",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "AH",
+       "legal": [
+        "AH",
+        "7H",
+        "9S",
+        "2S",
+        "8C",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "3H",
+       "legal": [
+        "6H",
+        "3H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "9H",
+       "legal": [
+        "10H",
+        "9H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "8H",
+       "legal": [
+        "QH",
+        "8H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "4H",
+       "legal": [
+        "4H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "KH",
+       "legal": [
+        "KH"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "JH",
+       "legal": [
+        "JH",
+        "5H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "2S",
+       "legal": [
+        "7H",
+        "9S",
+        "2S",
+        "8C",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "4S",
+       "legal": [
+        "6S",
+        "4S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "QS",
+       "legal": [
+        "KS",
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "4D",
+       "legal": [
+        "QH",
+        "KD",
+        "QD",
+        "9D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "7S",
+       "legal": [
+        "AS",
+        "JS",
+        "7S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "8S",
+       "legal": [
+        "8S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "5S",
+       "legal": [
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "KS",
+       "legal": [
+        "10H",
+        "KS",
+        "10D",
+        "KC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "9D",
+       "legal": [
+        "QH",
+        "KD",
+        "QD",
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "JS",
+       "legal": [
+        "AS",
+        "JS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "6D",
+       "legal": [
+        "8D",
+        "6D",
+        "3D",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "JD",
+       "legal": [
+        "5H",
+        "JD",
+        "7D",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "9S",
+       "legal": [
+        "9S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "6S",
+       "legal": [
+        "6S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "10H",
+       "legal": [
+        "10H",
+        "10D",
+        "KC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "QH",
+       "legal": [
+        "QH"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "AD",
+       "legal": [
+        "AS",
+        "AD",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "9C",
+       "legal": [
+        "8D",
+        "3D",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "5H",
+       "legal": [
+        "5H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "7H",
+       "legal": [
+        "7H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "6H",
+       "legal": [
+        "6H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "QD",
+       "legal": [
+        "KD",
+        "QD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "5C",
+       "legal": [
+        "AS",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "8D",
+       "legal": [
+        "8D",
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "7D",
+       "legal": [
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "8C",
+       "legal": [
+        "8C",
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "2D",
+       "legal": [
+        "5D",
+        "2D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "10D",
+       "legal": [
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "KD",
+       "legal": [
+        "KD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "AS",
+       "legal": [
+        "AS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "3D",
+       "legal": [
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "4C",
+       "legal": [
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "6C",
+       "legal": [
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "5D",
+       "legal": [
+        "5D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "KC",
+       "legal": [
+        "KC"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 2,
+       "tricks": 0,
+       "delta": 0,
+       "total": 53
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 80
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 2,
+       "tricks": 2,
+       "delta": 20,
+       "total": 52
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 44
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 2,
+       "tricks": 2,
+       "delta": 20,
+       "total": 92
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 1,
+       "tricks": 3,
+       "delta": 3,
+       "total": 93
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 2,
+       "tricks": 0,
+       "delta": 0,
+       "total": 31
+      }
+     ]
+    },
+    {
+     "cards": 7,
+     "kind": "blind",
+     "hands": [
+      [
+       "JH",
+       "AS",
+       "4S",
+       "2D",
+       "QC",
+       "6C",
+       "3C"
+      ],
+      [
+       "QH",
+       "8H",
+       "7H",
+       "KS",
+       "JS",
+       "5S",
+       "3D"
+      ],
+      [
+       "9H",
+       "6H",
+       "2S",
+       "QD",
+       "9D",
+       "6D",
+       "5C"
+      ],
+      [
+       "10H",
+       "4H",
+       "QS",
+       "10S",
+       "7S",
+       "10D",
+       "8C"
+      ],
+      [
+       "2H",
+       "AD",
+       "KD",
+       "8D",
+       "7D",
+       "5D",
+       "4D"
+      ],
+      [
+       "AH",
+       "KH",
+       "5H",
+       "KC",
+       "JC",
+       "9C",
+       "4C"
+      ],
+      [
+       "3H",
+       "9S",
+       "8S",
+       "6S",
+       "10C",
+       "7C",
+       "2C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "bid",
+       "player": "p2",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p3",
+       "value": 2,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p4",
+       "value": 0,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p5",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p6",
+       "value": 1,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p0",
+       "value": 2,
+       "legal": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": null
+      },
+      {
+       "kind": "bid",
+       "player": "p1",
+       "value": 1,
+       "legal": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+       ],
+       "forbidden": 0
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "9H",
+       "legal": [
+        "9H",
+        "6H",
+        "2S",
+        "QD",
+        "9D",
+        "6D",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "4H",
+       "legal": [
+        "10H",
+        "4H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "2H",
+       "legal": [
+        "2H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "KH",
+       "legal": [
+        "AH",
+        "KH",
+        "5H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "3H",
+       "legal": [
+        "3H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "JH",
+       "legal": [
+        "JH"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "7H",
+       "legal": [
+        "QH",
+        "8H",
+        "7H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "4C",
+       "legal": [
+        "AH",
+        "5H",
+        "KC",
+        "JC",
+        "9C",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "10C",
+       "legal": [
+        "10C",
+        "7C",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "QC",
+       "legal": [
+        "QC",
+        "6C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "8H",
+       "legal": [
+        "QH",
+        "8H",
+        "KS",
+        "JS",
+        "5S",
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "5C",
+       "legal": [
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "8C",
+       "legal": [
+        "8C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AD",
+       "legal": [
+        "AD",
+        "KD",
+        "8D",
+        "7D",
+        "5D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "3D",
+       "legal": [
+        "QH",
+        "KS",
+        "JS",
+        "5S",
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "6D",
+       "legal": [
+        "QD",
+        "9D",
+        "6D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "10D",
+       "legal": [
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "8D",
+       "legal": [
+        "KD",
+        "8D",
+        "7D",
+        "5D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "KC",
+       "legal": [
+        "AH",
+        "5H",
+        "KC",
+        "JC",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "2C",
+       "legal": [
+        "9S",
+        "8S",
+        "6S",
+        "7C",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "2D",
+       "legal": [
+        "2D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "10S",
+       "legal": [
+        "10H",
+        "QS",
+        "10S",
+        "7S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "KD",
+       "legal": [
+        "KD",
+        "7D",
+        "5D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "JC",
+       "legal": [
+        "AH",
+        "5H",
+        "JC",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "8S",
+       "legal": [
+        "9S",
+        "8S",
+        "6S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "AS",
+       "legal": [
+        "AS",
+        "4S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "KS",
+       "legal": [
+        "KS",
+        "JS",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "2S",
+       "legal": [
+        "2S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "4S",
+       "legal": [
+        "4S",
+        "6C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "JS",
+       "legal": [
+        "JS",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "6H",
+       "legal": [
+        "6H",
+        "QD",
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "7S",
+       "legal": [
+        "QS",
+        "7S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "7D",
+       "legal": [
+        "7D",
+        "5D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "5H",
+       "legal": [
+        "AH",
+        "5H",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "6S",
+       "legal": [
+        "9S",
+        "6S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "9D",
+       "legal": [
+        "QD",
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "10H",
+       "legal": [
+        "10H",
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "5D",
+       "legal": [
+        "5D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "9C",
+       "legal": [
+        "AH",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "9S",
+       "legal": [
+        "9S",
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "6C",
+       "legal": [
+        "6C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "5S",
+       "legal": [
+        "QH",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "QS",
+       "legal": [
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "4D",
+       "legal": [
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "AH",
+       "legal": [
+        "AH"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "7C",
+       "legal": [
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "3C",
+       "legal": [
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "QH",
+       "legal": [
+        "QH"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "QD",
+       "legal": [
+        "QD"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": 2,
+       "tricks": 1,
+       "delta": 1,
+       "total": 54
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 95
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": 1,
+       "tricks": 1,
+       "delta": 15,
+       "total": 67
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": 2,
+       "tricks": 2,
+       "delta": 20,
+       "total": 64
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": 0,
+       "tricks": 0,
+       "delta": 10,
+       "total": 102
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": 1,
+       "tricks": 2,
+       "delta": 2,
+       "total": 95
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": 1,
+       "tricks": 0,
+       "delta": 0,
+       "total": 31
+      }
+     ]
+    },
+    {
+     "cards": 7,
+     "kind": "misere",
+     "hands": [
+      [
+       "4H",
+       "10S",
+       "7S",
+       "6S",
+       "5S",
+       "3D",
+       "7C"
+      ],
+      [
+       "KH",
+       "QH",
+       "10H",
+       "KS",
+       "QS",
+       "9C",
+       "5C"
+      ],
+      [
+       "7H",
+       "JS",
+       "KD",
+       "9D",
+       "4D",
+       "10C",
+       "4C"
+      ],
+      [
+       "6H",
+       "4S",
+       "QD",
+       "10D",
+       "KC",
+       "QC",
+       "2C"
+      ],
+      [
+       "AH",
+       "9H",
+       "3H",
+       "AS",
+       "8S",
+       "2S",
+       "AC"
+      ],
+      [
+       "8H",
+       "9S",
+       "8D",
+       "6D",
+       "JC",
+       "8C",
+       "3C"
+      ],
+      [
+       "JH",
+       "2H",
+       "3S",
+       "AD",
+       "JD",
+       "7D",
+       "6C"
+      ]
+     ],
+     "actions": [
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "6H",
+       "legal": [
+        "6H",
+        "4S",
+        "QD",
+        "10D",
+        "KC",
+        "QC",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "3H",
+       "legal": [
+        "AH",
+        "9H",
+        "3H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "8H",
+       "legal": [
+        "8H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "2H",
+       "legal": [
+        "JH",
+        "2H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "4H",
+       "legal": [
+        "4H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "KH",
+       "legal": [
+        "KH",
+        "QH",
+        "10H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "7H",
+       "legal": [
+        "7H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "5C",
+       "legal": [
+        "QH",
+        "10H",
+        "KS",
+        "QS",
+        "9C",
+        "5C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "4C",
+       "legal": [
+        "10C",
+        "4C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "QC",
+       "legal": [
+        "KC",
+        "QC",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AC",
+       "legal": [
+        "AC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "JC",
+       "legal": [
+        "JC",
+        "8C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "6C",
+       "legal": [
+        "6C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "7C",
+       "legal": [
+        "7C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "2S",
+       "legal": [
+        "AH",
+        "9H",
+        "AS",
+        "8S",
+        "2S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "9S",
+       "legal": [
+        "9S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "3S",
+       "legal": [
+        "3S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "10S",
+       "legal": [
+        "10S",
+        "7S",
+        "6S",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "KS",
+       "legal": [
+        "KS",
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "JS",
+       "legal": [
+        "JS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "4S",
+       "legal": [
+        "4S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "9C",
+       "legal": [
+        "QH",
+        "10H",
+        "QS",
+        "9C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "10C",
+       "legal": [
+        "10C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "2C",
+       "legal": [
+        "KC",
+        "2C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AS",
+       "legal": [
+        "AH",
+        "9H",
+        "AS",
+        "8S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "8C",
+       "legal": [
+        "8C",
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "JD",
+       "legal": [
+        "JH",
+        "AD",
+        "JD",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "3D",
+       "legal": [
+        "7S",
+        "6S",
+        "5S",
+        "3D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "4D",
+       "legal": [
+        "KD",
+        "9D",
+        "4D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "QD",
+       "legal": [
+        "QD",
+        "10D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "8S",
+       "legal": [
+        "AH",
+        "9H",
+        "8S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "8D",
+       "legal": [
+        "8D",
+        "6D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "7D",
+       "legal": [
+        "AD",
+        "7D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "7S",
+       "legal": [
+        "7S",
+        "6S",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "QS",
+       "legal": [
+        "QH",
+        "10H",
+        "QS"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "KC",
+       "legal": [
+        "10D",
+        "KC"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "AH",
+       "legal": [
+        "AH",
+        "9H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "3C",
+       "legal": [
+        "3C"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "JH",
+       "legal": [
+        "JH",
+        "AD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "5S",
+       "legal": [
+        "6S",
+        "5S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "QH",
+       "legal": [
+        "QH",
+        "10H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "KD",
+       "legal": [
+        "KD",
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p4",
+       "card": "9H",
+       "legal": [
+        "9H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p5",
+       "card": "6D",
+       "legal": [
+        "6D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p6",
+       "card": "AD",
+       "legal": [
+        "AD"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p0",
+       "card": "6S",
+       "legal": [
+        "6S"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p1",
+       "card": "10H",
+       "legal": [
+        "10H"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p2",
+       "card": "9D",
+       "legal": [
+        "9D"
+       ]
+      },
+      {
+       "kind": "play",
+       "player": "p3",
+       "card": "10D",
+       "legal": [
+        "10D"
+       ]
+      }
+     ],
+     "rows": [
+      {
+       "player_id": "p0",
+       "name": "P0",
+       "bid": null,
+       "tricks": 0,
+       "delta": 0,
+       "total": 54
+      },
+      {
+       "player_id": "p1",
+       "name": "P1",
+       "bid": null,
+       "tricks": 3,
+       "delta": -15,
+       "total": 80
+      },
+      {
+       "player_id": "p2",
+       "name": "P2",
+       "bid": null,
+       "tricks": 1,
+       "delta": -5,
+       "total": 62
+      },
+      {
+       "player_id": "p3",
+       "name": "P3",
+       "bid": null,
+       "tricks": 1,
+       "delta": -5,
+       "total": 59
+      },
+      {
+       "player_id": "p4",
+       "name": "P4",
+       "bid": null,
+       "tricks": 2,
+       "delta": -10,
+       "total": 92
+      },
+      {
+       "player_id": "p5",
+       "name": "P5",
+       "bid": null,
+       "tricks": 0,
+       "delta": 0,
+       "total": 95
+      },
+      {
+       "player_id": "p6",
+       "name": "P6",
+       "bid": null,
+       "tricks": 0,
+       "delta": 0,
+       "total": 31
+      }
+     ]
+    }
+   ],
+   "final": [
+    {
+     "id": "p0",
+     "score": 54
+    },
+    {
+     "id": "p1",
+     "score": 80
+    },
+    {
+     "id": "p2",
+     "score": 62
+    },
+    {
+     "id": "p3",
+     "score": 59
+    },
+    {
+     "id": "p4",
+     "score": 92
+    },
+    {
+     "id": "p5",
+     "score": 95
+    },
+    {
+     "id": "p6",
+     "score": 31
+    }
+   ]
+  },
+  {
    "label": "4 giocatori \u00b7 long \u00b7 seed 77",
    "mode": "long",
    "dealer": 0,

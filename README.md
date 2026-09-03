@@ -79,7 +79,8 @@ e poi arrivano i tre round speciali, tutti da 7 carte:
 - **Partita lunga — 20 round:** la veloce, poi la risalita `1, 2, 3, 4, 5, 6, 7`
   e di nuovo i tre speciali.
 
-Vince chi ha più punti alla fine. Si gioca da **2 a 6 giocatori**, umani o bot mescolati.
+Vince chi ha più punti alla fine. Si gioca da **2 a 7 giocatori**, umani o bot mescolati.
+Sette è il tetto: con sette carte a testa sono 49 delle 52 del mazzo, in otto non ci si sta.
 
 ---
 
@@ -278,8 +279,8 @@ Le regole sono scritte due volte — in Python e in JavaScript — ed è esattam
 tipo di duplicazione che marcisce in silenzio. Non è lasciata all'attenzione di chi
 modifica.
 
-`site/tests/make_fixtures.py` fa giocare al motore Python sette partite intere (da 2
-a 6 giocatori, entrambe le durate) e registra tutto: le mani distribuite a ogni round,
+`site/tests/make_fixtures.py` fa giocare al motore Python otto partite intere (da 2
+a 7 giocatori, entrambe le durate) e registra tutto: le mani distribuite a ogni round,
 ogni mossa, **le mosse che erano legali in quel momento** e i punti di ogni round.
 `site/tests/run.mjs` rigioca quelle partite in JavaScript e pretende che coincidano,
 turno per turno — oltre cinquemila confronti.
@@ -300,7 +301,7 @@ python -m pytest
 ```
 
 Coprono le regole (chi vince una presa, i punteggi, il calendario dei round),
-l'engine (turni, obbligo di seme, mosse illegali, partite complete da 2 a 6 giocatori)
+l'engine (turni, obbligo di seme, mosse illegali, partite complete da 2 a 7 giocatori)
 e il server via WebSocket (lobby, permessi dell'host, privatezza delle mani,
 riconnessione, una partita intera contro i bot).
 

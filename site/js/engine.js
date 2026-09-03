@@ -121,7 +121,9 @@ export const MISERE_PER_TRICK = -5;
 export const MISERE_SWEEP_BONUS = 30;
 
 export const MIN_PLAYERS = 2;
-export const MAX_PLAYERS = 6;
+// Il tetto lo decide il mazzo: la mano piu' lunga e' di 7 carte, e 7 giocatori
+// ne consumano 49 delle 52. In otto non ci si sta.
+export const MAX_PLAYERS = Math.floor(52 / MAX_NORMAL_CARDS);
 
 function roundSpec(number, cards, kind) {
   return {
