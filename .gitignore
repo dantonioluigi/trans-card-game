@@ -14,3 +14,6 @@ htmlcov/
 .vscode/
 *.log
 site/dist/
+
+# pacchetti Helm generati da "helm package"
+*.tgz
