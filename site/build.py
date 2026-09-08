@@ -13,6 +13,7 @@ import hashlib
 import pathlib
 import re
 import shutil
+from datetime import date
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 WEB = ROOT / "web"
@@ -20,6 +21,38 @@ SITE = ROOT / "site"
 DIST = SITE / "dist"
 
 PEERJS = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"
+
+#: Dove vive il sito pubblicato. Serve agli indirizzi assoluti che vogliono
+#: Open Graph e la sitemap: quelli relativi li' non funzionano.
+SITE_URL = "https://dantonioluigi.github.io/trans-card-game/"
+
+TITLE = "TRANS — il gioco di carte"
+DESCRIPTION = (
+    "Gioco di carte a prese e dichiarazioni: dichiari quante prese farai, e "
+    "sbagliare costa. Si gioca nel browser con gli amici o contro i bot."
+)
+
+#: Quello che si vede quando il link finisce in una chat. Senza, appare
+#: l'indirizzo nudo — ed e' cosi' che questo gioco si passa davvero di mano.
+SOCIAL_CARD = f"""  <link rel="canonical" href="{SITE_URL}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TRANS">
+  <meta property="og:title" content="{TITLE}">
+  <meta property="og:description" content="{DESCRIPTION}">
+  <meta property="og:url" content="{SITE_URL}">
+  <meta property="og:image" content="{SITE_URL}anteprima.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Il tavolo di TRANS a partita in corso">
+  <meta property="og:locale" content="it_IT">
+  <meta name="twitter:card" content="summary_large_image">
+"""
+
+ROBOTS = f"""User-agent: *
+Allow: /
+
+Sitemap: {SITE_URL}sitemap.xml
+"""
 
 HOME_NOTE = """    <p class="tagline small">Versione senza server: le partite passano da browser a browser.</p>
 """
@@ -57,6 +90,13 @@ def transform_index(html: str, version: str) -> str:
         html = html.replace(before, after, 1)
 
     swap('href="/static/style.css"', f'href="style.css?v={version}"')
+
+    # La descrizione del sorgente e quella condivisa devono restare la stessa.
+    swap(
+        '<meta name="description" content="TRANS: gioco di carte a prese e scommesse, '
+        'online o contro i bot.">\n',
+        f'<meta name="description" content="{DESCRIPTION}">\n' + SOCIAL_CARD,
+    )
 
     # Il trasporto va installato prima che app.js parta: i moduli sono
     # deferred, quindi girano comunque prima del DOMContentLoaded.
@@ -98,6 +138,19 @@ def main() -> None:
 
     for module in modules:
         (DIST / "js" / module.name).write_text(version_imports(module.read_text(), version))
+
+    shutil.copy2(ROOT / "docs" / "social.png", DIST / "anteprima.png")
+
+    # Una pagina sola, ma Search Console la sitemap la chiede lo stesso.
+    (DIST / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"  <url>\n    <loc>{SITE_URL}</loc>\n"
+        f"    <lastmod>{date.today().isoformat()}</lastmod>\n"
+        "    <changefreq>monthly</changefreq>\n  </url>\n"
+        "</urlset>\n"
+    )
+    (DIST / "robots.txt").write_text(ROBOTS)
 
     # Senza .nojekyll, Pages passa tutto da Jekyll e ignora certe cartelle.
     (DIST / ".nojekyll").write_text("")
