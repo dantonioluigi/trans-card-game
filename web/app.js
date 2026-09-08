@@ -20,6 +20,8 @@
     },
   };
 
+  const IDLE_TITLE = document.title;
+
   const app = {
     link: null,
     state: null,
@@ -28,6 +30,7 @@
     room: "",
     wantConnection: false,
     retry: 500,
+    pendingBid: null,
     heldSignature: "",
     heldUntil: 0,
     holdTimer: null,
@@ -193,6 +196,7 @@
     $("screenLobby").hidden = which !== "lobby";
     $("screenGame").hidden = which !== "game";
     $("topbarInfo").hidden = which === "home";
+    if (which !== "game") markTurn(false);
     if (which === "home") {
       $("btnLeave").hidden = true;
       hideOverlays();
@@ -288,6 +292,7 @@
     trumpChip.innerHTML = g.round.trump ? "Briscola " + suitHtml(g.round.trump) : "Senza briscola";
     trumpChip.classList.toggle("hot", !g.round.trump);
 
+    markTurn(myTurnNow(g));
     renderSeats(g, me);
     renderTrick(g, me);
     renderCenter(g);
@@ -424,14 +429,29 @@
         : "Queste sono le tue carte. <b>Nessuna briscola</b> in questo round.";
     }
     if (myTurn) {
-      const lead = g.lead_suit ? ` Seme di uscita: ${suitHtml(g.lead_suit)}.` : " Esci tu.";
-      return "<b>Tocca a te.</b>" + lead;
+      const lead = g.lead_suit
+        ? ` Seme di uscita: ${suitHtml(g.lead_suit)}.`
+        : " Esci tu: scegli il seme.";
+      return '<span class="turn-badge">Tocca a te</span>' + lead;
     }
     return `Gioca <b>${escapeHtml(actor ? actor.name : "…")}</b>.`;
   }
 
   function myTurnToBid(g) {
     return g.phase === "bidding" && g.legal_bids.length > 0;
+  }
+
+  /** Tocca a me, che sia da dichiarare o da giocare. */
+  function myTurnNow(g) {
+    return g.legal_bids.length > 0 || g.legal_cards.length > 0;
+  }
+
+  /* Il turno va gridato in tre posti: il tavolo, la riga sopra la mano e il
+   * titolo della scheda — perche' spesso si sta guardando un'altra finestra. */
+  function markTurn(mine) {
+    $("screenGame").classList.toggle("your-turn", mine);
+    const wanted = mine ? "\u25B6 Tocca a te \u00b7 TRANS" : IDLE_TITLE;
+    if (document.title !== wanted) document.title = wanted;
   }
 
   function renderScores(g, me) {
@@ -491,6 +511,8 @@
 
       // Il numero vietato resta visibile, barrato: sparire e basta confonde.
       const legal = new Set(g.legal_bids);
+      if (app.pendingBid !== null && !legal.has(app.pendingBid)) app.pendingBid = null;
+
       const grid = $("bidGrid");
       grid.innerHTML = "";
       for (let value = 0; value <= g.round.cards; value++) {
@@ -498,7 +520,12 @@
         btn.type = "button";
         btn.textContent = value;
         if (legal.has(value)) {
-          btn.onclick = () => send({ type: "bid", value });
+          // Un click sceglie soltanto: a dichiarare ci pensa il secondo passo.
+          if (value === app.pendingBid) btn.className = "chosen";
+          btn.onclick = () => {
+            app.pendingBid = app.pendingBid === value ? null : value;
+            render();
+          };
         } else {
           btn.disabled = true;
           btn.className = "banned";
@@ -507,6 +534,10 @@
         }
         grid.appendChild(btn);
       }
+      renderBidConfirm(g);
+    } else {
+      app.pendingBid = null;
+      $("bidConfirm").hidden = true;
     }
 
     // Fine round
@@ -530,6 +561,32 @@
         ? "Torna alla lobby"
         : "In attesa dell'host…";
     }
+  }
+
+  /* Dichiarare non si disfa: prima si sceglie, poi si conferma. */
+  function renderBidConfirm(g) {
+    const row = $("bidConfirm");
+    const chosen = app.pendingBid;
+    row.hidden = chosen === null;
+    if (chosen === null) return;
+    $("bidChosen").innerHTML =
+      chosen === 0
+        ? "Dichiari <b>nessuna presa</b>?"
+        : `Dichiari <b>${chosen}</b> ${chosen === 1 ? "presa" : "prese"}?`;
+  }
+
+  function confirmBid() {
+    if (app.pendingBid === null) return;
+    const value = app.pendingBid;
+    app.pendingBid = null;
+    $("bidConfirm").hidden = true;
+    send({ type: "bid", value });
+  }
+
+  function cancelBid() {
+    if (app.pendingBid === null) return;
+    app.pendingBid = null;
+    render();
   }
 
   function fillResultTable(table, rows, misere, finalOnly = false) {
@@ -637,6 +694,9 @@
       btn.onclick = () => send({ type: "set_mode", mode: btn.dataset.mode });
     });
 
+    $("btnBidConfirm").onclick = confirmBid;
+    $("btnBidCancel").onclick = cancelBid;
+
     $("btnStart").onclick = () => send({ type: "start" });
     $("btnNextRound").onclick = () => send({ type: "next_round" });
     $("btnNewGame").onclick = () => send({ type: "new_game" });
@@ -654,7 +714,28 @@
     };
 
     window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") $("rulesOverlay").hidden = true;
+      if (e.key === "Escape") {
+        $("rulesOverlay").hidden = true;
+        cancelBid();
+        return;
+      }
+      // Mentre si scrive in chat i tasti sono della chat.
+      if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+      if ($("bidPanel").hidden) return;
+
+      if (e.key === "Enter") {
+        confirmBid();
+        return;
+      }
+      // Le cifre scelgono, non dichiarano: serve comunque il secondo passo.
+      if (/^[0-9]$/.test(e.key)) {
+        const value = Number(e.key);
+        const g = app.state && app.state.game;
+        if (g && g.legal_bids.includes(value)) {
+          app.pendingBid = value;
+          render();
+        }
+      }
     });
 
     // Se ricarichi la pagina mentre sei a un tavolo, ci rientri da solo.

@@ -35,7 +35,8 @@ di un bot**, con le sue carte e il suo punteggio: nessuno resta fuori per aver
 tardato, e chi ospita non deve restare fermo ad aspettare.
 
 **La dichiarazione.** Prima di giocare ognuno dichiara quante prese farà,
-partendo da sinistra del mazziere — che quindi parla per ultimo.
+partendo da sinistra del mazziere — che quindi parla per ultimo. Si sceglie il
+numero e poi si conferma: dichiarare non si disfa, un click storto sì.
 
 **Il mazziere non può pareggiare il conto:** la somma delle dichiarazioni non
 può fare esattamente il numero di prese in palio. In cinque, in un round da 5
