@@ -472,6 +472,8 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 .result-table .down { color: var(--bad); font-weight: 700; }
 .result-table .flat { color: var(--ink-dim); }
 .winner { color: var(--gold); font-size: 1.2rem; font-weight: 700; margin: 0 0 .6rem; }
+.end-actions { display: flex; gap: .6rem; }
+.end-actions .primary, .end-actions .ghost { flex: 1; margin-top: 0; }
 
 .rules-body { font-size: .9rem; line-height: 1.65; color: var(--ink-dim); }
 .rules-body h3 { color: var(--gold); font-size: .85rem; text-transform: uppercase; letter-spacing: .12em; margin-top: 1.2rem; }

@@ -556,10 +556,18 @@
       $("endWinner").textContent = "Vince " + g.winner;
       const rows = g.standings.map((s) => ({ name: s.name, total: s.score }));
       fillResultTable($("endTable"), rows, false, true);
+
+      // Chi si e' scollegato durante la partita non torna al tavolo: se restano
+      // in troppo pochi, rigiocare com'e' non si puo'.
+      const staying = g.players.filter((p) => p.is_bot || p.connected !== false).length;
+      const canReplay = state.is_host && staying >= state.min_players;
+      $("btnRematch").disabled = !canReplay;
       $("btnNewGame").disabled = !state.is_host;
-      $("btnNewGame").textContent = state.is_host
-        ? "Torna alla lobby"
-        : "In attesa dell'host…";
+      $("endHint").textContent = !state.is_host
+        ? "Aspetta che l'host decida se rigiocare."
+        : canReplay
+          ? "Stessi giocatori e stessa durata, punteggi da zero."
+          : `Per rigiocare servono almeno ${state.min_players} giocatori: passa dalla lobby.`;
     }
   }
 
@@ -699,6 +707,7 @@
 
     $("btnStart").onclick = () => send({ type: "start" });
     $("btnNextRound").onclick = () => send({ type: "next_round" });
+    $("btnRematch").onclick = () => send({ type: "rematch" });
     $("btnNewGame").onclick = () => send({ type: "new_game" });
 
     $("btnRules").onclick = () => { $("rulesOverlay").hidden = false; };

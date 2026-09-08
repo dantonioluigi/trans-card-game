@@ -286,6 +286,60 @@ def test_blind_round_hides_the_hand_over_the_wire(client):
         assert seen_blind
 
 
+def test_rematch_restarts_with_the_same_table(client):
+    """Rigiocare non deve costringere a rifare la stanza."""
+    with client.websocket_connect("/ws") as host:
+        join(host, "Luigi")
+        next_state(host)
+        host.send_json({"type": "add_bot", "level": "facile"})
+        next_state(host)
+        host.send_json({"type": "start"})
+        final = play_full_game(host)
+        assert final["winner"]
+        names_before = [p["name"] for p in final["players"]]
+
+        host.send_json({"type": "rematch"})
+        fresh = state_until(host, lambda s: s["screen"] == "game"
+                            and s["game"]["round"]["number"] == 1)["game"]
+        assert [p["name"] for p in fresh["players"]] == names_before
+        assert all(p["score"] == 0 for p in fresh["players"])
+        assert len(fresh["hand"]) == 7
+        assert fresh["round"]["total"] == 10
+
+
+def test_rematch_keeps_the_chosen_length(client):
+    with client.websocket_connect("/ws") as host:
+        join(host, "Luigi")
+        next_state(host)
+        host.send_json({"type": "set_mode", "mode": "long"})
+        next_state(host)
+        host.send_json({"type": "add_bot", "level": "facile"})
+        next_state(host)
+        host.send_json({"type": "start"})
+        play_full_game(host)
+        host.send_json({"type": "rematch"})
+        fresh = state_until(host, lambda s: s["screen"] == "game"
+                            and s["game"]["round"]["number"] == 1)["game"]
+        assert fresh["round"]["total"] == 20
+
+
+def test_rematch_is_refused_before_the_end_and_to_guests(client):
+    with client.websocket_connect("/ws") as host:
+        code = join(host, "Luigi")["room"]
+        next_state(host)
+        with client.websocket_connect("/ws") as guest:
+            join(guest, "Anna", room=code)
+            next_state(guest)
+            next_state(host)
+            host.send_json({"type": "start"})
+            state_until(host, lambda s: s["screen"] == "game")
+
+            host.send_json({"type": "rematch"})
+            assert "non e' ancora finita" in next_error(host)["message"]
+            guest.send_json({"type": "rematch"})
+            assert "solo chi ha creato" in next_error(guest)["message"]
+
+
 def test_a_latecomer_takes_over_a_bot(client):
     """Chi arriva a partita iniziata non resta fuori: entra al posto di un bot."""
     with client.websocket_connect("/ws") as host:

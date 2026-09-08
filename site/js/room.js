@@ -210,6 +210,20 @@ export class Table {
     this._promoteHost();
   }
 
+  /**
+   * Stessi giocatori, stessa durata, punteggi da zero.
+   *
+   * Passare dalla lobby per rigiocare identico e' un giro a vuoto: il tavolo
+   * e' gia' quello giusto, cambiano solo i punti.
+   */
+  rematch(requester) {
+    this._requireHost(requester);
+    const game = this._requireGame();
+    if (!game.isOver) throw new TableError("la partita non e' ancora finita");
+    this.backToLobby(requester);
+    this.start(requester);
+  }
+
   bid(playerId, value) {
     this._requireGame().placeBid(playerId, Number(value));
   }
@@ -375,6 +389,8 @@ function applyClientMessage(table, session, msg) {
       return table.play(session.playerId, msg.card || "");
     case "next_round":
       return table.nextRound(session.playerId);
+    case "rematch":
+      return table.rematch(session.playerId);
     case "new_game":
       return table.backToLobby(session.playerId);
     case "chat":

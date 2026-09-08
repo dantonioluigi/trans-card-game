@@ -111,6 +111,8 @@ async def websocket_endpoint(ws: WebSocket) -> None:
                         room.play(player_id, msg.get("card", ""))
                     elif kind == "next_round":
                         room.next_round(player_id)
+                    elif kind == "rematch":
+                        room.rematch(player_id)
                     elif kind == "new_game":
                         room.back_to_lobby(player_id)
                     elif kind == "chat":

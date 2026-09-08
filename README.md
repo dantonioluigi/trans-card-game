@@ -80,7 +80,9 @@ e poi arrivano i tre round speciali, tutti da 7 carte:
 - **Partita lunga — 20 round:** la veloce, poi la risalita `1, 2, 3, 4, 5, 6, 7`
   e di nuovo i tre speciali.
 
-Vince chi ha più punti alla fine. Si gioca da **2 a 7 giocatori**, umani o bot mescolati.
+Vince chi ha più punti alla fine, e da lì si riparte con **Gioca di nuovo**: stesso
+tavolo, stessa durata, punteggi da zero, senza rifare la stanza.
+Si gioca da **2 a 7 giocatori**, umani o bot mescolati.
 Sette è il tetto: con sette carte a testa sono 49 delle 52 del mazzo, in otto non ci si sta.
 
 ---
@@ -252,7 +254,7 @@ site/           versione senza server, per GitHub Pages
   js/net-p2p.js WebRTC fra i giocatori
   build.py      assembla site/dist da web/ + site/js, con ?v= sugli asset
   tests/        confronto JS↔Python e test dell'arbitro
-tests/          80 test su regole, engine e server
+tests/          93 test su regole, engine e server
 helm/           chart Kubernetes
 render.yaml     blueprint Render (va in radice, lo cerca lì)
 deploy/         fly.toml, docker-compose

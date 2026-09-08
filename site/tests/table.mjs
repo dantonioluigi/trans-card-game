@@ -160,6 +160,49 @@ function makeSession(table, name, playerId = null) {
   }
 }
 
+/* --------------------------------------------------- rigiocare senza rifare */
+
+{
+  const table = new Table(newRoomCode());
+  const host = makeSession(table, "Luigi");
+  host.join();
+  const guest = makeSession(table, "Anna");
+  guest.join();
+  host.send({ type: "set_mode", mode: "long" });
+  host.send({ type: "start" });
+
+  const bots = await import("../js/bots.js");
+  const names = table.game.players.map((p) => p.name);
+
+  // A meta' strada non si rigioca.
+  host.send({ type: "rematch" });
+  check(host.errors().at(-1)?.message.includes("non e' ancora finita"),
+        "ha accettato il rematch a partita in corso");
+
+  let guard = 0;
+  while (!table.game.isOver) {
+    if (++guard > 40000) throw new Error("la partita non finisce");
+    if (table.game.phase === "round_over") { table.game.advanceRound(); continue; }
+    bots.act(table.game, table.game.currentActor());
+  }
+  check(table.game.players.some((p) => p.score !== 0), "nessuno ha fatto punti");
+
+  // Un ospite non decide per il tavolo.
+  guest.send({ type: "rematch" });
+  check(guest.errors().at(-1)?.message.includes("solo chi ha creato"),
+        "un ospite ha potuto far ripartire la partita");
+
+  host.send({ type: "rematch" });
+  check(host.errors().length === 1, `rematch rifiutato: ${JSON.stringify(host.errors())}`);
+  check(table.game !== null && !table.game.isOver, "la nuova partita non e' partita");
+  check(table.game.roundIndex === 0, "non e' ripartita dal primo round");
+  check(table.game.players.map((p) => p.name).join() === names.join(),
+        "i giocatori al tavolo sono cambiati");
+  check(table.game.players.every((p) => p.score === 0), "i punteggi non sono azzerati");
+  check(table.game.schedule.length === 20, "la durata scelta non e' stata mantenuta");
+  check(guest.last("state").game.hand.length === 7, "l'ospite non ha ricevuto carte nuove");
+}
+
 /* ------------------------------------- chi arriva tardi prende posto a un bot */
 
 {

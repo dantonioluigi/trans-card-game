@@ -217,6 +217,19 @@ class Room:
         self.seats = [s for s in self.seats if s.is_bot or s.connected]
         self._promote_host()
 
+    def rematch(self, requester: str) -> None:
+        """Stessi giocatori, stessa durata, punteggi da zero.
+
+        Passare dalla lobby per rigiocare identico e' un giro a vuoto: il
+        tavolo e' gia' quello giusto, cambiano solo i punti.
+        """
+        self._require_host(requester)
+        game = self._require_game()
+        if not game.is_over:
+            raise RoomError("la partita non e' ancora finita")
+        self.back_to_lobby(requester)
+        self.start(requester)
+
     def bid(self, player_id: str, value: int) -> None:
         game = self._require_game()
         game.place_bid(player_id, int(value))
