@@ -250,7 +250,7 @@ site/           versione senza server, per GitHub Pages
   js/bots.js    porto in JS dei bot
   js/room.js    il tavolo, dentro il browser dell'host
   js/net-p2p.js WebRTC fra i giocatori
-  build.py      assembla site/dist da web/ + site/js
+  build.py      assembla site/dist da web/ + site/js, con ?v= sugli asset
   tests/        confronto JS↔Python e test dell'arbitro
 tests/          80 test su regole, engine e server
 helm/           chart Kubernetes
