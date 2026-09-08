@@ -48,6 +48,11 @@ SOCIAL_CARD = f"""  <link rel="canonical" href="{SITE_URL}">
   <meta name="twitter:card" content="summary_large_image">
 """
 
+#: File di verifica di Google Search Console. Il nome lo assegna Google e il
+#: contenuto e' una riga sola che ripete il nome del file: deve restare
+#: raggiungibile per sempre, se sparisce la proprieta' torna non verificata.
+GOOGLE_VERIFICATION = "googled3de7d3fb246b92b.html"
+
 ROBOTS = f"""User-agent: *
 Allow: /
 
@@ -151,6 +156,9 @@ def main() -> None:
         "</urlset>\n"
     )
     (DIST / "robots.txt").write_text(ROBOTS)
+    (DIST / GOOGLE_VERIFICATION).write_text(
+        f"google-site-verification: {GOOGLE_VERIFICATION}\n"
+    )
 
     # Senza .nojekyll, Pages passa tutto da Jekyll e ignora certe cartelle.
     (DIST / ".nojekyll").write_text("")
