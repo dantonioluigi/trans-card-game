@@ -413,7 +413,7 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 .scores { width: 100%; border-collapse: collapse; font-size: .86rem; }
 .scores td { padding: .25rem 0; }
 .scores .pts { text-align: right; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
-.scores tr.me td { color: #fff; }
+.scores tr.me td { color: var(--ink); font-weight: 650; }
 .scores .rank { color: var(--ink-dim); width: 1.5rem; }
 
 .log { flex: 1; overflow-y: auto; font-size: .8rem; color: var(--ink-dim); line-height: 1.5; }
@@ -512,3 +512,123 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
   .brand { font-size: 1rem; letter-spacing: .15em; }
   .hand { gap: .2rem; }
 }
+
+/* ======================================================= modalita' ufficio --
+   Grigi, pannelli bianchi e un solo accento viola, come le app da ufficio.
+   Dall'altra parte della stanza deve sembrare una schermata di lavoro:
+   quindi niente feltro, niente oro, niente seme gigante sulle carte e niente
+   che pulsa. Si accende con data-mode="office" su <html>.
+
+   --gold resta "gold" di nome anche quando e' viola: e' l'accento usato in
+   tutta la UI, rinominarlo avrebbe toccato ogni regola del file. */
+
+:root[data-mode="office"] {
+  --bg: #f5f5f5;
+  --bg-soft: #ffffff;
+  --panel: #ffffff;
+  --panel-line: #e0e0e0;
+  --felt-a: #fafafa;
+  --felt-b: #fafafa;
+  --ink: #242424;
+  --ink-dim: #616161;
+  --gold: #5b5fc7;
+  --gold-dim: #4f52b2;
+  --red: #c50f1f;
+  --card-face: #ffffff;
+  --card-black: #242424;
+  --card-red: #c50f1f;
+  --ok: #107c10;
+  --bad: #c50f1f;
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .12);
+  --accent-ink: #ffffff;
+  --accent-soft: #e8ebfa;
+  color-scheme: light;
+}
+
+/* Chi ha il sistema scuro avrebbe una finestra bianca accesa in mezzo allo
+   schermo: proprio quello che si voleva evitare. */
+@media (prefers-color-scheme: dark) {
+  :root[data-mode="office"] {
+    --bg: #1f1f1f;
+    --bg-soft: #292929;
+    --panel: #292929;
+    --panel-line: #3d3d3d;
+    --felt-a: #242424;
+    --felt-b: #242424;
+    --ink: #ffffff;
+    --ink-dim: #adadad;
+    --gold: #7f85f5;
+    --gold-dim: #6a70e0;
+    --red: #dc626d;
+    --card-face: #333333;
+    --card-black: #ffffff;
+    --card-red: #f1707b;
+    --ok: #54b054;
+    --bad: #dc626d;
+    --shadow: 0 1px 3px rgba(0, 0, 0, .5);
+    --accent-soft: #3d3e66;
+    color-scheme: dark;
+  }
+}
+
+:root[data-mode="office"] body { background: var(--bg); }
+[data-mode="office"] .topbar,
+[data-mode="office"] .sidebar { background: var(--panel); }
+
+[data-mode="office"] .brand { color: var(--ink); letter-spacing: 0; font-size: 1rem; font-weight: 600; }
+[data-mode="office"] .hero h1 {
+  color: var(--ink); letter-spacing: 0; text-shadow: none;
+  font-size: clamp(2rem, 6vw, 3rem); font-weight: 600;
+}
+[data-mode="office"] .tagline.small { display: none; }
+
+/* Accento pieno con testo chiaro al posto del gradiente dorato. */
+[data-mode="office"] .primary { background: var(--gold); color: var(--accent-ink); }
+[data-mode="office"] .primary:hover { background: var(--gold-dim); filter: none; }
+[data-mode="office"] .ghost.active,
+[data-mode="office"] .bid-grid button.chosen {
+  background: var(--gold); color: var(--accent-ink); border-color: var(--gold);
+  box-shadow: none; transform: none;
+}
+
+/* Il tavolo diventa un pannello come un altro. */
+[data-mode="office"] .felt {
+  background: var(--felt-a); border: 1px solid var(--panel-line);
+  border-radius: var(--radius); box-shadow: none;
+}
+[data-mode="office"] .table-center,
+[data-mode="office"] .table-center .sub { color: var(--ink-dim); opacity: .45; }
+
+[data-mode="office"] .player-seat {
+  background: var(--panel); border-color: var(--panel-line); box-shadow: var(--shadow);
+}
+[data-mode="office"] .player-seat.self { background: var(--accent-soft); }
+[data-mode="office"] .player-seat.turn { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+[data-mode="office"] .player-seat .bid-badge { background: var(--accent-soft); border-color: var(--gold); }
+
+/* Carte piatte, senza il seme stampato al centro: e' quello che si riconosce
+   a colpo d'occhio. Gli angolini restano, per giocare bastano. */
+[data-mode="office"] .card {
+  background: var(--card-face); border-color: var(--panel-line);
+  border-radius: 4px; box-shadow: var(--shadow);
+}
+[data-mode="office"] .card .pip-big { display: none; }
+[data-mode="office"] .card.back { background: var(--panel-line); }
+[data-mode="office"] .trick .card.winning { box-shadow: 0 0 0 2px var(--gold); }
+
+/* Il turno resta chiaro, ma fermo: qualcosa che lampeggia si nota da lontano. */
+[data-mode="office"] .turn-badge,
+[data-mode="office"] .your-turn .felt,
+[data-mode="office"] .player-seat.turn.self { animation: none; }
+[data-mode="office"] .your-turn .felt { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+[data-mode="office"] .turn-badge {
+  background: var(--gold); color: var(--accent-ink);
+  text-transform: none; letter-spacing: 0; font-weight: 600;
+}
+[data-mode="office"] .your-turn .hand .card.playable { box-shadow: 0 0 0 2px var(--gold); }
+
+[data-mode="office"] .bid-panel { border-color: var(--gold); box-shadow: var(--shadow); animation: none; }
+[data-mode="office"] .log div { border-bottom-color: var(--panel-line); }
+[data-mode="office"] .overlay { background: rgba(0, 0, 0, .35); backdrop-filter: none; }
+[data-mode="office"] .dialog { box-shadow: 0 8px 28px rgba(0, 0, 0, .18); }

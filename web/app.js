@@ -21,6 +21,21 @@
   };
 
   const IDLE_TITLE = document.title;
+  const GAME_ICON = document.querySelector('link[rel="icon"]').href;
+
+  // In modalita' ufficio la scheda non deve dire cosa c'e' dentro. Il turno
+  // si annuncia come un messaggio non letto, "(1)": e' il segnale che ogni app
+  // da ufficio usa gia', quindi non stona.
+  const OFFICE_TITLE = "Riepilogo attività";
+  const OFFICE_ICON =
+    "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>" +
+    "<rect width='32' height='32' rx='7' fill='%235B5FC7'/>" +
+    "<path d='M9 11h14M9 16h14M9 21h9' stroke='white' stroke-width='2.5' " +
+    "stroke-linecap='round'/></svg>";
+
+  // Due Esc ravvicinati accendono la modalita' ufficio. Solo accendono: un
+  // tasto di emergenza premuto due volte nel panico non deve spegnerla.
+  const PANIC_WINDOW_MS = 450;
 
   const app = {
     link: null,
@@ -31,6 +46,9 @@
     wantConnection: false,
     retry: 500,
     pendingBid: null,
+    office: store.get("office") === "1",
+    myTurn: false,
+    lastEscape: 0,
     heldSignature: "",
     heldUntil: 0,
     holdTimer: null,
@@ -449,9 +467,37 @@
   /* Il turno va gridato in tre posti: il tavolo, la riga sopra la mano e il
    * titolo della scheda — perche' spesso si sta guardando un'altra finestra. */
   function markTurn(mine) {
+    app.myTurn = mine;
     $("screenGame").classList.toggle("your-turn", mine);
-    const wanted = mine ? "\u25B6 Tocca a te \u00b7 TRANS" : IDLE_TITLE;
+    let wanted;
+    if (app.office) wanted = mine ? `(1) ${OFFICE_TITLE}` : OFFICE_TITLE;
+    else wanted = mine ? "\u25B6 Tocca a te \u00b7 TRANS" : IDLE_TITLE;
     if (document.title !== wanted) document.title = wanted;
+  }
+
+  /* ------------------------------------------------------ modalita' ufficio */
+
+  function applyMode() {
+    const root = document.documentElement;
+    if (app.office) root.dataset.mode = "office";
+    else delete root.dataset.mode;
+
+    // I testi che si leggono da lontano: marchio e titolone della home.
+    document.querySelectorAll("[data-office-text]").forEach((el) => {
+      if (el.dataset.gameHtml === undefined) el.dataset.gameHtml = el.innerHTML;
+      if (app.office) el.textContent = el.dataset.officeText;
+      else el.innerHTML = el.dataset.gameHtml;
+    });
+
+    document.querySelector('link[rel="icon"]').href = app.office ? OFFICE_ICON : GAME_ICON;
+    $("btnOffice").textContent = app.office ? "Vista normale" : "Modalità ufficio";
+    markTurn(app.myTurn);
+  }
+
+  function setOffice(on) {
+    app.office = on;
+    store.set("office", on ? "1" : "0");
+    applyMode();
   }
 
   function renderScores(g, me) {
@@ -650,6 +696,7 @@
   /* -------------------------------------------------------------- init -- */
 
   function wire() {
+    applyMode();
     $("nameNew").value = app.name;
     $("nameJoin").value = app.name;
     const hash = location.hash.replace("#", "").toUpperCase();
@@ -710,6 +757,7 @@
     $("btnRematch").onclick = () => send({ type: "rematch" });
     $("btnNewGame").onclick = () => send({ type: "new_game" });
 
+    $("btnOffice").onclick = () => setOffice(!app.office);
     $("btnRules").onclick = () => { $("rulesOverlay").hidden = false; };
     $("btnCloseRules").onclick = () => { $("rulesOverlay").hidden = true; };
     $("rulesOverlay").onclick = (e) => { if (e.target === $("rulesOverlay")) $("rulesOverlay").hidden = true; };
@@ -724,6 +772,9 @@
 
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        const now = Date.now();
+        if (now - app.lastEscape < PANIC_WINDOW_MS) setOffice(true);
+        app.lastEscape = now;
         $("rulesOverlay").hidden = true;
         cancelBid();
         return;

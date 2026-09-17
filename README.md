@@ -117,6 +117,20 @@ docker run --rm -p 8000:8000 trans
 
 ---
 
+## Modalità ufficio
+
+In alto c'è **Modalità ufficio**: il tavolo diventa grigio con un accento viola,
+le carte perdono il seme stampato al centro, niente pulsa, e la scheda si chiama
+"Riepilogo attività" con un'icona neutra. Quando tocca a te il titolo diventa
+"(1) Riepilogo attività", come un messaggio non letto. Se il sistema è in tema
+scuro, lo segue.
+
+**Esc due volte** la accende al volo, anche mentre scrivi in chat. La accende
+soltanto: premerlo di nuovo non la spegne. La scelta resta salvata nel browser
+e vale solo per te, gli altri al tavolo non vedono differenze.
+
+---
+
 ## Dove farlo girare
 
 Ci sono due modi di far girare TRANS, e fanno cose diverse.

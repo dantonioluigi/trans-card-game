@@ -11,13 +11,14 @@
 <body>
 
 <header class="topbar">
-  <div class="brand" id="brand">TRANS<span class="pip">♥&#xFE0E;</span></div>
+  <div class="brand" id="brand" data-office-text="Attività">TRANS<span class="pip">♥&#xFE0E;</span></div>
   <div class="topbar-info" id="topbarInfo" hidden>
     <span class="chip" id="chipRoom"></span>
     <span class="chip" id="chipRound"></span>
     <span class="chip" id="chipTrump"></span>
   </div>
   <div class="topbar-actions">
+    <button class="ghost" id="btnOffice" type="button" title="Doppio Esc per attivarla al volo">Modalità ufficio</button>
     <button class="ghost" id="btnRules" type="button">Regole</button>
     <button class="ghost" id="btnLeave" type="button" hidden>Esci</button>
   </div>
@@ -28,8 +29,8 @@
   <!-- ------------------------------------------------------------- HOME -->
   <section id="screenHome" class="screen home">
     <div class="hero">
-      <h1>TRANS</h1>
-      <p class="tagline">Dichiara quante prese farai. Sbagliare costa.</p>
+      <h1 data-office-text="Attività">TRANS</h1>
+      <p class="tagline" data-office-text="Coordinamento del gruppo di lavoro.">Dichiara quante prese farai. Sbagliare costa.</p>
     </div>
 
     <div class="panels">

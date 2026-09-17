@@ -113,8 +113,10 @@ def transform_index(html: str, version: str) -> str:
     )
 
     swap(
-        '      <p class="tagline">Dichiara quante prese farai. Sbagliare costa.</p>\n',
-        '      <p class="tagline">Dichiara quante prese farai. Sbagliare costa.</p>\n' + HOME_NOTE,
+        '      <p class="tagline" data-office-text="Coordinamento del gruppo di lavoro.">'
+        'Dichiara quante prese farai. Sbagliare costa.</p>\n',
+        '      <p class="tagline" data-office-text="Coordinamento del gruppo di lavoro.">'
+        'Dichiara quante prese farai. Sbagliare costa.</p>\n' + HOME_NOTE,
     )
 
     swap(
