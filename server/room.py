@@ -106,14 +106,15 @@ class Room:
         if seat is not None:
             if seat.is_bot:
                 raise RoomError("quel posto e' occupato da un bot")
+            was_away = not seat.connected
             seat.connected = True
             seat.socket = socket
+            if was_away and self.game is not None:
+                self.game._log(f"{seat.name} rientra al tavolo.")
         elif self.started:
-            seat = self._take_over_bot(name, socket)
+            seat = self._take_over_seat(name, socket)
             if seat is None:
-                raise RoomError(
-                    "partita gia' iniziata e non ci sono bot di cui prendere il posto"
-                )
+                raise RoomError("partita gia' iniziata e non ci sono posti liberi da prendere")
         else:
             if len(self.seats) >= MAX_PLAYERS:
                 raise RoomError(f"tavolo pieno (max {MAX_PLAYERS} giocatori)")
@@ -127,36 +128,46 @@ class Room:
         self._promote_host()
         return seat
 
-    def _take_over_bot(self, name: str, socket: object) -> Seat | None:
-        """Chi arriva a partita iniziata prende il posto di un bot.
+    def _take_over_seat(self, name: str, socket: object) -> Seat | None:
+        """Chi arriva a partita iniziata si siede dove gioca il computer.
 
-        Senza questo, chi apre il tavolo deve aspettare fermo che arrivino
-        tutti: per premere "Inizia" servono due giocatori, e se riempie i posti
-        con i bot poi non entra piu' nessuno.
+        Prima al posto di un bot vero, poi a quello lasciato da chi e' uscito.
+        Il posto riceve un id nuovo: chi era uscito, rientrando col vecchio id,
+        non lo ritrova e non puo' scalzare chi nel frattempo si e' seduto li'.
         """
-        bot = next((s for s in self.seats if s.is_bot), None)
-        if bot is None:
+        seat = next((s for s in self.seats if s.is_bot), None) or next(
+            (s for s in self.seats if not s.connected), None
+        )
+        if seat is None:
             return None
-        was = bot.name
-        bot.is_bot = False
-        bot.name = self._unique_name(name, exclude_id=bot.id)
-        bot.connected = True
-        bot.socket = socket
-        if self.game is not None:
-            player = self.game.players[self.game.index_of(bot.id)]
+        was = seat.name
+        fresh_id = new_player_id()
+        player = self.game.players[self.game.index_of(seat.id)] if self.game else None
+
+        seat.id = fresh_id
+        seat.is_bot = False
+        seat.name = self._unique_name(name, exclude_id=fresh_id)
+        seat.connected = True
+        seat.socket = socket
+        if player is not None:
+            player.id = fresh_id
             player.is_bot = False
-            player.name = bot.name
-            self.game._log(f"{bot.name} prende il posto di {was}.")
-        return bot
+            player.name = seat.name
+            self.game._log(f"{seat.name} prende il posto di {was}.")
+        return seat
 
     def leave(self, player_id: str) -> None:
+        """Chi esce a partita iniziata non la blocca: al suo posto gioca un bot."""
         seat = self.seat_by_id(player_id)
         if seat is None:
             return
+        was_here = seat.connected
         seat.connected = False
         seat.socket = None
         if not self.started:
             self.seats = [s for s in self.seats if s.id != player_id]
+        elif was_here and not seat.is_bot and not self.game.is_over:
+            self.game._log(f"{seat.name} esce: al suo posto gioca un bot.")
         self._promote_host()
 
     def add_bot(self, requester: str, level: str = "normale") -> None:

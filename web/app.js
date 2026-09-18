@@ -336,13 +336,21 @@
 
       const marks = [];
       if (p.is_dealer) marks.push('<span class="dot dealer" title="mazziere">◆</span>');
-      if (p.connected === false && !p.is_bot) marks.push('<span class="dot off" title="offline">●</span>');
+
+      // Chi e' uscito resta al tavolo col suo nome e i suoi punti, ma deve
+      // vedersi che al posto suo sta giocando il computer.
+      const replaced = !p.is_bot && p.connected === false;
+      if (replaced) el.classList.add("replaced");
+      const who = p.is_bot
+        ? `bot · ${p.bot_level}`
+        : replaced
+          ? `uscito · gioca un bot · ${p.score} pt`
+          : `${p.score} pt`;
 
       const bid = renderBidBadge(g, p);
       el.innerHTML =
         `<div class="nm">${escapeHtml(p.name)} ${marks.join("")}</div>` +
-        `<div class="meta">${p.is_bot ? "bot · " + p.bot_level : p.score + " pt"}` +
-        `${p.cards_left ? " · " + p.cards_left + " carte" : ""}</div>` +
+        `<div class="meta">${who}${p.cards_left ? " · " + p.cards_left + " carte" : ""}</div>` +
         bid;
       ring.appendChild(el);
     });

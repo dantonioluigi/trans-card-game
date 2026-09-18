@@ -8,7 +8,7 @@
  *   node site/tests/table.mjs
  */
 
-import { Table, handleClientMessage, newRoomCode } from "../js/room.js";
+import { Table, handleClientMessage, newRoomCode, silentSessions } from "../js/room.js";
 
 let checks = 0;
 const failures = [];
@@ -94,8 +94,8 @@ function makeSession(table, name, playerId = null) {
   // A partita iniziata, senza bot al tavolo, non c'e' posto.
   const late = makeSession(table, "Tardi");
   late.join();
-  check(late.errors().at(-1)?.message.includes("non ci sono bot"),
-        "senza bot il ritardatario dovrebbe restare fuori");
+  check(late.errors().at(-1)?.message.includes("non ci sono posti liberi"),
+        "senza posti liberi il ritardatario dovrebbe restare fuori");
 
   // Mosse fuori turno o fuori fase.
   host.send({ type: "play", card: "AH" });
@@ -228,6 +228,74 @@ function makeSession(table, name, playerId = null) {
   check(table.playsItself(table.seats[1]) === false,
         "il computer continua a giocare al posto suo");
   check(table.game.players[1].name === "Anna", "il nome non e' cambiato anche nella partita");
+}
+
+/* ------------------------------------------ chi esce lascia il posto a un bot */
+
+{
+  const table = new Table(newRoomCode());
+  const host = makeSession(table, "Luigi");
+  host.join();
+  const guest = makeSession(table, "Anna");
+  guest.join();
+  const annaId = guest.id;
+  host.send({ type: "start" });
+
+  table.leave(annaId);
+  table.leave(annaId); // "close" ed "error" arrivano spesso insieme
+  const seat = table.seatById(annaId);
+  check(table.playsItself(seat), "dopo l'uscita il posto di Anna non e' giocato dal computer");
+  const exits = table.game.log.filter((l) => l.includes("Anna esce: al suo posto gioca un bot."));
+  check(exits.length === 1, `avviso d'uscita ripetuto ${exits.length} volte invece di una`);
+
+  const view = host.last("state");
+  table.broadcast();
+  const anna = host.last("state").game.players.find((p) => p.name === "Anna");
+  check(anna.connected === false && anna.auto === true, "la UI non riceve che Anna e' sostituita");
+
+  // Chi arriva si siede li', con un id nuovo.
+  const late = makeSession(table, "Marco");
+  late.join();
+  check(late.errors().length === 0, `Marco rifiutato: ${JSON.stringify(late.errors())}`);
+  check(late.id !== annaId, "Marco ha ereditato l'id di Anna");
+  check(table.game.players.map((p) => p.name).join() === "Luigi,Marco", "Marco non e' al posto di Anna");
+  check(table.game.log.some((l) => l.includes("Marco prende il posto di Anna.")), "manca l'avviso del cambio");
+
+  // Anna col vecchio id non puo' riprenderselo.
+  const back = makeSession(table, "Anna", annaId);
+  back.join();
+  check(back.errors().at(-1)?.message.includes("non ci sono posti liberi"),
+        "Anna ha scalzato Marco dal posto");
+}
+
+{
+  // Se rientra prima che qualcuno si sieda, il posto torna suo.
+  const table = new Table(newRoomCode());
+  const host = makeSession(table, "Luigi");
+  host.join();
+  const guest = makeSession(table, "Anna");
+  guest.join();
+  const annaId = guest.id;
+  host.send({ type: "start" });
+  table.leave(annaId);
+
+  const back = makeSession(table, "Anna", annaId);
+  back.join();
+  check(back.id === annaId, "rientrando Anna non ha riavuto il suo posto");
+  check(!table.playsItself(table.seatById(annaId)), "il bot continua a giocare anche dopo il rientro");
+  check(table.game.log.some((l) => l.includes("Anna rientra al tavolo.")), "manca l'avviso del rientro");
+}
+
+{
+  // Il silenzio conta come uscita: la rete che cade non avvisa nessuno.
+  const now = 100000;
+  const sessions = [
+    { playerId: "a", lastHeard: now - 2000 },
+    { playerId: "b", lastHeard: now - 20000 },
+    { playerId: null, lastHeard: now - 99999 }, // non ancora entrato: non conta
+  ];
+  const quiet = silentSessions(sessions, now, 15000).map((s) => s.playerId);
+  check(quiet.join() === "b", `sessioni mute sbagliate: ${JSON.stringify(quiet)}`);
 }
 
 /* ------------------------------------------- l'host che se ne va e ritorna */

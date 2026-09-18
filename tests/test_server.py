@@ -1,5 +1,8 @@
 """Test d'integrazione sul server: lobby, WebSocket, bot, partita intera."""
 
+import contextlib
+import signal
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -21,6 +24,21 @@ def fast_bots(monkeypatch):
 def client():
     with TestClient(app) as c:
         yield c
+
+
+@contextlib.contextmanager
+def deadline(seconds):
+    """Se il bot non subentra, il test resterebbe appeso ad aspettare una mossa
+    che non arriva mai: meglio fallire con un messaggio."""
+    def boom(*_):
+        raise AssertionError(f"nessun progresso in {seconds}s: il tavolo e' bloccato")
+    previous = signal.signal(signal.SIGALRM, boom)
+    signal.alarm(seconds)
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
 
 
 def join(ws, name, room=None, player_id=None):
@@ -340,6 +358,70 @@ def test_rematch_is_refused_before_the_end_and_to_guests(client):
             assert "solo chi ha creato" in next_error(guest)["message"]
 
 
+def start_with_guest(client, host):
+    """Luigi apre, Anna entra, si parte: nessun bot al tavolo."""
+    welcome = join(host, "Luigi")
+    next_state(host)
+    guest = client.websocket_connect("/ws")
+    guest_ws = guest.__enter__()
+    anna = join(guest_ws, "Anna", room=welcome["room"])
+    next_state(guest_ws)
+    host.send_json({"type": "start"})
+    state_until(host, lambda s: s["screen"] == "game")
+    return welcome["room"], guest, guest_ws, anna["player_id"]
+
+
+def test_a_player_who_leaves_is_replaced_by_a_bot(client):
+    with client.websocket_connect("/ws") as host:
+        code, guest, guest_ws, anna_id = start_with_guest(client, host)
+        guest.__exit__(None, None, None)  # Anna chiude la scheda
+
+        state = state_until(host, lambda s: any(
+            p["name"] == "Anna" and p["connected"] is False for p in s["game"]["players"]))
+        anna = next(p for p in state["game"]["players"] if p["name"] == "Anna")
+        assert anna["auto"] is True
+        assert any("Anna esce: al suo posto gioca un bot." in line for line in state["game"]["log"])
+
+        # La partita va avanti da sola: il bot gioca le mani di Anna.
+        with deadline(20):
+            final = play_full_game(host)
+        assert final["winner"]
+
+
+def test_a_latecomer_can_sit_where_someone_left(client):
+    with client.websocket_connect("/ws") as host:
+        code, guest, guest_ws, anna_id = start_with_guest(client, host)
+        guest.__exit__(None, None, None)
+        state_until(host, lambda s: any(p["connected"] is False for p in s["game"]["players"]))
+
+        with client.websocket_connect("/ws") as late:
+            welcome = join(late, "Marco", room=code)
+            assert welcome["player_id"] != anna_id  # id nuovo, non quello di Anna
+            view = next_state(late, tolerate_errors=True)["game"]
+            assert [p["name"] for p in view["players"]] == ["Luigi", "Marco"]
+            assert any("Marco prende il posto di Anna." in line for line in view["log"])
+
+            # Anna rientra col vecchio id: il suo posto e' preso e non ce n'e' un altro.
+            with client.websocket_connect("/ws") as back:
+                back.send_json({"type": "join", "room": code, "name": "Anna", "player_id": anna_id})
+                assert "non ci sono posti liberi" in next_error(back)["message"]
+
+
+def test_whoever_comes_back_first_gets_the_seat_back(client):
+    with client.websocket_connect("/ws") as host:
+        code, guest, guest_ws, anna_id = start_with_guest(client, host)
+        guest.__exit__(None, None, None)
+        state_until(host, lambda s: any(p["connected"] is False for p in s["game"]["players"]))
+
+        with client.websocket_connect("/ws") as back:
+            welcome = join(back, "Anna", room=code, player_id=anna_id)
+            assert welcome["player_id"] == anna_id
+            view = next_state(back, tolerate_errors=True)["game"]
+            anna = next(p for p in view["players"] if p["name"] == "Anna")
+            assert anna["connected"] is True and anna["auto"] is False
+            assert any("Anna rientra al tavolo." in line for line in view["log"])
+
+
 def test_a_latecomer_takes_over_a_bot(client):
     """Chi arriva a partita iniziata non resta fuori: entra al posto di un bot."""
     with client.websocket_connect("/ws") as host:
@@ -376,7 +458,7 @@ def test_without_bots_a_started_game_stays_closed(client):
             state_until(a, lambda s: s["screen"] == "game")
             with client.websocket_connect("/ws") as late:
                 late.send_json({"type": "join", "room": code, "name": "Tardi"})
-                assert "non ci sono bot" in next_error(late)["message"]
+                assert "non ci sono posti liberi" in next_error(late)["message"]
 
 
 def test_reconnecting_with_the_same_id_gets_the_seat_back(client):

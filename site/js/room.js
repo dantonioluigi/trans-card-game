@@ -99,12 +99,14 @@ export class Table {
     let seat = playerId ? this.seatById(playerId) : null;
     if (seat) {
       if (seat.isBot) throw new TableError("quel posto e' occupato da un bot");
+      const wasAway = !seat.connected;
       seat.connected = true;
       seat.sink = sink;
+      if (wasAway && this.game) this.game._log(`${seat.name} rientra al tavolo.`);
     } else if (this.started) {
-      seat = this._takeOverBot(name, sink);
+      seat = this._takeOverSeat(name, sink);
       if (!seat) {
-        throw new TableError("partita gia' iniziata e non ci sono bot di cui prendere il posto");
+        throw new TableError("partita gia' iniziata e non ci sono posti liberi da prendere");
       }
     } else {
       if (this.seats.length >= MAX_PLAYERS) throw new TableError(`tavolo pieno (max ${MAX_PLAYERS} giocatori)`);
@@ -123,35 +125,46 @@ export class Table {
   }
 
   /**
-   * Chi arriva a partita iniziata prende il posto di un bot.
+   * Chi arriva a partita iniziata si siede dove gioca il computer: prima al
+   * posto di un bot vero, poi a quello lasciato da chi e' uscito.
    *
-   * Senza questo, chi apre il tavolo resta fermo ad aspettare: per premere
-   * "Inizia" servono due giocatori, e se riempie i posti con i bot poi non
-   * entra piu' nessuno.
+   * Il posto riceve un id nuovo. Chi era uscito, rientrando col vecchio id,
+   * non lo ritrova: non puo' scalzare chi nel frattempo si e' seduto li'.
    */
-  _takeOverBot(name, sink) {
-    const bot = this.seats.find((s) => s.isBot);
-    if (!bot) return null;
-    const was = bot.name;
-    bot.isBot = false;
-    bot.name = this._uniqueName(name, bot.id);
-    bot.connected = true;
-    bot.sink = sink;
-    if (this.game) {
-      const player = this.game.players[this.game.indexOf(bot.id)];
+  _takeOverSeat(name, sink) {
+    const seat = this.seats.find((s) => s.isBot) || this.seats.find((s) => !s.connected);
+    if (!seat) return null;
+    const was = seat.name;
+    const freshId = newPlayerId();
+    const player = this.game ? this.game.players[this.game.indexOf(seat.id)] : null;
+
+    seat.id = freshId;
+    seat.isBot = false;
+    seat.name = this._uniqueName(name, freshId);
+    seat.connected = true;
+    seat.sink = sink;
+    if (player) {
+      player.id = freshId;
       player.isBot = false;
-      player.name = bot.name;
-      this.game._log(`${bot.name} prende il posto di ${was}.`);
+      player.name = seat.name;
+      this.game._log(`${seat.name} prende il posto di ${was}.`);
     }
-    return bot;
+    return seat;
   }
 
+  /** Chi esce a partita iniziata non la blocca: al suo posto gioca un bot. */
   leave(playerId) {
     const seat = this.seatById(playerId);
     if (!seat) return;
+    const wasHere = seat.connected;
     seat.connected = false;
     seat.sink = null;
-    if (!this.started) this.seats = this.seats.filter((s) => s.id !== playerId);
+    if (!this.started) {
+      this.seats = this.seats.filter((s) => s.id !== playerId);
+    } else if (wasHere && !seat.isBot && !this.game.isOver) {
+      // wasHere evita il doppio avviso: "close" ed "error" arrivano spesso insieme.
+      this.game._log(`${seat.name} esce: al suo posto gioca un bot.`);
+    }
     this._promoteHost();
   }
 
@@ -372,6 +385,17 @@ export class Table {
   }
 }
 
+/**
+ * Le sessioni che non si fanno sentire da troppo.
+ *
+ * WebRTC non avvisa quando la rete cade o il telefono va in background: la
+ * connessione resta "aperta" e muta. Senza questo, il tavolo aspetterebbe per
+ * sempre la mossa di qualcuno che non c'e' piu'.
+ */
+export function silentSessions(sessions, now, limitMs) {
+  return sessions.filter((s) => s.playerId && now - s.lastHeard > limitMs);
+}
+
 /** Applica un messaggio del client al tavolo. */
 function applyClientMessage(table, session, msg) {
   switch (msg.type) {
@@ -418,12 +442,13 @@ export function handleClientMessage(table, session, msg, deliver) {
     return;
   }
 
-  if (!session.playerId) {
-    deliver({ type: "error", message: "prima entra in un tavolo" });
-    return;
-  }
+  // Il battito vale anche prima di sedersi: e' solo "ci sei?".
   if (msg.type === "ping") {
     deliver({ type: "pong" });
+    return;
+  }
+  if (!session.playerId) {
+    deliver({ type: "error", message: "prima entra in un tavolo" });
     return;
   }
 

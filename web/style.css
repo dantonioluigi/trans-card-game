@@ -241,7 +241,8 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 .player-seat .bid-badge.over { background: rgba(224, 104, 95, .16); color: var(--bad); border-color: var(--bad); }
 .player-seat .dot { font-size: .65rem; }
 .player-seat .dot.dealer { color: var(--gold); }
-.player-seat .dot.off { color: var(--bad); }
+.player-seat.replaced { opacity: .72; border-style: dashed; }
+.player-seat.replaced .meta { color: var(--ink-dim); font-style: italic; }
 
 /* --- tocca a te --- */
 
