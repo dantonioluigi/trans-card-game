@@ -24,6 +24,11 @@ DIST = SITE / "dist"
 
 PEERJS = "https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"
 
+# Un raw string: niente ambiguita' di doppio escaping. E' la sequenza JS
+# per '<', usata per evitare che un "</script>" dentro un valore incorporato
+# chiuda il blocco prima del tempo.
+ESCAPED_LT = '\\u003c'
+
 #: Dove vive il sito pubblicato. Serve agli indirizzi assoluti che vogliono
 #: Open Graph e la sitemap: quelli relativi li' non funzionano.
 SITE_URL = "https://dantonioluigi.github.io/trans-card-game/"
@@ -90,20 +95,44 @@ def build_id(sources: list[pathlib.Path]) -> str:
     return digest.hexdigest()[:10]
 
 
-def relay_config() -> str:
-    """Indirizzo da cui il browser chiede le credenziali del relay TURN.
-
-    Viene dall'ambiente, non dal codice: in pubblicazione lo passa la variabile
-    TURN_CREDENTIALS_URL del repo. Senza, il sito funziona lo stesso, ma solo
-    fra browser che riescono a collegarsi direttamente.
-    """
-    url = os.environ.get("TRANS_TURN_URL", "").strip()
-    if not url:
-        return ""
+def _inline_script(var_name: str, value) -> str:
     # json.dumps protegge le virgolette; "<" va protetto a mano, se no un
-    # "</script>" nel valore chiuderebbe il blocco prima del tempo.
-    literal = json.dumps(url).replace("<", "\\u003c")
-    return f"<script>window.TRANS_TURN_URL = {literal};</script>\n"
+    # chiusura di script anticipata nel valore chiuderebbe il blocco prima del
+    # tempo.
+    literal = json.dumps(value).replace("<", ESCAPED_LT)
+    return "<script>window." + var_name + " = " + literal + ";</script>\n"
+
+
+def relay_config() -> str:
+    """Come il browser trova il relay TURN, se ce n'e' uno.
+
+    Due modi, entrambi dall'ambiente e non dal codice: in pubblicazione li
+    passano le variabili del repo.
+
+    - TRANS_TURN_ICE: un elenco di server gia' pronto (le credenziali statiche
+      di un piano gratuito, che non scadono). Va incorporato cosi' com'e':
+      nessuna richiesta in piu' per aprire una connessione.
+    - TRANS_TURN_URL: un indirizzo che genera credenziali temporanee al volo,
+      per chi preferisce quel meccanismo.
+
+    Senza nessuno dei due il sito funziona lo stesso, ma solo fra browser che
+    riescono a collegarsi direttamente.
+    """
+    ice_json = os.environ.get("TRANS_TURN_ICE", "").strip()
+    url = os.environ.get("TRANS_TURN_URL", "").strip()
+
+    out = []
+    if ice_json:
+        try:
+            servers = json.loads(ice_json)
+        except json.JSONDecodeError as exc:
+            raise SystemExit("TRANS_TURN_ICE non e' un JSON valido: " + str(exc)) from exc
+        if not isinstance(servers, list) or not servers:
+            raise SystemExit("TRANS_TURN_ICE deve essere un array non vuoto di server ICE")
+        out.append(_inline_script("TRANS_TURN_ICE", servers))
+    if url:
+        out.append(_inline_script("TRANS_TURN_URL", url))
+    return "".join(out)
 
 
 def transform_index(html: str, version: str) -> str:
@@ -185,7 +214,12 @@ def main() -> None:
     (DIST / ".nojekyll").write_text("")
 
     files = sorted(p.relative_to(DIST).as_posix() for p in DIST.rglob("*") if p.is_file())
-    relay = "relay configurato" if os.environ.get("TRANS_TURN_URL") else "SENZA relay"
+    if os.environ.get("TRANS_TURN_ICE"):
+        relay = "relay statico configurato"
+    elif os.environ.get("TRANS_TURN_URL"):
+        relay = "relay dinamico configurato"
+    else:
+        relay = "SENZA relay"
     print(f"site/dist pronto — versione {version} — {relay} — {len(files)} file:")
     for f in files:
         print("  " + f)

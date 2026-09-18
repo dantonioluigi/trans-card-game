@@ -91,8 +91,21 @@ function loadIce() {
 }
 
 async function fetchIce() {
+  const params = new URLSearchParams(location.search);
+
+  // Elenco gia' pronto (credenziali statiche, tipiche di un piano gratuito
+  // senza scadenza): niente richiesta in piu' per aprire una connessione.
+  // ?ice= serve per le prove; in produzione lo mette la build.
+  const staticJson = params.get("ice") || "";
+  const embedded = staticJson ? tryParse(staticJson) : window.TRANS_TURN_ICE;
+  if (embedded) {
+    const turn = normaliseIce(embedded);
+    if (turn.length) return { servers: [...STUN_SERVERS, ...turn], relay: true };
+  }
+
+  // In alternativa, un endpoint che genera credenziali temporanee al volo.
   // ?turn= serve per le prove; in produzione l'indirizzo lo mette la build.
-  const url = new URLSearchParams(location.search).get("turn") || window.TRANS_TURN_URL || "";
+  const url = params.get("turn") || window.TRANS_TURN_URL || "";
   if (!url) return { servers: STUN_SERVERS, relay: false };
 
   const abort = new AbortController();
@@ -108,6 +121,15 @@ async function fetchIce() {
     return { servers: STUN_SERVERS, relay: false };
   } finally {
     clearTimeout(timer);
+  }
+}
+
+function tryParse(json) {
+  try {
+    return JSON.parse(json);
+  } catch (err) {
+    console.warn("TRANS: elenco ICE nell'indirizzo non valido", err);
+    return null;
   }
 }
 

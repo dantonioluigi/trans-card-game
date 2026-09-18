@@ -172,13 +172,24 @@ inoltra. PeerJS ne elenca uno pubblico nella sua configurazione, ma quei server
 sono stati dismessi: i nomi non risolvono più. Senza un relay proprio, il
 gioco funziona solo fra browser che riescono a vedersi.
 
-Il sito accetta un relay configurato in pubblicazione: la variabile di repo
-`TURN_CREDENTIALS_URL` (Settings → Secrets and variables → Actions → Variables)
-deve contenere l'indirizzo da cui il browser scarica le credenziali — per
-esempio quello di [Metered](https://www.metered.ca/tools/openrelay/), che usa le
-porte 80 e 443, quelle che i firewall aziendali lasciano passare. Va bene anche
-una risposta nel formato di Cloudflare (`{"iceServers": …}`). Quell'indirizzo
-finisce nella pagina pubblica, quindi chiunque potrebbe consumare la quota.
+Il sito accetta un relay configurato in pubblicazione, in due modi — entrambi
+variabili di repo (Settings → Secrets and variables → Actions → Variables),
+entrambi finiscono nella pagina pubblica quindi chiunque potrebbe consumarne
+la quota:
+
+- **`TURN_ICE_SERVERS`** — l'elenco di server già pronto che un pannello come
+  quello di [Metered](https://www.metered.ca/tools/openrelay/) mostra alla
+  voce *Show ICE Servers Array*: credenziali statiche, non scadono, e il
+  browser non deve chiedere niente a runtime per usarle. È la scelta più
+  semplice, ed è quella che uso io.
+- **`TURN_CREDENTIALS_URL`** — in alternativa, l'indirizzo di un endpoint che
+  genera credenziali temporanee al volo (il meccanismo con *API Key* dello
+  stesso pannello, o una risposta nel formato di Cloudflare
+  `{"iceServers": …}`). Se sono presenti entrambe le variabili vince
+  `TURN_ICE_SERVERS`.
+
+Qualunque provider si scelga, conviene che offra le porte 80 e 443: sono
+quelle che i firewall aziendali lasciano passare.
 
 **Quanto consuma.** Misurato su un relay coturn, nel caso peggiore in cui
 entrambi i browser passano dal relay:
