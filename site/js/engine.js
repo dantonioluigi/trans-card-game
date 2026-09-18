@@ -472,7 +472,6 @@ export class Game {
       forbidden_bid: forbiddenBid,
       trick: this.currentTrick.map((p) => ({ player: p.player, card: p.card })),
       lead_suit: this.leadSuit,
-      played: [...this.playedCards],
       last_trick: this.lastTrick,
       last_result: this.results.length
         ? {
@@ -481,12 +480,8 @@ export class Game {
           }
         : null,
       standings: this.standings().map((p) => ({ id: p.id, name: p.name, score: p.score })),
-      schedule: this.schedule.map((s) => ({
-        number: s.number,
-        cards: s.cards,
-        kind: s.kind,
-        title: s.title,
-      })),
+      // Niente calendario e niente carte uscite: la UI non li usa, e
+      // viaggiavano a ogni mossa. Via relay ogni byte si paga.
       round_index: this.roundIndex,
       log: this.log.slice(-40),
       winner: this.isOver ? this.winnerNames() : null,

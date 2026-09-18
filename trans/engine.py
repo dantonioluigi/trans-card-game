@@ -361,7 +361,6 @@ class Game:
             "forbidden_bid": forbidden_bid,
             "trick": [{"player": i, "card": c.code} for i, c in self.current_trick],
             "lead_suit": self.lead_suit.value if self.lead_suit else None,
-            "played": [c.code for c in self.played_cards],
             "last_trick": self.last_trick,
             "last_result": (
                 {"round": self.results[-1].round_number, "rows": self.results[-1].rows}
@@ -369,10 +368,8 @@ class Game:
                 else None
             ),
             "standings": [{"id": p.id, "name": p.name, "score": p.score} for p in self.standings()],
-            "schedule": [
-                {"number": s.number, "cards": s.cards, "kind": s.kind.value, "title": s.title}
-                for s in self.schedule
-            ],
+            # Niente calendario e niente carte uscite: la UI non li usa, e
+            # viaggiavano a ogni mossa. Via relay ogni byte si paga.
             "round_index": self.round_index,
             "log": self.log[-40:],
             "winner": self.winner_names() if self.is_over else None,

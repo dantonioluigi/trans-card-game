@@ -175,11 +175,31 @@ gioco funziona solo fra browser che riescono a vedersi.
 Il sito accetta un relay configurato in pubblicazione: la variabile di repo
 `TURN_CREDENTIALS_URL` (Settings → Secrets and variables → Actions → Variables)
 deve contenere l'indirizzo da cui il browser scarica le credenziali — per
-esempio quello di [Metered](https://www.metered.ca/tools/openrelay/), che ha un
-piano gratuito e usa le porte 80 e 443, quelle che i firewall aziendali lasciano
-passare. Va bene anche una risposta nel formato di Cloudflare
-(`{"iceServers": …}`). Quell'indirizzo finisce nella pagina pubblica, quindi
-chiunque potrebbe consumare la quota del piano.
+esempio quello di [Metered](https://www.metered.ca/tools/openrelay/), che usa le
+porte 80 e 443, quelle che i firewall aziendali lasciano passare. Va bene anche
+una risposta nel formato di Cloudflare (`{"iceServers": …}`). Quell'indirizzo
+finisce nella pagina pubblica, quindi chiunque potrebbe consumare la quota.
+
+**Quanto consuma.** Misurato su un relay coturn, nel caso peggiore in cui
+entrambi i browser passano dal relay:
+
+| | byte passati dal relay |
+|---|---|
+| partita veloce a 4, tutte le mosse | ~550 KB per ospite |
+| collegati e fermi | ~23 KB al minuto |
+| partita veloce vera, ~20 minuti | ~940 KB per ospite |
+
+Il relay entra in gioco solo quando i due browser non si vedono direttamente:
+due giocatori sulla stessa rete non lo toccano. Con 10–15 persone al giorno a
+tavoli da 4 fanno 220–300 MB al mese nel caso peggiore, la metà se il relay
+serve a uno solo dei due lati. Il grosso dell'attesa sono i controlli con cui
+WebRTC riconferma ogni ~5 secondi che la connessione è viva: li impone lo
+standard, non si tolgono.
+
+Lo stato del tavolo viaggia compresso (circa 4 volte più leggero) verso gli
+ospiti che dichiarano di saperlo decomprimere: così un host con la scheda
+aperta da ieri, sul codice vecchio, continua a parlare con ospiti sul codice
+nuovo.
 
 ### Con il server Python
 

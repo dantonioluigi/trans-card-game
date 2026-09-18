@@ -25,8 +25,11 @@ const ID_ATTEMPTS = 5;
 
 const OPEN_TIMEOUT = 12000;      // broker o collegamento diretto che non si aprono
 const TURN_FETCH_TIMEOUT = 6000; // credenziali del relay
-const PING_EVERY = 4000;
-const SILENCE_LIMIT = 15000;     // oltre, chi tace e' considerato uscito
+// Il battito passa dal relay anche quando nessuno gioca, e il relay si paga a
+// byte. Chi chiude la scheda viene rilevato subito lo stesso: il battito serve
+// solo per chi sparisce senza chiudere, e li' mezzo minuto basta.
+const PING_EVERY = 10000;
+const SILENCE_LIMIT = 30000;     // oltre, chi tace e' considerato uscito
 
 // Piu' di uno, di fornitori diversi: se uno e' giu' non si resta ciechi.
 const STUN_SERVERS = [
@@ -48,6 +51,34 @@ const MESSAGES = {
   hostClosed: "l'host ha chiuso la stanza",
   hostLost: "l'host non risponde piu': ha chiuso la scheda o ha perso la connessione",
 };
+
+/* ------------------------------------------------------------ compressione */
+
+// Ogni stato del tavolo viaggia intero, e compresso pesa circa un quarto. Solo
+// host → ospite: e' li' che passa il grosso, le intenzioni sono poche decine di
+// byte. Chi la supporta lo dichiara nel join, e l'host comprime solo per lui:
+// cosi' codice vecchio e nuovo si parlano anche a meta' pubblicazione.
+const CAN_COMPRESS = (() => {
+  try {
+    new CompressionStream("deflate-raw");
+    new DecompressionStream("deflate-raw");
+    return true;
+  } catch (_) {
+    return false;
+  }
+})();
+
+async function pack(message) {
+  const stream = new Blob([JSON.stringify(message)])
+    .stream()
+    .pipeThrough(new CompressionStream("deflate-raw"));
+  return new Response(stream).arrayBuffer();
+}
+
+async function unpack(bytes) {
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  return JSON.parse(await new Response(stream).text());
+}
 
 /* ----------------------------------------------------------- configurazione */
 
@@ -200,16 +231,19 @@ function hostTable(handlers) {
       playerId: null,
       lastHeard: Date.now(),
       away: false,
+      compress: false,
+      queue: Promise.resolve(),
       conn,
-      sink: (msg) => safeSend(conn, msg),
+      sink: (msg) => post(guest, msg),
     };
     guests.add(guest);
 
     conn.on("data", (msg) => {
       guest.lastHeard = Date.now();
       if (!table || !msg || typeof msg !== "object") return;
+      if (msg.type === "join" && msg.compress && CAN_COMPRESS) guest.compress = true;
       if (guest.away) comeBack(guest);
-      handleClientMessage(table, guest, msg, (out) => safeSend(conn, out));
+      handleClientMessage(table, guest, msg, (out) => post(guest, out));
     });
 
     const drop = () => {
@@ -222,6 +256,17 @@ function hostTable(handlers) {
     };
     conn.on("close", drop);
     conn.on("error", drop);
+  }
+
+  /**
+   * Tutto quello che va a un ospite passa da qui, in fila: la compressione e'
+   * asincrona, e senza la fila uno stato vecchio potrebbe superarne uno nuovo.
+   */
+  function post(guest, message) {
+    guest.queue = guest.queue
+      .then(() => (guest.compress ? pack(message).then((z) => ({ z })) : message))
+      .then((wire) => safeSend(guest.conn, wire))
+      .catch((err) => console.warn("TRANS: invio all'ospite fallito", err));
   }
 
   /**
@@ -257,7 +302,7 @@ function hostTable(handlers) {
     if (!table.seatById(guest.playerId)) {
       // Nel frattempo qualcuno si e' seduto al suo posto: niente posto nuovo
       // assegnato di nascosto, glielo si dice.
-      safeSend(guest.conn, { type: "error", message: "mentre eri assente il tuo posto e' stato preso" });
+      post(guest, { type: "error", message: "mentre eri assente il tuo posto e' stato preso" });
       guests.delete(guest);
       guest.conn.close();
       return;
@@ -312,10 +357,17 @@ function joinAsGuest(handlers) {
         pinger = setInterval(heartbeat, PING_EVERY);
         handlers.onOpen();
       });
+      let inbox = Promise.resolve();
       conn.on("data", (msg) => {
         waitingSince = null;
-        if (closed || !msg || typeof msg !== "object" || msg.type === "pong") return;
-        handlers.onMessage(msg);
+        if (closed || !msg || typeof msg !== "object") return;
+        // Anche la decompressione in fila, per non invertire l'ordine degli stati.
+        inbox = inbox
+          .then(() => (msg.z ? unpack(msg.z) : msg))
+          .then((plain) => {
+            if (!closed && plain.type !== "pong") handlers.onMessage(plain);
+          })
+          .catch((err) => console.warn("TRANS: messaggio dall'host illeggibile", err));
       });
       // Prima dell'apertura, chiusura ed errore significano che il collegamento
       // diretto non e' riuscito (PeerJS chiude la connessione quando ICE fallisce).
@@ -362,7 +414,9 @@ function joinAsGuest(handlers) {
 
   return {
     send(message) {
-      if (conn) safeSend(conn, message);
+      if (!conn) return;
+      const wanted = message.type === "join" && CAN_COMPRESS ? { ...message, compress: true } : message;
+      safeSend(conn, wanted);
     },
     close() {
       closed = true;
