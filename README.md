@@ -34,6 +34,10 @@ parte con dei bot. Chi entra col codice a partita già cominciata **prende il po
 di un bot**, con le sue carte e il suo punteggio: nessuno resta fuori per aver
 tardato, e chi ospita non deve restare fermo ad aspettare.
 
+**Chi esce.** Se qualcuno chiude la scheda o perde la connessione, **al suo posto
+gioca un bot** e la partita va avanti. Se rientra prima che qualcun altro si sieda
+lì, il posto torna suo; altrimenti è libero per chi arriva.
+
 **La dichiarazione.** Prima di giocare ognuno dichiara quante prese farà,
 partendo da sinistra del mazziere — che quindi parla per ultimo. Si sceglie il
 numero e poi si conferma: dichiarare non si disfa, un click storto sì.
@@ -160,6 +164,22 @@ Due cose che non sono gratis, e vanno sapute:
 Serve comunque un intermediario per la presentazione fra i browser — due
 computer non si trovano da soli. TRANS usa il broker pubblico di PeerJS, che
 vede solo la stretta di mano: le carte poi viaggiano dirette.
+
+**Fra reti diverse serve un relay.** Sulla stessa Wi‑Fi i browser si parlano
+direttamente. Da reti diverse spesso no — 4G, hotspot del telefono, reti
+aziendali — e allora il traffico deve passare da un server TURN che lo
+inoltra. PeerJS ne elenca uno pubblico nella sua configurazione, ma quei server
+sono stati dismessi: i nomi non risolvono più. Senza un relay proprio, il
+gioco funziona solo fra browser che riescono a vedersi.
+
+Il sito accetta un relay configurato in pubblicazione: la variabile di repo
+`TURN_CREDENTIALS_URL` (Settings → Secrets and variables → Actions → Variables)
+deve contenere l'indirizzo da cui il browser scarica le credenziali — per
+esempio quello di [Metered](https://www.metered.ca/tools/openrelay/), che ha un
+piano gratuito e usa le porte 80 e 443, quelle che i firewall aziendali lasciano
+passare. Va bene anche una risposta nel formato di Cloudflare
+(`{"iceServers": …}`). Quell'indirizzo finisce nella pagina pubblica, quindi
+chiunque potrebbe consumare la quota del piano.
 
 ### Con il server Python
 

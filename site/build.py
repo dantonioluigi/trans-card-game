@@ -10,6 +10,8 @@ il trasporto peer-to-peer, che parla lo stesso protocollo del WebSocket.
 from __future__ import annotations
 
 import hashlib
+import json
+import os
 import pathlib
 import re
 import shutil
@@ -88,6 +90,22 @@ def build_id(sources: list[pathlib.Path]) -> str:
     return digest.hexdigest()[:10]
 
 
+def relay_config() -> str:
+    """Indirizzo da cui il browser chiede le credenziali del relay TURN.
+
+    Viene dall'ambiente, non dal codice: in pubblicazione lo passa la variabile
+    TURN_CREDENTIALS_URL del repo. Senza, il sito funziona lo stesso, ma solo
+    fra browser che riescono a collegarsi direttamente.
+    """
+    url = os.environ.get("TRANS_TURN_URL", "").strip()
+    if not url:
+        return ""
+    # json.dumps protegge le virgolette; "<" va protetto a mano, se no un
+    # "</script>" nel valore chiuderebbe il blocco prima del tempo.
+    literal = json.dumps(url).replace("<", "\\u003c")
+    return f"<script>window.TRANS_TURN_URL = {literal};</script>\n"
+
+
 def transform_index(html: str, version: str) -> str:
     def swap(before: str, after: str) -> None:
         nonlocal html
@@ -108,7 +126,8 @@ def transform_index(html: str, version: str) -> str:
     swap(
         '<script src="/static/app.js"></script>',
         f'<script src="{PEERJS}"></script>\n'
-        f'<script type="module" src="js/net-p2p.js?v={version}"></script>\n'
+        + relay_config()
+        + f'<script type="module" src="js/net-p2p.js?v={version}"></script>\n'
         f'<script src="app.js?v={version}"></script>',
     )
 
@@ -166,7 +185,8 @@ def main() -> None:
     (DIST / ".nojekyll").write_text("")
 
     files = sorted(p.relative_to(DIST).as_posix() for p in DIST.rglob("*") if p.is_file())
-    print(f"site/dist pronto — versione {version} — {len(files)} file:")
+    relay = "relay configurato" if os.environ.get("TRANS_TURN_URL") else "SENZA relay"
+    print(f"site/dist pronto — versione {version} — {relay} — {len(files)} file:")
     for f in files:
         print("  " + f)
 

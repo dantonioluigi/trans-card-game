@@ -30,6 +30,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: assembla il sito
+        env:
+          # Variabile del repo (Settings → Secrets and variables → Actions →
+          # Variables). Senza, il gioco va solo fra browser sulla stessa rete.
+          TRANS_TURN_URL: ${{ vars.TURN_CREDENTIALS_URL }}
         run: python site/build.py
       # Niente enablement qui. Creando il sito da solo lo faceva nascere in
       # modalita' "Deploy from a branch", dove GitHub passa il repo dentro
