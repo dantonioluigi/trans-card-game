@@ -15,6 +15,13 @@ updates:
     directory: /app
     schedule:
       interval: weekly
+    ignore:
+      # Fissato alla 8.2.x apposta: dalla 8.3.0 il plugin porta una dipendenza in
+      # piu' (@webview-native-ui/engine, 14 MB, un solo maintainer) che non serve.
+      # Le patch della 8.2 arrivano; salire di minor si decide a mano, dopo aver
+      # guardato cosa entra nell'app (vedi README, sezione Pubblicita').
+      - dependency-name: "@capacitor-community/admob"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
   - package-ecosystem: docker
     directory: /
     schedule:
