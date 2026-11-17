@@ -1,11 +1,15 @@
 """Test d'integrazione sul server: lobby, WebSocket, bot, partita intera."""
 
 import contextlib
+import json
 import signal
 
 import pytest
 from fastapi.testclient import TestClient
 
+from starlette.websockets import WebSocketDisconnect
+
+from server import main as main_module
 from server import room as room_module
 from server.main import app, registry
 
@@ -18,6 +22,14 @@ def fast_bots(monkeypatch):
     monkeypatch.setattr(room_module, "TRICK_PAUSE", 0)
     monkeypatch.setattr(room_module, "AUTO_ADVANCE_AFTER", 3600)
     registry.rooms.clear()
+
+
+@pytest.fixture(autouse=True)
+def relaxed_limits(monkeypatch):
+    """Il limite di frequenza e' fatto per le persone: i test giocano a velocita' di macchina."""
+    monkeypatch.setattr(main_module, "RATE_BURST", 100_000)
+    monkeypatch.setattr(main_module, "RATE_PER_SECOND", 100_000.0)
+    main_module._connections.clear()
 
 
 @pytest.fixture
@@ -41,8 +53,8 @@ def deadline(seconds):
         signal.signal(signal.SIGALRM, previous)
 
 
-def join(ws, name, room=None, player_id=None):
-    ws.send_json({"type": "join", "room": room, "name": name, "player_id": player_id})
+def join(ws, name, room=None, player_id=None, secret=None):
+    ws.send_json({"type": "join", "room": room, "name": name, "player_id": player_id, "secret": secret})
     welcome = ws.receive_json()
     assert welcome["type"] == "welcome", welcome
     return welcome
@@ -98,7 +110,7 @@ def test_port_comes_from_TRANS_PORT_then_PORT_then_the_default(monkeypatch):
 def test_health_and_index_are_served(client):
     assert client.get("/health").json()["ok"] is True
     page = client.get("/")
-    assert page.status_code == 200 and "TRANS" in page.text
+    assert page.status_code == 200 and "DICHIARO" in page.text
     assert client.get("/static/app.js").status_code == 200
 
 
@@ -368,12 +380,12 @@ def start_with_guest(client, host):
     next_state(guest_ws)
     host.send_json({"type": "start"})
     state_until(host, lambda s: s["screen"] == "game")
-    return welcome["room"], guest, guest_ws, anna["player_id"]
+    return welcome["room"], guest, guest_ws, anna["player_id"], anna["secret"]
 
 
 def test_a_player_who_leaves_is_replaced_by_a_bot(client):
     with client.websocket_connect("/ws") as host:
-        code, guest, guest_ws, anna_id = start_with_guest(client, host)
+        code, guest, guest_ws, anna_id, anna_secret = start_with_guest(client, host)
         guest.__exit__(None, None, None)  # Anna chiude la scheda
 
         state = state_until(host, lambda s: any(
@@ -390,7 +402,7 @@ def test_a_player_who_leaves_is_replaced_by_a_bot(client):
 
 def test_a_latecomer_can_sit_where_someone_left(client):
     with client.websocket_connect("/ws") as host:
-        code, guest, guest_ws, anna_id = start_with_guest(client, host)
+        code, guest, guest_ws, anna_id, anna_secret = start_with_guest(client, host)
         guest.__exit__(None, None, None)
         state_until(host, lambda s: any(p["connected"] is False for p in s["game"]["players"]))
 
@@ -409,12 +421,12 @@ def test_a_latecomer_can_sit_where_someone_left(client):
 
 def test_whoever_comes_back_first_gets_the_seat_back(client):
     with client.websocket_connect("/ws") as host:
-        code, guest, guest_ws, anna_id = start_with_guest(client, host)
+        code, guest, guest_ws, anna_id, anna_secret = start_with_guest(client, host)
         guest.__exit__(None, None, None)
         state_until(host, lambda s: any(p["connected"] is False for p in s["game"]["players"]))
 
         with client.websocket_connect("/ws") as back:
-            welcome = join(back, "Anna", room=code, player_id=anna_id)
+            welcome = join(back, "Anna", room=code, player_id=anna_id, secret=anna_secret)
             assert welcome["player_id"] == anna_id
             view = next_state(back, tolerate_errors=True)["game"]
             anna = next(p for p in view["players"] if p["name"] == "Anna")
@@ -464,7 +476,7 @@ def test_without_bots_a_started_game_stays_closed(client):
 def test_reconnecting_with_the_same_id_gets_the_seat_back(client):
     with client.websocket_connect("/ws") as host:
         welcome = join(host, "Luigi")
-        code, pid = welcome["room"], welcome["player_id"]
+        code, pid, secret = welcome["room"], welcome["player_id"], welcome["secret"]
         next_state(host)
         host.send_json({"type": "add_bot", "level": "facile"})
         next_state(host)
@@ -473,8 +485,188 @@ def test_reconnecting_with_the_same_id_gets_the_seat_back(client):
 
     # Il socket e' caduto: il bot gioca al posto suo, ma il posto resta.
     with client.websocket_connect("/ws") as again:
-        back = join(again, "Luigi", room=code, player_id=pid)
+        back = join(again, "Luigi", room=code, player_id=pid, secret=secret)
         assert back["player_id"] == pid
         state = next_state(again)
         assert state["screen"] == "game"
         assert state["game"]["you"] is not None
+
+
+# --------------------------------------------------------------------- sicurezza
+
+
+def test_the_public_id_alone_does_not_take_the_hosts_seat(client):
+    """L'id di ogni posto e' in ogni stato, quindi non puo' bastare a prendere quel posto."""
+    with client.websocket_connect("/ws") as host:
+        welcome = join(host, "Luigi")
+        code, host_id = welcome["room"], welcome["player_id"]
+        next_state(host)
+        with client.websocket_connect("/ws") as bob:
+            join(bob, "Bob", room=code)
+            assert next_state(bob)["host"] == host_id  # l'id dell'host e' visibile a tutti
+
+            with client.websocket_connect("/ws") as mallory:
+                got = join(mallory, "Mallory", room=code, player_id=host_id)
+                assert got["player_id"] != host_id
+                state = next_state(mallory)
+                assert state["is_host"] is False and state["host"] == host_id
+
+                mallory.send_json({"type": "add_bot", "level": "facile"})
+                assert "solo chi ha creato" in next_error(mallory)["message"]
+
+            # L'host vero riceve ancora gli stati e comanda ancora.
+            host.send_json({"type": "add_bot", "level": "facile"})
+            state = state_until(host, lambda s: len(s.get("seats", [])) >= 3)
+            assert state["is_host"] is True
+
+
+def test_a_wrong_secret_does_not_take_the_seat_either(client):
+    with client.websocket_connect("/ws") as host:
+        welcome = join(host, "Luigi")
+        next_state(host)
+        with client.websocket_connect("/ws") as mallory:
+            got = join(mallory, "Mallory", room=welcome["room"],
+                       player_id=welcome["player_id"], secret="x" * 22)
+            assert got["player_id"] != welcome["player_id"]
+            assert next_state(mallory)["is_host"] is False
+
+
+def test_the_secret_never_appears_in_any_state(client):
+    with client.websocket_connect("/ws") as host:
+        h = join(host, "Luigi")
+        seen = [next_state(host)]
+        with client.websocket_connect("/ws") as guest:
+            g = join(guest, "Anna", room=h["room"])
+            guest_seen = [next_state(guest)]
+            host.send_json({"type": "start"})
+            seen.append(state_until(host, lambda s: s["screen"] == "game"))
+            guest_seen.append(state_until(guest, lambda s: s["screen"] == "game"))
+            everything = json.dumps(seen + guest_seen)
+            assert h["secret"] and g["secret"] and h["secret"] != g["secret"]
+            assert h["secret"] not in everything and g["secret"] not in everything
+
+
+def test_a_second_join_on_the_same_connection_is_refused(client):
+    with client.websocket_connect("/ws") as ws:
+        welcome = join(ws, "Luigi")
+        next_state(ws)
+        ws.send_json({"type": "join", "room": welcome["room"], "name": "Fantasma"})
+        assert "gia' al tavolo" in next_error(ws)["message"]
+        ws.send_json({"type": "chat", "text": "ci sono"})
+        assert len(next_state(ws)["seats"]) == 1
+
+
+def test_an_unknown_room_code_is_refused_and_creates_nothing(client):
+    with client.websocket_connect("/ws") as ws:
+        for code in ("ZZZZ", "A" * 100, "ab", 12345, ["A"]):
+            ws.send_json({"type": "join", "room": code, "name": "Luigi"})
+            message = next_error(ws)["message"]
+            assert "inesistente" in message and len(message) < 40
+    assert registry.rooms == {}
+
+
+def test_malformed_fields_are_answered_without_killing_the_session(client):
+    with client.websocket_connect("/ws") as ws:
+        ws.send_json({"type": "join", "room": None, "name": ["a"], "player_id": {"x": 1}, "secret": 5})
+        welcome = ws.receive_json()
+        assert welcome["type"] == "welcome" and welcome["name"] == "Ospite"
+        next_state(ws)
+
+        for bad in (
+            {"type": "add_bot", "level": ["x"]},
+            {"type": "set_mode", "mode": {"a": 1}},
+            {"type": "bid", "value": "1"},
+            {"type": "play", "card": 7},
+            {"type": "remove_player", "player_id": ["x"]},
+            {"type": 5},
+            [1, 2, 3],
+            "testo",
+        ):
+            ws.send_json(bad)
+            assert next_error(ws)["type"] == "error", bad
+        ws.send_bytes(b"\x00\x01")
+        assert "solo messaggi di testo" in next_error(ws)["message"]
+        ws.send_text("{non e' json")
+        assert "non valido" in next_error(ws)["message"]
+
+        # Dopo tutto questo il tavolo funziona ancora.
+        ws.send_json({"type": "add_bot", "level": "facile"})
+        next_state(ws)
+        ws.send_json({"type": "start"})
+        assert state_until(ws, lambda s: s["screen"] == "game")["screen"] == "game"
+
+
+def test_an_oversized_message_closes_the_connection(client):
+    with client.websocket_connect("/ws") as ws:
+        join(ws, "Luigi")
+        ws.send_text("x" * 5000)
+        with pytest.raises(WebSocketDisconnect) as closed:
+            for _ in range(5):
+                ws.receive_json()
+        assert closed.value.code == 1009
+
+
+def test_a_flood_of_messages_closes_the_connection(client, monkeypatch):
+    monkeypatch.setattr(main_module, "RATE_BURST", 5)
+    monkeypatch.setattr(main_module, "RATE_PER_SECOND", 0.001)
+    with client.websocket_connect("/ws") as ws:
+        join(ws, "Luigi")
+        for _ in range(12):
+            ws.send_json({"type": "ping"})
+        with pytest.raises(WebSocketDisconnect) as closed:
+            for _ in range(30):
+                ws.receive_json()
+        assert closed.value.code == 1008
+
+
+def test_only_the_same_site_may_open_a_websocket(client, monkeypatch):
+    with pytest.raises(WebSocketDisconnect):
+        with client.websocket_connect("/ws", headers={"origin": "http://evil.example"}):
+            pass
+    with client.websocket_connect("/ws", headers={"origin": "http://testserver"}) as ws:
+        assert join(ws, "Luigi")["type"] == "welcome"
+    # Un elenco esplicito vince sul confronto con l'host.
+    monkeypatch.setenv("TRANS_ALLOWED_ORIGINS", "https://gioco.example")
+    with client.websocket_connect("/ws", headers={"origin": "https://gioco.example"}) as ws:
+        assert join(ws, "Anna")["type"] == "welcome"
+    with pytest.raises(WebSocketDisconnect):
+        with client.websocket_connect("/ws", headers={"origin": "http://testserver"}):
+            pass
+
+
+def test_connections_and_rooms_have_a_ceiling(client, monkeypatch):
+    monkeypatch.setattr(main_module, "MAX_CONNECTIONS_PER_IP", 2)
+    with client.websocket_connect("/ws") as a, client.websocket_connect("/ws") as b:
+        join(a, "A")
+        join(b, "B")
+        with pytest.raises(WebSocketDisconnect):
+            with client.websocket_connect("/ws"):
+                pass
+    monkeypatch.setattr(room_module, "MAX_ROOMS", 2)
+    registry.rooms.clear()
+    for name in ("A", "B"):
+        with client.websocket_connect("/ws") as ws:
+            join(ws, name)
+    with client.websocket_connect("/ws") as ws:
+        ws.send_json({"type": "join", "room": None, "name": "C"})
+        assert "pieno" in next_error(ws)["message"]
+
+
+def test_names_lose_invisible_and_direction_characters(client):
+    with client.websocket_connect("/ws") as ws:
+        welcome = join(ws, "A​B‮  C\n")
+        assert welcome["name"] == "AB C"
+    with client.websocket_connect("/ws") as ws:
+        assert join(ws, "Ｌｕｉｇｉ")["name"] == "Luigi"  # a larghezza piena
+    with client.websocket_connect("/ws") as ws:
+        assert join(ws, "​‮")["name"] == "Ospite"
+
+
+def test_pages_carry_security_headers_and_no_room_oracle(client):
+    page = client.get("/")
+    assert "script-src 'self'" in page.headers["content-security-policy"]
+    assert "frame-ancestors 'none'" in page.headers["content-security-policy"]
+    assert page.headers["x-content-type-options"] == "nosniff"
+    assert page.headers["x-frame-options"] == "DENY"
+    # Prima diceva 200 o 404 per ogni codice: un modo gratis per cercare tavoli aperti.
+    assert client.get("/api/rooms/ABCD").status_code == 404

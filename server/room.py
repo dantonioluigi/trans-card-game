@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import asyncio
+import hmac
 import random
-import string
+import re
+import secrets
 import time
+import unicodedata
 import uuid
 from dataclasses import dataclass, field
 
@@ -23,12 +26,53 @@ AUTO_ADVANCE_AFTER = 12.0
 CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # niente I/O/0/1
 
 
+#: Tavoli aperti contemporaneamente. Servono a non finire in memoria se qualcuno
+#: ne apre a raffica: i tavoli vivono nel processo e non c'e' nient'altro.
+MAX_ROOMS = 500
+
+CODE_RE = re.compile(f"[{CODE_ALPHABET}]{{4}}")
+
+
 def new_room_code() -> str:
-    return "".join(random.choice(CODE_ALPHABET) for _ in range(4))
+    # Il generatore sicuro, non random: il codice e' tutto quello che separa un
+    # tavolo dagli sconosciuti.
+    return "".join(secrets.choice(CODE_ALPHABET) for _ in range(4))
 
 
 def new_player_id() -> str:
+    """L'id e' pubblico: lo vedono tutti al tavolo. Dice chi e' un posto, non lo prova."""
     return uuid.uuid4().hex[:12]
+
+
+def new_secret() -> str:
+    """Il segreto di rientro: lo riceve solo chi si siede, e non compare in nessuno stato."""
+    return secrets.token_urlsafe(16)
+
+
+def normalize_code(code: object) -> str | None:
+    """Il codice tavolo in forma canonica, o None se non ha la forma di un codice."""
+    if not isinstance(code, str):
+        return None
+    code = code.strip().upper()
+    return code if CODE_RE.fullmatch(code) else None
+
+
+# Caratteri di controllo, di formato (zero-width, override destra-sinistra) e
+# separatori di riga: permettono nomi che sembrano uguali a un altro.
+_INVISIBLE = {"Cc", "Cf", "Zl", "Zp"}
+
+
+def _visible(text: str) -> str:
+    return "".join(ch for ch in text if unicodedata.category(ch) not in _INVISIBLE)
+
+
+def clean_name(raw: object) -> str:
+    text = unicodedata.normalize("NFKC", raw if isinstance(raw, str) else "")
+    return " ".join(_visible(text).split())[:16]
+
+
+def clean_chat(raw: object) -> str:
+    return _visible(raw if isinstance(raw, str) else "").strip()[:200]
 
 
 @dataclass
@@ -39,6 +83,7 @@ class Seat:
     bot_level: str = "normale"
     connected: bool = False
     socket: object | None = field(default=None, repr=False)
+    secret: str | None = field(default=None, repr=False)
 
     @property
     def plays_itself(self) -> bool:
@@ -83,7 +128,7 @@ class Room:
         return self.humans_online() == 0
 
     def _unique_name(self, wanted: str, exclude_id: str | None = None) -> str:
-        wanted = (wanted or "Ospite").strip()[:16] or "Ospite"
+        wanted = clean_name(wanted) or "Ospite"
         taken = {s.name for s in self.seats if s.id != exclude_id}
         if wanted not in taken:
             return wanted
@@ -101,11 +146,19 @@ class Room:
 
     # ----------------------------------------------------------------- lobby
 
-    def join(self, player_id: str | None, name: str, socket: object) -> Seat:
-        seat = self.seat_by_id(player_id) if player_id else None
+    def join(
+        self, player_id: str | None, name: str, socket: object, secret: str | None = None
+    ) -> Seat:
+        seat = self.seat_by_id(player_id) if isinstance(player_id, str) and player_id else None
+        # L'id e' pubblico: per riprendere un posto serve anche il segreto. Chi non
+        # lo ha (o ne ha uno sbagliato) e' un giocatore nuovo, non quello di prima.
+        if seat is not None and not (
+            seat.secret
+            and isinstance(secret, str)
+            and hmac.compare_digest(seat.secret.encode(), secret.encode())
+        ):
+            seat = None
         if seat is not None:
-            if seat.is_bot:
-                raise RoomError("quel posto e' occupato da un bot")
             was_away = not seat.connected
             seat.connected = True
             seat.socket = socket
@@ -119,7 +172,9 @@ class Room:
             if len(self.seats) >= MAX_PLAYERS:
                 raise RoomError(f"tavolo pieno (max {MAX_PLAYERS} giocatori)")
             seat = Seat(
-                id=player_id or new_player_id(),
+                # Mai l'id proposto dal client: potrebbe coincidere con quello di un altro posto.
+                id=new_player_id(),
+                secret=new_secret(),
                 name=self._unique_name(name),
                 connected=True,
                 socket=socket,
@@ -145,6 +200,7 @@ class Room:
         player = self.game.players[self.game.index_of(seat.id)] if self.game else None
 
         seat.id = fresh_id
+        seat.secret = new_secret()
         seat.is_bot = False
         seat.name = self._unique_name(name, exclude_id=fresh_id)
         seat.connected = True
@@ -265,7 +321,7 @@ class Room:
         seat = self.seat_by_id(player_id)
         if seat is None:
             return
-        text = text.strip()[:200]
+        text = clean_chat(text)
         if text:
             self.chat.append({"name": seat.name, "text": text, "ts": time.time()})
             del self.chat[:-50]
@@ -416,6 +472,9 @@ class RoomRegistry:
         self.rooms: dict[str, Room] = {}
 
     def create(self) -> Room:
+        self.sweep()
+        if len(self.rooms) >= MAX_ROOMS:
+            raise RoomError("il server e' pieno: riprova fra poco")
         for _ in range(50):
             code = new_room_code()
             if code not in self.rooms:
@@ -424,21 +483,25 @@ class RoomRegistry:
                 return room
         raise RoomError("non riesco a generare un codice libero")
 
-    def get(self, code: str) -> Room:
-        room = self.rooms.get(code.strip().upper())
+    def get(self, code: object) -> Room:
+        canonical = normalize_code(code)
+        room = self.rooms.get(canonical) if canonical else None
         if room is None:
-            raise RoomError(f"tavolo {code.strip().upper()} inesistente")
+            # Il codice e' roba altrui: lo si mostra corto e senza spazi di troppo.
+            shown = " ".join(str(code).split())[:8] if code is not None else ""
+            raise RoomError(f"tavolo {shown} inesistente".replace("  ", " "))
         return room
 
-    def get_or_create(self, code: str | None) -> Room:
-        if not code:
+    def get_or_create(self, code: object | None) -> Room:
+        """Senza codice si apre un tavolo; con un codice si entra in uno che c'e'.
+
+        Prima un codice sconosciuto creava un tavolo con quel nome, qualunque
+        fosse: un refuso diventava una stanza vuota, e una stringa di megabyte
+        restava in memoria.
+        """
+        if code is None or code == "":
             return self.create()
-        code = code.strip().upper()
-        if code in self.rooms:
-            return self.rooms[code]
-        room = Room(code)
-        self.rooms[code] = room
-        return room
+        return self.get(code)
 
     def sweep(self, max_idle: float = 3 * 3600) -> None:
         """Butta via i tavoli vuoti e vecchi."""

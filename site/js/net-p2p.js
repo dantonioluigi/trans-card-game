@@ -18,7 +18,11 @@
  * pagina conosce le carte di tutti.
  */
 
-import { Table, handleClientMessage, newRoomCode, silentSessions } from "./room.js";
+import { Table, handleClientMessage, localTable, newRoomCode, silentSessions } from "./room.js";
+import { trustedQuery } from "./params.js";
+import {
+  CAN_COMPRESS, MAX_GUESTS, MAX_PENDING, RATE_BURST, RATE_PER_SECOND, TokenBucket, pack, smallEnough, unpack,
+} from "./limits.js";
 
 const PEER_PREFIX = "trans-";
 const ID_ATTEMPTS = 5;
@@ -52,34 +56,6 @@ const MESSAGES = {
   hostLost: "l'host non risponde piu': ha chiuso la scheda o ha perso la connessione",
 };
 
-/* ------------------------------------------------------------ compressione */
-
-// Ogni stato del tavolo viaggia intero, e compresso pesa circa un quarto. Solo
-// host → ospite: e' li' che passa il grosso, le intenzioni sono poche decine di
-// byte. Chi la supporta lo dichiara nel join, e l'host comprime solo per lui:
-// cosi' codice vecchio e nuovo si parlano anche a meta' pubblicazione.
-const CAN_COMPRESS = (() => {
-  try {
-    new CompressionStream("deflate-raw");
-    new DecompressionStream("deflate-raw");
-    return true;
-  } catch (_) {
-    return false;
-  }
-})();
-
-async function pack(message) {
-  const stream = new Blob([JSON.stringify(message)])
-    .stream()
-    .pipeThrough(new CompressionStream("deflate-raw"));
-  return new Response(stream).arrayBuffer();
-}
-
-async function unpack(bytes) {
-  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
-  return JSON.parse(await new Response(stream).text());
-}
-
 /* ----------------------------------------------------------- configurazione */
 
 let icePromise = null;
@@ -91,7 +67,7 @@ function loadIce() {
 }
 
 async function fetchIce() {
-  const params = new URLSearchParams(location.search);
+  const params = trustedQuery(location);
 
   // Elenco gia' pronto (credenziali statiche, tipiche di un piano gratuito
   // senza scadenza): niente richiesta in piu' per aprire una connessione.
@@ -145,7 +121,7 @@ function normaliseIce(body) {
  * relay (serve a verificare che funzioni davvero).
  */
 function peerOptions(ice) {
-  const params = new URLSearchParams(location.search);
+  const params = trustedQuery(location);
   const options = { debug: 0, config: { iceServers: ice.servers } };
   if (params.get("relay") === "1") options.config.iceTransportPolicy = "relay";
 
@@ -183,7 +159,14 @@ function hostTable(handlers) {
   let closed = false;
   let sweeper = null;
   const guests = new Set();
-  const session = { playerId: null, sink: (msg) => handlers.onMessage(msg) };
+  // Dopo close() il Table ha ancora i timer dei bot: senza questa guardia, un
+  // loro messaggio tardivo rimetterebbe in primo piano il tavolo appena lasciato.
+  const session = {
+    playerId: null,
+    sink: (msg) => {
+      if (table) handlers.onMessage(msg);
+    },
+  };
 
   loadIce().then((ice) => {
     if (!closed) claimId(1, ice);
@@ -249,25 +232,46 @@ function hostTable(handlers) {
   }
 
   function wireGuest(conn) {
+    // I posti sono 7: chi ne apre di piu' sta solo consumando la pagina dell'host.
+    if (guests.size >= MAX_GUESTS) {
+      conn.close();
+      return;
+    }
     const guest = {
       playerId: null,
+      secret: null,
       lastHeard: Date.now(),
       away: false,
       compress: false,
       queue: Promise.resolve(),
+      pending: 0,
+      bucket: new TokenBucket(RATE_BURST, RATE_PER_SECOND),
+      banned: false,
       conn,
       sink: (msg) => post(guest, msg),
     };
     guests.add(guest);
 
+    // Fuori dai limiti non e' una partita: si chiude, e il posto passa a un bot.
+    const kick = (why) => {
+      if (guest.banned) return;
+      guest.banned = true;
+      console.warn("TRANS: ospite escluso:", why);
+      conn.close();
+    };
+
     conn.on("data", (msg) => {
+      if (guest.banned) return;
       guest.lastHeard = Date.now();
       if (!table || !msg || typeof msg !== "object") return;
+      if (!guest.bucket.take()) return kick("troppi messaggi");
+      if (!smallEnough(msg)) return kick("messaggio troppo grande");
       if (msg.type === "join" && msg.compress && CAN_COMPRESS) guest.compress = true;
       if (guest.away) comeBack(guest);
       handleClientMessage(table, guest, msg, (out) => post(guest, out));
     });
 
+    guest.kick = kick;
     const drop = () => {
       if (!guests.delete(guest)) return;
       if (table && guest.playerId && !guest.away) {
@@ -285,10 +289,14 @@ function hostTable(handlers) {
    * asincrona, e senza la fila uno stato vecchio potrebbe superarne uno nuovo.
    */
   function post(guest, message) {
+    // Chi non legge i propri stati li lascia accumulare nella nostra memoria.
+    if (guest.pending >= MAX_PENDING) return guest.kick("non legge i messaggi");
+    guest.pending++;
     guest.queue = guest.queue
       .then(() => (guest.compress ? pack(message).then((z) => ({ z })) : message))
       .then((wire) => safeSend(guest.conn, wire))
-      .catch((err) => console.warn("TRANS: invio all'ospite fallito", err));
+      .catch((err) => console.warn("TRANS: invio all'ospite fallito", err))
+      .finally(() => { guest.pending--; });
   }
 
   /**
@@ -329,7 +337,7 @@ function hostTable(handlers) {
       guest.conn.close();
       return;
     }
-    table.join(guest.playerId, "", guest.sink);
+    table.join(guest.playerId, "", guest.sink, guest.secret);
     table.broadcast();
   }
 
@@ -387,6 +395,7 @@ function joinAsGuest(handlers) {
         inbox = inbox
           .then(() => (msg.z ? unpack(msg.z) : msg))
           .then((plain) => {
+            if (!plain || typeof plain !== "object" || typeof plain.type !== "string") return;
             if (!closed && plain.type !== "pong") handlers.onMessage(plain);
           })
           .catch((err) => console.warn("TRANS: messaggio dall'host illeggibile", err));
@@ -454,6 +463,7 @@ function joinAsGuest(handlers) {
 
 window.TRANS_TRANSPORT = {
   create(handlers) {
+    if (handlers.local) return localTable(handlers);
     if (typeof Peer === "undefined") {
       setTimeout(() => handlers.onClose({ fatal: true, message: "libreria di connessione non caricata" }), 0);
       return { send() {}, close() {} };

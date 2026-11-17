@@ -24,16 +24,58 @@ export class TableError extends Error {}
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function newRoomCode() {
-  let code = "";
-  for (let i = 0; i < 4; i++) {
-    code += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)];
-  }
-  return code;
+// Tutto quello che non deve essere indovinabile viene dal generatore sicuro del
+// browser, non da Math.random. Se manca, meglio fermarsi che usarne uno debole.
+function randomBytes(count) {
+  const bytes = new Uint8Array(count);
+  globalThis.crypto.getRandomValues(bytes);
+  return bytes;
 }
 
+const hex = (bytes) => Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+
+export function newRoomCode() {
+  // L'alfabeto ha 32 simboli: b & 31 non ha scarti ne' sbilanciamenti.
+  return Array.from(randomBytes(4), (b) => CODE_ALPHABET[b & 31]).join("");
+}
+
+/** L'id e' pubblico: lo vedono tutti al tavolo. Dice chi e' un posto, non lo prova. */
 export function newPlayerId() {
-  return Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 6);
+  return hex(randomBytes(6));
+}
+
+/**
+ * Il segreto di rientro: lo riceve solo chi si siede, nel suo "welcome", e non
+ * compare in nessuno stato. Senza, l'id (pubblico) bastava a prendere il posto
+ * di un altro, anche quello dell'host.
+ */
+export function newSecret() {
+  return hex(randomBytes(16));
+}
+
+/** Confronto a tempo costante: non rivela da dove differiscono due segreti. */
+function sameSecret(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+/** Un campo del messaggio che deve essere testo di lunghezza ragionevole, o niente. */
+function asText(value, max) {
+  return typeof value === "string" && value.length <= max ? value : null;
+}
+
+// Controllo, formato (zero-width, override destra-sinistra) e separatori di riga:
+// permettono nomi che sembrano uguali a un altro o che girano il testo intorno.
+const INVISIBLE = /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/gu;
+
+export function cleanName(raw) {
+  return String(raw ?? "").normalize("NFKC").replace(INVISIBLE, "").replace(/\s+/g, " ").trim().slice(0, 16);
+}
+
+export function cleanChat(raw) {
+  return String(raw ?? "").replace(INVISIBLE, "").trim().slice(0, 200);
 }
 
 export class Table {
@@ -68,7 +110,7 @@ export class Table {
   }
 
   _uniqueName(wanted, excludeId = null) {
-    let name = (wanted || "Ospite").trim().slice(0, 16) || "Ospite";
+    let name = cleanName(wanted) || "Ospite";
     const taken = new Set(this.seats.filter((s) => s.id !== excludeId).map((s) => s.name));
     if (!taken.has(name)) return name;
     for (let i = 2; i < 100; i++) {
@@ -95,10 +137,12 @@ export class Table {
 
   /* ----------------------------------------------------------------- lobby */
 
-  join(playerId, name, sink) {
+  join(playerId, name, sink, secret = null) {
     let seat = playerId ? this.seatById(playerId) : null;
+    // L'id e' pubblico: per riprendere un posto serve anche il segreto. Chi non
+    // lo ha (o ne ha uno sbagliato) e' un giocatore nuovo, non quello di prima.
+    if (seat && !(seat.secret && sameSecret(seat.secret, secret))) seat = null;
     if (seat) {
-      if (seat.isBot) throw new TableError("quel posto e' occupato da un bot");
       const wasAway = !seat.connected;
       seat.connected = true;
       seat.sink = sink;
@@ -111,7 +155,10 @@ export class Table {
     } else {
       if (this.seats.length >= MAX_PLAYERS) throw new TableError(`tavolo pieno (max ${MAX_PLAYERS} giocatori)`);
       seat = {
-        id: playerId || newPlayerId(),
+        // Mai l'id proposto dal client: un id scelto da chi entra potrebbe
+        // coincidere con quello di un altro posto.
+        id: newPlayerId(),
+        secret: newSecret(),
         name: this._uniqueName(name),
         isBot: false,
         botLevel: "normale",
@@ -139,6 +186,7 @@ export class Table {
     const player = this.game ? this.game.players[this.game.indexOf(seat.id)] : null;
 
     seat.id = freshId;
+    seat.secret = newSecret();
     seat.isBot = false;
     seat.name = this._uniqueName(name, freshId);
     seat.connected = true;
@@ -197,7 +245,9 @@ export class Table {
   setMode(requester, mode) {
     this._requireHost(requester);
     if (this.started) throw new TableError("partita gia' iniziata");
-    if (!MODE_LABELS[mode]) throw new TableError(`modalita' sconosciuta: ${mode}`);
+    if (typeof mode !== "string" || !Object.hasOwn(MODE_LABELS, mode)) {
+      throw new TableError("modalita' sconosciuta");
+    }
     this.mode = mode;
   }
 
@@ -255,7 +305,7 @@ export class Table {
   say(playerId, text) {
     const seat = this.seatById(playerId);
     if (!seat) return;
-    const clean = String(text || "").trim().slice(0, 200);
+    const clean = cleanChat(text);
     if (!clean) return;
     this.chat.push({ name: seat.name, text: clean, ts: Date.now() / 1000 });
     if (this.chat.length > 50) this.chat = this.chat.slice(-50);
@@ -427,16 +477,39 @@ function applyClientMessage(table, session, msg) {
 /** Smista un messaggio del client. Gemello di server/main.py: e' l'unico
  * punto in cui si decide cosa un giocatore ha il diritto di fare. */
 export function handleClientMessage(table, session, msg, deliver) {
+  if (!msg || typeof msg !== "object" || typeof msg.type !== "string") {
+    deliver({ type: "error", message: "messaggio non valido" });
+    return;
+  }
+
   if (msg.type === "join") {
+    // Una connessione, un posto: un secondo "join" sulla stessa sessione
+    // riempirebbe il tavolo di posti fantasma.
+    if (session.playerId) {
+      deliver({ type: "error", message: "sei gia' al tavolo" });
+      return;
+    }
     let seat;
     try {
-      seat = table.join(msg.player_id || null, msg.name || "", session.sink);
+      seat = table.join(
+        asText(msg.player_id, 64),
+        asText(msg.name, 64) ?? "",
+        session.sink,
+        asText(msg.secret, 64)
+      );
     } catch (err) {
       deliver({ type: "error", message: err.message });
       return;
     }
     session.playerId = seat.id;
-    deliver({ type: "welcome", room: table.code, player_id: seat.id, name: seat.name });
+    session.secret = seat.secret;
+    deliver({
+      type: "welcome",
+      room: table.code,
+      player_id: seat.id,
+      secret: seat.secret,
+      name: seat.name,
+    });
     table.broadcast();
     table.pump();
     return;
@@ -462,3 +535,36 @@ export function handleClientMessage(table, session, msg, deliver) {
   table.pump();
 }
 
+
+/**
+ * Un tavolo senza rete: lo ospita la pagina stessa e ci gioca chi la sta
+ * usando, con i bot. Serve alla modalita' offline e alla campagna: stesso Table,
+ * stessi messaggi dei trasporti di rete, ma niente broker e niente WebRTC.
+ *
+ * Dopo close() non arriva piu' niente: il Table continua ad avere timer dei bot
+ * in giro, e un loro messaggio tardivo riaprirebbe la schermata appena lasciata.
+ */
+export function localTable(handlers) {
+  let table = new Table(newRoomCode());
+  const session = {
+    playerId: null,
+    sink: (msg) => {
+      if (table) handlers.onMessage(msg);
+    },
+  };
+
+  // Asincrono come ogni trasporto di rete: chi chiama create() sta ancora
+  // assegnando il collegamento, e onOpen ci manda subito il "join".
+  setTimeout(() => {
+    if (table) handlers.onOpen();
+  }, 0);
+
+  return {
+    send(message) {
+      if (table) handleClientMessage(table, session, message, session.sink);
+    },
+    close() {
+      table = null;
+    },
+  };
+}

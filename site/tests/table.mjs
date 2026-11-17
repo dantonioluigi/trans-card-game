@@ -8,7 +8,11 @@
  *   node site/tests/table.mjs
  */
 
-import { Table, handleClientMessage, newRoomCode, silentSessions } from "../js/room.js";
+import {
+  Table, cleanName, handleClientMessage, localTable, newPlayerId, newRoomCode, newSecret, silentSessions,
+} from "../js/room.js";
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let checks = 0;
 const failures = [];
@@ -19,7 +23,7 @@ function check(condition, message) {
 }
 
 /** Un giocatore collegato al tavolo: raccoglie quello che gli arriva. */
-function makeSession(table, name, playerId = null) {
+function makeSession(table, name, playerId = null, secret = null) {
   const inbox = [];
   const session = { playerId: null, sink: (msg) => inbox.push(msg) };
   const deliver = (msg) => inbox.push(msg);
@@ -29,10 +33,13 @@ function makeSession(table, name, playerId = null) {
     inbox,
     send,
     join(joinName = name) {
-      send({ type: "join", room: table.code, name: joinName, player_id: playerId });
+      send({ type: "join", room: table.code, name: joinName, player_id: playerId, secret });
     },
     get id() {
       return session.playerId;
+    },
+    get secret() {
+      return session.secret;
     },
     last(type) {
       for (let i = inbox.length - 1; i >= 0; i--) if (inbox[i].type === type) return inbox[i];
@@ -276,10 +283,11 @@ function makeSession(table, name, playerId = null) {
   const guest = makeSession(table, "Anna");
   guest.join();
   const annaId = guest.id;
+  const annaSecret = guest.secret;
   host.send({ type: "start" });
   table.leave(annaId);
 
-  const back = makeSession(table, "Anna", annaId);
+  const back = makeSession(table, "Anna", annaId, annaSecret);
   back.join();
   check(back.id === annaId, "rientrando Anna non ha riavuto il suo posto");
   check(!table.playsItself(table.seatById(annaId)), "il bot continua a giocare anche dopo il rientro");
@@ -307,6 +315,7 @@ function makeSession(table, name, playerId = null) {
   const guest = makeSession(table, "Anna");
   guest.join();
   const guestId = guest.id;
+  const guestSecret = guest.secret;
   host.send({ type: "start" });
 
   table.leave(guestId);
@@ -314,10 +323,187 @@ function makeSession(table, name, playerId = null) {
   check(table.playsItself(table.seatById(guestId)) === true,
         "un disconnesso dovrebbe essere giocato dal computer");
 
-  const back = makeSession(table, "Anna", guestId);
+  const back = makeSession(table, "Anna", guestId, guestSecret);
   back.join();
-  check(back.id === guestId, "rientrando non ha riavuto il suo posto");
+  check(back.id === guestId, "rientrando col segreto non ha riavuto il suo posto");
   check(back.last("state").screen === "game", "rientrando non e' tornato in partita");
+}
+
+/* ----------------------------------------------- id pubblico e segreto di rientro */
+
+{
+  const table = new Table(newRoomCode());
+  const host = makeSession(table, "Luigi");
+  host.join();
+  const bob = makeSession(table, "Bob");
+  bob.join();
+  const hostId = bob.last("state").host;
+  check(hostId === host.id, "l'id dell'host dovrebbe essere visibile a tutti (e' pubblico)");
+  check(typeof host.last("welcome").secret === "string" && host.last("welcome").secret.length >= 32,
+        "il benvenuto non porta un segreto abbastanza lungo");
+
+  // Chi conosce solo l'id pubblico non prende il posto, ne' quello dell'host.
+  const mallory = makeSession(table, "Mallory", hostId);
+  mallory.join();
+  check(mallory.id !== hostId, "Mallory ha preso l'id dell'host");
+  check(mallory.last("state").is_host === false, "Mallory e' diventata host con un id pubblico");
+  const seats = table.seats.length;
+  mallory.send({ type: "add_bot", level: "facile" });
+  check(mallory.errors().at(-1)?.message.includes("solo chi ha creato"), "Mallory ha potuto aggiungere un bot");
+  check(table.seats.length === seats, "Mallory ha cambiato il tavolo");
+  const heard = host.inbox.length;
+  table.broadcast();
+  check(host.inbox.length > heard, "l'host vero non riceve piu' gli stati");
+  check(table.hostId === host.id, "l'host non e' piu' quello di prima");
+
+  // Un segreto sbagliato vale come nessun segreto.
+  const wrong = makeSession(table, "Wrong", hostId, "0".repeat(32));
+  wrong.join();
+  check(wrong.id !== hostId && wrong.last("state").is_host === false, "un segreto sbagliato ha dato il posto dell'host");
+
+  // Il segreto non compare in nessuno stato, ne' per se' ne' per gli altri.
+  const secrets = [host, bob, mallory, wrong].map((s) => s.secret);
+  check(new Set(secrets).size === 4 && secrets.every(Boolean), "i segreti non sono tutti diversi");
+  const states = JSON.stringify([host, bob, mallory, wrong].flatMap((s) => s.inbox.filter((m) => m.type === "state")));
+  check(secrets.every((secret) => !states.includes(secret)), "un segreto e' finito in uno stato");
+
+  // Col segreto giusto, invece, si riprende il proprio posto (a partita iniziata il posto resta).
+  host.send({ type: "start" });
+  table.leave(hostId);
+  const back = makeSession(table, "Luigi", hostId, host.secret);
+  back.join();
+  check(back.id === hostId, "l'host col suo segreto non ha ripreso il posto");
+  check(table.seatById(hostId).connected === true, "il posto dell'host non e' tornato collegato");
+  const stolen = makeSession(table, "Mallory2", hostId);
+  stolen.join();
+  check(stolen.id !== hostId, "col solo id pubblico si e' preso il posto di chi e' appena rientrato");
+}
+
+{
+  // Chi prende il posto di un bot o di chi e' uscito ha id e segreto nuovi: i vecchi non rientrano.
+  const table = new Table(newRoomCode());
+  const host = makeSession(table, "Luigi");
+  host.join();
+  const anna = makeSession(table, "Anna");
+  anna.join();
+  host.send({ type: "start" });
+  const annaId = anna.id;
+  const annaSecret = anna.secret;
+  table.leave(annaId);
+
+  const marco = makeSession(table, "Marco");
+  marco.join();
+  check(marco.id !== annaId && marco.secret !== annaSecret, "il posto preso non ha id e segreto nuovi");
+  const old = makeSession(table, "Anna", annaId, annaSecret);
+  old.join();
+  check(old.errors().length > 0 && old.id === null, "chi era uscito ha scalzato chi si e' seduto al suo posto");
+}
+
+{
+  // Una sessione, un posto; messaggi che non hanno la forma giusta.
+  const table = new Table(newRoomCode());
+  const host = makeSession(table, "Luigi");
+  host.join();
+  host.send({ type: "join", room: table.code, name: "Fantasma" });
+  check(host.errors().at(-1)?.message.includes("gia' al tavolo"), "un secondo join e' stato accettato");
+  check(table.seats.length === 1, "il secondo join ha creato un posto fantasma");
+
+  for (const bad of [null, 5, "testo", [1, 2], {}, { type: 5 }]) {
+    const before = host.errors().length;
+    host.send(bad);
+    check(host.errors().length === before + 1, `il messaggio ${JSON.stringify(bad)} non ha avuto risposta`);
+  }
+  host.send({ type: "set_mode", mode: "constructor" });
+  host.send({ type: "set_mode", mode: "__proto__" });
+  host.send({ type: "set_mode", mode: ["fast"] });
+  check(table.mode === "fast", `modalita' cambiata da un nome non valido: ${table.mode}`);
+  check(host.errors().filter((e) => e.message.includes("modalita'")).length === 3,
+        "set_mode con nomi non validi non ha dato errore");
+
+  const huge = makeSession(table, "x".repeat(10000));
+  huge.join();
+  check(huge.last("welcome")?.name === "Ospite", "un nome enorme non e' stato ridotto a un nome di riserva");
+  const weird = makeSession(table, { toString() { return "x"; } }, { id: 1 }, 7);
+  weird.join();
+  check(weird.last("welcome") !== null && weird.id !== null, "campi di tipo sbagliato nel join hanno rotto l'ingresso");
+}
+
+{
+  // Nomi: niente caratteri invisibili o di direzione, niente doppioni per aspetto.
+  check(cleanName("A​B‮  C\n") === "AB C", "zero-width o override non tolti dal nome");
+  check(cleanName("Ｌｕｉｇｉ") === "Luigi", "il nome a larghezza piena non e' stato normalizzato");
+  check(cleanName("​‮") === "", "un nome fatto solo di caratteri invisibili e' rimasto");
+  check(cleanName("x".repeat(40)).length === 16, "il nome non e' stato tagliato a 16");
+  const table = new Table(newRoomCode());
+  const a = makeSession(table, "Anna");
+  a.join();
+  const b = makeSession(table, "An​na");
+  b.join();
+  check(a.last("welcome").name !== b.last("welcome").name, "due nomi che sembrano uguali sono rimasti uguali");
+  a.send({ type: "chat", text: "ciao‮​ mondo" });
+  check(table.chat.at(-1)?.text === "ciao mondo", `testo della chat non ripulito: ${table.chat.at(-1)?.text}`);
+}
+
+{
+  // Id, segreti e codici vengono da un generatore sicuro: formato giusto e mai uguali.
+  const ids = new Set(Array.from({ length: 200 }, newPlayerId));
+  const secrets = new Set(Array.from({ length: 200 }, newSecret));
+  const codes = Array.from({ length: 200 }, newRoomCode);
+  check(ids.size === 200 && secrets.size === 200, "id o segreti ripetuti in 200 estrazioni");
+  check([...ids].every((v) => /^[0-9a-f]{12}$/.test(v)), "formato dell'id inatteso");
+  check([...secrets].every((v) => /^[0-9a-f]{32}$/.test(v)), "formato del segreto inatteso");
+  check(codes.every((c) => /^[ABCDEFGHJKLMNPQRSTUVWXYZ2-9]{4}$/.test(c)), "un codice stanza fuori dall'alfabeto");
+  check(new Set(codes).size > 150, "i codici stanza si ripetono troppo");
+}
+
+/* ------------------------------------------- tavolo locale (offline, campagna) */
+
+{
+  const inbox = [];
+  let opened = 0;
+  const link = localTable({
+    onOpen: () => {
+      opened++;
+      link.send({ type: "join", room: null, name: "Luigi", player_id: null });
+    },
+    onMessage: (msg) => inbox.push(msg),
+    onClose: () => failures.push("il tavolo locale non dovrebbe chiudersi da solo"),
+  });
+  const last = (type) => inbox.findLast((m) => m.type === type) ?? null;
+
+  check(opened === 0, "onOpen e' arrivato in modo sincrono: chi chiama non ha ancora il collegamento");
+  await sleep(10);
+  check(opened === 1, "onOpen non e' arrivato");
+  check(last("welcome")?.room?.length === 4, "il tavolo locale non ha dato il benvenuto");
+  check(last("state")?.is_host === true, "chi gioca da solo dovrebbe essere l'host");
+
+  link.send({ type: "add_bot", level: "facile" });
+  link.send({ type: "add_bot", level: "facile" });
+  // Nel gioco vero i messaggi arrivano in momenti diversi; qui, mandati tutti
+  // di fila, pump() scarterebbe la chiamata dopo "start" e i bot non partirebbero.
+  await sleep(20);
+  link.send({ type: "start" });
+  check(last("state").screen === "game", "la partita locale non e' partita");
+  check(last("state").game.players.length === 3, "dovevano esserci tre giocatori");
+  await sleep(20);
+
+  // Un messaggio sbagliato torna come errore, non come eccezione.
+  link.send({ type: "play", card: "2H" });
+  check(inbox.some((m) => m.type === "error"), "una mossa fuori turno doveva dare errore");
+
+  // Apre il primo bot (il mazziere e' l'host, quindi parla il bot dopo di lui):
+  // il suo timer e' gia' in corso, e senza la guardia scatterebbe dopo close().
+  await sleep(100);
+  check(last("state").game.phase === "bidding" && last("state").game.legal_bids.length === 0,
+        "il test presume che a muovere sia un bot");
+
+  // Dopo close() non arriva piu' niente, nemmeno dai bot che hanno timer in giro.
+  link.close();
+  const before = inbox.length;
+  await sleep(1800);
+  check(inbox.length === before, `arrivati ${inbox.length - before} messaggi dopo close()`);
+  link.send({ type: "chat", text: "ci sei?" });
+  check(inbox.length === before, "un tavolo chiuso ha risposto a un messaggio");
 }
 
 if (failures.length) {
