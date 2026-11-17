@@ -41,6 +41,8 @@
     link: null,
     state: null,
     playerId: store.get("pid"),
+    // Il segreto di rientro: l'id e' pubblico, questo no. Resta solo su questo dispositivo.
+    secret: store.get("secret"),
     name: store.get("name"),
     room: "",
     wantConnection: false,
@@ -56,8 +58,20 @@
 
   /* ------------------------------------------------------------ carte -- */
 
+  // Tutto quello che arriva dal tavolo e' dato altrui: in P2P chi apre la stanza
+  // e' un avversario, e quello che manda finisce nel DOM. Una carta con una forma
+  // diversa da questa diventa "?" invece di essere scritta come HTML.
+  const CARD_RE = /^(10|[2-9JQKA])[HDCS]$/;
+
   function parseCode(code) {
+    if (typeof code !== "string" || !CARD_RE.test(code)) return { rank: "?", suit: "?" };
     return { rank: code.slice(0, -1), suit: code.slice(-1) };
+  }
+
+  /** Un numero dallo stato, mai testo: dentro l'HTML entra solo una cifra. */
+  function num(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? String(Math.trunc(n)) : "0";
   }
 
   function cardEl(code, classes = "") {
@@ -151,6 +165,7 @@
           room: app.room || null,
           name: app.name,
           player_id: app.playerId || null,
+          secret: app.secret || null,
         });
       },
 
@@ -186,9 +201,12 @@
   function handleMessage(msg) {
     if (msg.type === "welcome") {
       app.playerId = msg.player_id;
+      // Un host con codice vecchio non lo manda: allora non c'e' niente da presentare.
+      app.secret = typeof msg.secret === "string" ? msg.secret : "";
       app.room = msg.room;
       app.name = msg.name;
       store.set("pid", msg.player_id);
+      store.set("secret", app.secret);
       store.set("name", msg.name);
       history.replaceState(null, "", "#" + msg.room);
       clearBusy();
@@ -209,7 +227,38 @@
     else renderGame(state);
   }
 
+  // Chi ospita il tavolo fa da arbitro: se il telefono spegne lo schermo la
+  // pagina si ferma e la partita finisce per tutti. Finche' si e' a un tavolo
+  // lo schermo resta acceso. Il blocco cade da solo quando la pagina va in
+  // secondo piano, quindi va richiesto di nuovo al ritorno.
+  let wakeLock = null;
+  let wakeLockPending = false;
+
+  async function keepAwake(on) {
+    try {
+      if (!on) {
+        const lock = wakeLock;
+        wakeLock = null;
+        if (lock) await lock.release();
+        return;
+      }
+      if (wakeLock || wakeLockPending || !navigator.wakeLock) return;
+      wakeLockPending = true;
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", () => { wakeLock = null; });
+      } finally {
+        wakeLockPending = false;
+      }
+    } catch { /* non supportato o negato: si gioca lo stesso */ }
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") keepAwake($("screenHome").hidden);
+  });
+
   function showScreen(which) {
+    keepAwake(which !== "home");
     $("screenHome").hidden = which !== "home";
     $("screenLobby").hidden = which !== "lobby";
     $("screenGame").hidden = which !== "game";
@@ -342,15 +391,15 @@
       const replaced = !p.is_bot && p.connected === false;
       if (replaced) el.classList.add("replaced");
       const who = p.is_bot
-        ? `bot · ${p.bot_level}`
+        ? `bot · ${escapeHtml(p.bot_level)}`
         : replaced
-          ? `uscito · gioca un bot · ${p.score} pt`
-          : `${p.score} pt`;
+          ? `uscito · gioca un bot · ${num(p.score)} pt`
+          : `${num(p.score)} pt`;
 
       const bid = renderBidBadge(g, p);
       el.innerHTML =
         `<div class="nm">${escapeHtml(p.name)} ${marks.join("")}</div>` +
-        `<div class="meta">${who}${p.cards_left ? " · " + p.cards_left + " carte" : ""}</div>` +
+        `<div class="meta">${who}${p.cards_left ? " · " + num(p.cards_left) + " carte" : ""}</div>` +
         bid;
       ring.appendChild(el);
     });
@@ -359,14 +408,14 @@
   function renderBidBadge(g, p) {
     if (g.round.kind === "misere") {
       const cls = p.tricks > 0 ? "over" : "done";
-      return `<div class="bid-badge ${cls}">${p.tricks} prese</div>`;
+      return `<div class="bid-badge ${cls}">${num(p.tricks)} prese</div>`;
     }
     if (p.bid === null || p.bid === undefined) {
       return g.phase === "bidding" ? `<div class="bid-badge">…</div>` : "";
     }
     let cls = "";
     if (g.phase !== "bidding") cls = p.tricks === p.bid ? "done" : p.tricks > p.bid ? "over" : "";
-    return `<div class="bid-badge ${cls}">${p.tricks}/${p.bid}</div>`;
+    return `<div class="bid-badge ${cls}">${num(p.tricks)}/${num(p.bid)}</div>`;
   }
 
   function trickView(g) {
@@ -414,8 +463,8 @@
     if (view.plays.length) { center.innerHTML = ""; return; }
     const label = g.round.kind === "normal" ? "" : g.round.kind_label;
     center.innerHTML = label
-      ? `${escapeHtml(label)}<span class="sub">${g.round.cards} carte</span>`
-      : `<span class="sub">Round ${g.round.number} di ${g.round.total}</span>`;
+      ? `${escapeHtml(label)}<span class="sub">${num(g.round.cards)} carte</span>`
+      : `<span class="sub">Round ${num(g.round.number)} di ${num(g.round.total)}</span>`;
   }
 
   function renderHand(g) {
@@ -479,7 +528,7 @@
     $("screenGame").classList.toggle("your-turn", mine);
     let wanted;
     if (app.office) wanted = mine ? `(1) ${OFFICE_TITLE}` : OFFICE_TITLE;
-    else wanted = mine ? "\u25B6 Tocca a te \u00b7 TRANS" : IDLE_TITLE;
+    else wanted = mine ? "\u25B6 Tocca a te \u00b7 Dichiaro" : IDLE_TITLE;
     if (document.title !== wanted) document.title = wanted;
   }
 
@@ -517,7 +566,7 @@
       tr.innerHTML =
         `<td class="rank">${i + 1}.</td>` +
         `<td>${escapeHtml(row.name)}</td>` +
-        `<td class="pts">${row.score}</td>`;
+        `<td class="pts">${num(row.score)}</td>`;
       table.appendChild(tr);
     });
   }
@@ -606,6 +655,17 @@
     // Fine partita
     const over = g.phase === "game_over";
     $("endOverlay").hidden = !over;
+
+    // Nell'app Android c'e' la pubblicita' (site/js/ads.js): la schermata dei
+    // punteggi e' una pausa naturale. Una volta sola per partita; l'annuncio
+    // parte solo se l'utente e' ancora li' quando scade l'attesa.
+    if (over && !app.gameOverSeen) {
+      app.gameOverSeen = true;
+      if (window.TRANS_ADS) window.TRANS_ADS.gameOver(() => app.gameOverSeen && !$("endOverlay").hidden);
+    } else if (!over) {
+      app.gameOverSeen = false;
+    }
+
     if (over) {
       $("endWinner").textContent = "Vince " + g.winner;
       const rows = g.standings.map((s) => ({ name: s.name, total: s.score }));
@@ -662,16 +722,16 @@
     rows.forEach((row) => {
       const tr = document.createElement("tr");
       if (finalOnly) {
-        tr.innerHTML = `<td>${escapeHtml(row.name)}</td><td class="up">${row.total}</td>`;
+        tr.innerHTML = `<td>${escapeHtml(row.name)}</td><td class="up">${num(row.total)}</td>`;
       } else {
         const cls = row.delta > 0 ? "up" : row.delta < 0 ? "down" : "flat";
         const sign = row.delta > 0 ? "+" : "";
         tr.innerHTML =
           `<td>${escapeHtml(row.name)}</td>` +
-          `<td>${row.bid === null || row.bid === undefined ? "—" : row.bid}</td>` +
-          `<td>${row.tricks}</td>` +
-          `<td class="${cls}">${sign}${row.delta}</td>` +
-          `<td>${row.total}</td>`;
+          `<td>${row.bid === null || row.bid === undefined ? "—" : num(row.bid)}</td>` +
+          `<td>${num(row.tricks)}</td>` +
+          `<td class="${cls}">${sign}${num(row.delta)}</td>` +
+          `<td>${num(row.total)}</td>`;
       }
       table.appendChild(tr);
     });
@@ -741,7 +801,9 @@
     };
 
     $("btnCopyLink").onclick = async () => {
-      const url = location.origin + location.pathname + "#" + app.room;
+      // Nell'app l'indirizzo della pagina e' https://localhost: il link da
+      // passare e' quello del sito pubblico, che la build dell'app incorpora.
+      const url = (window.TRANS_SHARE_URL || location.origin + location.pathname) + "#" + app.room;
       try {
         await navigator.clipboard.writeText(url);
         toast("Link copiato: " + url);

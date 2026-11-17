@@ -62,11 +62,11 @@ def main() -> None:
                 hit_rate[row["name"]].append(int(row["bid"] == row["tricks"]))
 
     print(f"{args.games} partite · {mode.label} · {len(args.levels)} giocatori\n")
-    print(f"{'giocatore':<14}{'vittorie':>10}{'punti medi':>13}{'scommesse ok':>15}")
+    print(f"{'giocatore':<14}{'vittorie':>10}{'punti medi':>13}{'dichiarazioni ok':>18}")
     for p in sorted(points, key=lambda n: -points[n]):
         hits = hit_rate[p]
         pct = 100 * sum(hits) / len(hits) if hits else 0.0
-        print(f"{p:<14}{wins[p]:>10}{points[p] / args.games:>13.1f}{pct:>14.1f}%")
+        print(f"{p:<14}{wins[p]:>10}{points[p] / args.games:>13.1f}{pct:>17.1f}%")
 
 
 if __name__ == "__main__":

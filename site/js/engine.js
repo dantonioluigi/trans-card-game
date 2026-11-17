@@ -283,7 +283,7 @@ export class Game {
     this.turn = (this.dealer + 1) % this.n;
     this.phase = spec.hasBidding ? Phase.BIDDING : Phase.PLAYING;
     this._log(`Round ${spec.number}/${this.schedule.length} — ${spec.title}`);
-    if (!spec.hasBidding) this._log("A PERDERE: nessuna scommessa, ogni presa vale -5.");
+    if (!spec.hasBidding) this._log("A PERDERE: nessuna dichiarazione, ogni presa vale -5.");
   }
 
   /* ---------------------------------------------------------- dichiarazioni */
@@ -306,26 +306,26 @@ export class Game {
 
   placeBid(playerId, value) {
     const idx = this.indexOf(playerId);
-    if (this.phase !== Phase.BIDDING) throw new IllegalMove("non e' il momento di scommettere");
-    if (idx !== this.turn) throw new IllegalMove("non e' il tuo turno di scommettere");
+    if (this.phase !== Phase.BIDDING) throw new IllegalMove("non e' il momento di dichiarare");
+    if (idx !== this.turn) throw new IllegalMove("non e' il tuo turno di dichiarare");
     if (value === this.forbiddenBid(idx)) {
       throw new IllegalMove(
         `chiudi tu il giro: con ${value} la somma farebbe esattamente ${this.spec.cards}, e non e' permesso`
       );
     }
     if (!this.legalBids(idx).includes(value)) {
-      throw new IllegalMove(`scommessa non valida: ${value}`);
+      throw new IllegalMove(`dichiarazione non valida: ${value}`);
     }
 
     const player = this.players[idx];
     player.bid = value;
-    this._log(`${player.name} scommette ${value}.`);
+    this._log(`${player.name} dichiara ${value}.`);
 
     if (this.players.every((p) => p.bid !== null)) {
       this.phase = Phase.PLAYING;
       this.turn = (this.dealer + 1) % this.n;
       const total = this.players.reduce((s, p) => s + p.bid, 0);
-      this._log(`Scommesse chiuse: ${total} prese dichiarate su ${this.spec.cards}.`);
+      this._log(`Dichiarazioni chiuse: ${total} prese dichiarate su ${this.spec.cards}.`);
     } else {
       this.turn = (this.turn + 1) % this.n;
     }

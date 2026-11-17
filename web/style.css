@@ -82,12 +82,13 @@ h1, h2, h3 { margin: 0 0 .5rem; font-weight: 650; letter-spacing: .01em; }
 /* ---------------------------------------------------------------- home -- */
 
 .home {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; justify-content: safe center;
   gap: 2rem; padding: 2rem 1rem; overflow-y: auto;
 }
 .hero { text-align: center; }
 .hero h1 {
-  font-size: clamp(3rem, 12vw, 6rem); letter-spacing: .3em; margin: 0;
+  font-size: clamp(2rem, 9.5vw, 6rem); letter-spacing: .2em; margin: 0;
   color: var(--gold); text-shadow: 0 6px 24px rgba(0, 0, 0, .6);
 }
 .tagline { color: var(--ink-dim); margin: .3rem 0 0; font-size: 1.05rem; }
@@ -510,8 +511,83 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 
 @media (max-width: 560px) {
   .topbar-info .chip { font-size: .7rem; padding: .2rem .45rem; }
-  .brand { font-size: 1rem; letter-spacing: .15em; }
+  .brand { font-size: .9rem; letter-spacing: .08em; }
+  .topbar { flex-wrap: wrap; gap: .3rem .5rem; padding: .4rem .6rem; }
+  .topbar-actions { gap: .3rem; }
+  .topbar-actions .ghost { padding: .4rem .55rem; font-size: .75rem; white-space: nowrap; }
+  .topbar-info { order: 3; flex: 1 0 100%; flex-wrap: nowrap; overflow-x: auto; }
   .hand { gap: .2rem; }
+}
+
+/* ------------------------------------------------ telefono in orizzontale --
+   L'app Android gira solo in orizzontale. Li' lo schermo e' largo ma bassissimo
+   (320-430px): il layout a una colonna di sopra, pensato per il verticale, lascia
+   al tavolo una striscia. Qui si fa il contrario: tavolo e mano a sinistra, solo
+   il punteggio a destra, tutto in verticale il piu' stretto possibile. */
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .topbar { flex-wrap: nowrap; gap: .5rem; padding: .25rem .6rem; }
+  .brand { font-size: .85rem; letter-spacing: .12em; }
+  .topbar-info { order: 0; flex: 0 1 auto; flex-wrap: nowrap; overflow: hidden; gap: .3rem; }
+  .topbar-info .chip { font-size: .65rem; padding: .1rem .4rem; }
+  .topbar-actions { gap: .3rem; }
+  .topbar-actions .ghost { padding: .3rem .55rem; font-size: .72rem; white-space: nowrap; }
+
+  .game { grid-template-columns: minmax(0, 1fr) 150px; grid-template-rows: none; }
+  .table-area { padding: .35rem; gap: .25rem; }
+  .felt { border-radius: 16px; }
+  .table-center { font-size: .8rem; letter-spacing: .2em; }
+  .trick .card { --cw: 38px; }
+
+  /* I posti si dispongono in percentuale: stringendo l'anello in verticale
+     quello in alto non esce piu' dal feltro. */
+  .seats-ring { position: absolute; inset: 12px 8px; }
+  .player-seat { width: 106px; padding: .15rem .25rem; font-size: .66rem; border-radius: 9px; }
+  .player-seat .meta { font-size: .56rem; margin-top: 0; white-space: nowrap; }
+  .player-seat .bid-badge { margin-top: .1rem; padding: 0 .35rem; font-size: .6rem; }
+
+  .hand-status { font-size: .72rem; min-height: 0; margin-bottom: .15rem; }
+  .turn-badge { padding: .05rem .5rem; font-size: .7rem; }
+  .hand { flex-wrap: nowrap; gap: .25rem; }
+  .hand .card { --cw: 46px; }
+
+  .bid-panel { flex-wrap: nowrap; gap: .4rem .8rem; margin-bottom: .25rem; padding: .3rem .6rem; }
+  .bid-title { font-size: .85rem; }
+  .bid-sub { display: none; }
+  .bid-grid { flex-wrap: nowrap; gap: .25rem; }
+  .bid-grid button { width: 2rem; height: 2rem; font-size: .9rem; border-radius: 8px; }
+  .bid-confirm { padding-left: .5rem; margin-left: 0; gap: .3rem; flex-wrap: nowrap; }
+  .primary.compact, .ghost.compact { padding: .35rem .6rem; font-size: .75rem; }
+
+  .sidebar { flex-direction: column; max-height: none; overflow-y: auto; padding: .35rem;
+             gap: .35rem; border-left: 1px solid var(--panel-line); border-top: none; }
+  .score-card { flex: none; padding: .4rem; }
+  .sidebar h3 { margin-bottom: .2rem; font-size: .65rem; }
+  .scores { font-size: .72rem; }
+  .scores td { padding: .12rem 0; }
+  .log-card, .chat-form { display: none; }
+
+  .dialog { padding: .8rem 1rem; max-height: 94vh; overflow-y: auto; }
+  .dialog h2 { font-size: 1.05rem; margin-bottom: .2rem; }
+  .result-table { margin: .3rem 0 .6rem; font-size: .8rem; }
+  .result-table td { padding: .15rem 0; }
+  .primary { margin-top: .5rem; }
+
+  .home { gap: .6rem; padding: .5rem 1rem; }
+  .hero h1 { font-size: 1.8rem; letter-spacing: .2em; }
+  .tagline { font-size: .85rem; margin-top: .1rem; }
+  .tagline.small { display: none; }
+  .panels { gap: .6rem; }
+  .panel { padding: .7rem .9rem; }
+  .panel h2 { font-size: 1rem; margin-bottom: .2rem; }
+  .panel label { margin: .35rem 0 .15rem; }
+  .panel input { padding: .4rem .6rem; }
+  .panel .hint { display: none; }
+  .lobby { padding: .5rem; }
+  .seats { margin: .4rem 0; gap: .3rem; }
+  .seat-row { padding: .25rem .6rem; }
+  .lobby-controls { margin-top: .5rem; gap: .8rem; }
+  .btn-row .ghost { padding: .35rem .5rem; }
 }
 
 /* ======================================================= modalita' ufficio --

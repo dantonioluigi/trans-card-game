@@ -145,7 +145,7 @@ class Game:
         self.phase = Phase.BIDDING if spec.has_bidding else Phase.PLAYING
         self._log(f"Round {spec.number}/{len(self.schedule)} — {spec.title}")
         if not spec.has_bidding:
-            self._log("A PERDERE: nessuna scommessa, ogni presa vale -5.")
+            self._log("A PERDERE: nessuna dichiarazione, ogni presa vale -5.")
 
     def _log(self, message: str) -> None:
         self.log.append(message)
@@ -178,26 +178,26 @@ class Game:
     def place_bid(self, player_id: str, value: int) -> None:
         idx = self.index_of(player_id)
         if self.phase is not Phase.BIDDING:
-            raise IllegalMove("non e' il momento di scommettere")
+            raise IllegalMove("non e' il momento di dichiarare")
         if idx != self.turn:
-            raise IllegalMove("non e' il tuo turno di scommettere")
+            raise IllegalMove("non e' il tuo turno di dichiarare")
         if value == self.forbidden_bid(idx):
             raise IllegalMove(
                 f"chiudi tu il giro: con {value} la somma farebbe esattamente "
                 f"{self.spec.cards}, e non e' permesso"
             )
         if value not in self.legal_bids(idx):
-            raise IllegalMove(f"scommessa non valida: {value}")
+            raise IllegalMove(f"dichiarazione non valida: {value}")
 
         player = self.players[idx]
         player.bid = value
-        self._log(f"{player.name} scommette {value}.")
+        self._log(f"{player.name} dichiara {value}.")
 
         if all(p.bid is not None for p in self.players):
             self.phase = Phase.PLAYING
             self.turn = (self.dealer + 1) % self.n
             total = sum(p.bid or 0 for p in self.players)
-            self._log(f"Scommesse chiuse: {total} prese dichiarate su {self.spec.cards}.")
+            self._log(f"Dichiarazioni chiuse: {total} prese dichiarate su {self.spec.cards}.")
         else:
             self.turn = (self.turn + 1) % self.n
 
