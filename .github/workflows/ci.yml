@@ -82,6 +82,16 @@ jobs:
       - name: le regole sulla pubblicita' (consenso, frequenza, quando non mostrarla)
         run: node site/tests/ads.mjs
 
+      - name: le frasi dei motori da tradurre sono quelle registrate
+        # Le scrivono i motori e la rete in italiano; il client le traduce con
+        # una tabella (web/i18n.js). Se cambi una frase, rigenera l'elenco.
+        run: |
+          python site/tests/make_messages.py
+          git diff --exit-code site/tests/messages.json
+
+      - name: le due lingue (dizionario, chiavi usate, ogni frase tradotta)
+        run: node site/tests/i18n.mjs
+
       - name: il sito statico si assembla
         run: python site/build.py
 

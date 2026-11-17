@@ -1,0 +1,336 @@
+[
+ {
+  "text": "A PERDERE: nessuna dichiarazione, ogni presa vale -5.",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "Anna dichiara 7.",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "Anna esce: al suo posto gioca un bot.",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "Anna gioca 7H.",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "Anna prende il posto di Anna.",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "Anna rientra al tavolo.",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "Dichiarazioni chiuse: 7 prese dichiarate su 7.",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "Fine round 7: Anna +10, Bob -3.",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "Partita finita. Vince Anna.",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "Presa a Anna.",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "Round 7/7 — 5 carte",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "carta non giocabile",
+  "src": [
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "chiudi tu il giro: con 7 la somma farebbe esattamente 7, e non e' permesso",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "devi rispondere a cuori",
+  "src": [
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "dichiarazione non valida: 7",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "giocatore non trovato",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "il round non e' finito",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "il server e' pieno: riprova fra poco",
+  "src": [
+   "server/room.py"
+  ]
+ },
+ {
+  "text": "la partita non e' ancora finita",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "la partita non e' iniziata",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "libreria di connessione non caricata",
+  "src": [
+   "site/js/net-p2p.js"
+  ]
+ },
+ {
+  "text": "livello sconosciuto: facile",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "mentre eri assente il tuo posto e' stato preso",
+  "src": [
+   "site/js/net-p2p.js"
+  ]
+ },
+ {
+  "text": "messaggio non valido",
+  "src": [
+   "server/main.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "messaggio sconosciuto",
+  "src": [
+   "server/main.py"
+  ]
+ },
+ {
+  "text": "messaggio sconosciuto: foo",
+  "src": [
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "messaggio troppo grande",
+  "src": [
+   "site/js/net-p2p.js"
+  ]
+ },
+ {
+  "text": "modalita' sconosciuta",
+  "src": [
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "modalita' sconosciuta: 7",
+  "src": [
+   "server/room.py"
+  ]
+ },
+ {
+  "text": "mossa non valida",
+  "src": [
+   "server/main.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "non e' il momento di dichiarare",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "non e' il momento di giocare una carta",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "non e' il tuo turno",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "non e' il tuo turno di dichiarare",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "non hai 7H in mano",
+  "src": [
+   "site/js/engine.js",
+   "trans/engine.py"
+  ]
+ },
+ {
+  "text": "non legge i messaggi",
+  "src": [
+   "site/js/net-p2p.js"
+  ]
+ },
+ {
+  "text": "non riesco a generare un codice libero",
+  "src": [
+   "server/room.py"
+  ]
+ },
+ {
+  "text": "non sei a questo tavolo",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "partita gia' iniziata",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "partita gia' iniziata e non ci sono posti liberi da prendere",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "prima entra in un tavolo",
+  "src": [
+   "server/main.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "puoi rimuovere solo i bot",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "questo browser non supporta WebRTC",
+  "src": [
+   "site/js/net-p2p.js"
+  ]
+ },
+ {
+  "text": "sei gia' al tavolo",
+  "src": [
+   "server/main.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "servono almeno 7 giocatori (aggiungi un bot)",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "solo chi ha creato il tavolo puo' farlo",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "solo messaggi di testo",
+  "src": [
+   "server/main.py"
+  ]
+ },
+ {
+  "text": "tavolo ABCD inesistente",
+  "src": [
+   "server/room.py"
+  ]
+ },
+ {
+  "text": "tavolo pieno (max 7 giocatori)",
+  "src": [
+   "server/room.py",
+   "site/js/room.js"
+  ]
+ },
+ {
+  "text": "troppi messaggi",
+  "src": [
+   "site/js/net-p2p.js"
+  ]
+ }
+]

@@ -112,6 +112,9 @@ def test_health_and_index_are_served(client):
     page = client.get("/")
     assert page.status_code == 200 and "DICHIARO" in page.text
     assert client.get("/static/app.js").status_code == 200
+    # Le lingue stanno in un file a parte, che app.js si aspetta gia' caricato.
+    assert client.get("/static/i18n.js").status_code == 200
+    assert page.text.index("/static/i18n.js") < page.text.index("/static/app.js")
 
 
 def test_creating_a_room_returns_a_code_and_makes_you_host(client):

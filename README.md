@@ -125,6 +125,30 @@ docker run --rm -p 8000:8000 trans
 
 ---
 
+## Italiano e inglese
+
+Il gioco parte nella lingua del dispositivo (italiano se è italiano, altrimenti
+inglese) e il pulsante **IT | EN** in alto la cambia al volo; la scelta si ricorda.
+Interfaccia, regole, diario, errori e messaggi di rete cambiano insieme.
+
+Come è fatto, perché sia facile non rompere niente:
+
+- `web/i18n.js` ha il dizionario `[italiano, inglese]`. Il testo scritto in
+  `index.html` resta italiano lì dentro (`data-i18n`) e si legge da lì; il testo
+  che scrive il client passa da `t()` (textContent) o `th()` (innerHTML: protegge i
+  parametri, tranne quelli che finiscono in `Html`).
+- Le frasi del diario e degli errori le scrivono i **motori** (JS e Python, che
+  restano allineati dalle partite registrate) e la rete, in italiano. Non si
+  toccano: il client le traduce a vista con una tabella di modelli.
+- `site/tests/i18n.mjs` fallisce se una chiave manca in una lingua, se i
+  segnaposto non coincidono, se una chiave non è usata o non esiste, o se una frase
+  trovata nel codice (`site/tests/messages.json`, generato da `make_messages.py`) non
+  ha il suo modello. Cambi una frase in un motore? Rigenera l'elenco e aggiungi la
+  traduzione: la CI lo pretende.
+- I nomi dei giocatori e la chat non si traducono, e non possono far scambiare
+  una frase per un'altra. "Briscola" in inglese è *trump*; **A PERDERE** è
+  *MISÈRE*.
+
 ## Modalità ufficio
 
 In alto c'è **Modalità ufficio**: il tavolo diventa grigio con un accento viola,
@@ -549,6 +573,8 @@ node site/tests/limits.mjs           # limiti dell'host, tetto alla decompressio
 node site/tests/params.mjs           # parametri di prova solo in locale
 node site/tests/host.mjs             # l'host con un finto PeerJS: flood, furto del posto
 node site/tests/ads.mjs              # pubblicità: consenso, frequenza, quando non mostrarla
+node site/tests/i18n.mjs             # lingue: dizionario completo, ogni frase tradotta
+python site/tests/make_messages.py   # se cambi una frase nel codice: rigenera messages.json
 ```
 
 ---

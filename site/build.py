@@ -99,10 +99,17 @@ Allow: /
 Sitemap: {SITE_URL}sitemap.xml
 """
 
-HOME_NOTE = """    <p class="tagline small">Versione senza server: le partite passano da browser a browser.</p>
+#: La riga sotto il titolo della home, com'e' in web/index.html: dopo di lei
+#: la build aggiunge la nota e i link.
+TAGLINE = (
+    '      <p class="tagline" data-office-key="office.tagline" data-i18n="home.tagline">'
+    "Dichiara quante prese farai. Sbagliare costa.</p>\n"
+)
+
+HOME_NOTE = """    <p class="tagline small" data-i18n="home.p2p_note">Versione senza server: le partite passano da browser a browser.</p>
 """
 
-LOBBY_NOTE = """      <p class="hint warn" id="p2pHostNote" hidden>Il tavolo vive in questa scheda:
+LOBBY_NOTE = """      <p class="hint warn" id="p2pHostNote" data-i18n="lobby.host_note" hidden>Il tavolo vive in questa scheda:
       se la chiudi, la partita finisce per tutti.</p>
 """
 
@@ -111,7 +118,7 @@ def home_links() -> str:
     (nascosto: lo mostra ads.js solo dove il consenso lo richiede)."""
     href = SITE_URL + "privacy.html" if APP else "privacy.html"
     button = (
-        '<button class="linklike" id="btnAdsPrivacy" type="button" hidden>'
+        '<button class="linklike" id="btnAdsPrivacy" type="button" data-i18n="home.ads_choices" hidden>'
         "Pubblicità: le tue scelte</button>"
         if APP else ""
     )
@@ -265,6 +272,7 @@ def transform_index(html: str, version: str) -> str:
         html = html.replace(before, after, 1)
 
     swap('href="/static/style.css"', f'href="style.css?v={version}"')
+    swap('<script src="/static/i18n.js"></script>', f'<script src="i18n.js?v={version}"></script>')
 
     # La descrizione del sorgente e quella condivisa devono restare la stessa.
     swap(
@@ -296,10 +304,8 @@ def transform_index(html: str, version: str) -> str:
     )
 
     swap(
-        '      <p class="tagline" data-office-text="Coordinamento del gruppo di lavoro.">'
-        'Dichiara quante prese farai. Sbagliare costa.</p>\n',
-        '      <p class="tagline" data-office-text="Coordinamento del gruppo di lavoro.">'
-        'Dichiara quante prese farai. Sbagliare costa.</p>\n' + HOME_NOTE + home_links(),
+        TAGLINE,
+        TAGLINE + HOME_NOTE + home_links(),
     )
 
     swap(
@@ -317,7 +323,7 @@ def version_imports(source: str, version: str) -> str:
 def main() -> None:
     # La pubblicita' esiste solo nell'app: il sito web non riceve nemmeno il file.
     modules = [m for m in sorted((SITE / "js").glob("*.js")) if APP or m.name != "ads.js"]
-    version = build_id([WEB / "index.html", WEB / "style.css", WEB / "app.js", *modules])
+    version = build_id([WEB / "index.html", WEB / "style.css", WEB / "app.js", WEB / "i18n.js", *modules])
 
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -326,6 +332,7 @@ def main() -> None:
     (DIST / "index.html").write_text(transform_index((WEB / "index.html").read_text(), version))
     (DIST / "style.css").write_text((WEB / "style.css").read_text() + EXTRA_CSS)
     shutil.copy2(WEB / "app.js", DIST / "app.js")
+    shutil.copy2(WEB / "i18n.js", DIST / "i18n.js")
 
     for module in modules:
         (DIST / "js" / module.name).write_text(version_imports(module.read_text(), version))

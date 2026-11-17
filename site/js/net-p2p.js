@@ -41,7 +41,7 @@ const STUN_SERVERS = [
   { urls: "stun:stun.cloudflare.com:3478" },
 ];
 
-const MESSAGES = {
+export const MESSAGES = {
   broker:
     "non riesco a raggiungere il servizio che mette in contatto i browser. " +
     "Puo' essere momentaneamente giu', oppure la rete che stai usando lo blocca.",

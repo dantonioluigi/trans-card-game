@@ -11,16 +11,17 @@
 <body>
 
 <header class="topbar">
-  <div class="brand" id="brand" data-office-text="Attività">DICHIARO<span class="pip">♥&#xFE0E;</span></div>
+  <div class="brand" id="brand" data-office-key="office.brand">DICHIARO<span class="pip">♥&#xFE0E;</span></div>
   <div class="topbar-info" id="topbarInfo" hidden>
     <span class="chip" id="chipRoom"></span>
     <span class="chip" id="chipRound"></span>
     <span class="chip" id="chipTrump"></span>
   </div>
   <div class="topbar-actions">
-    <button class="ghost" id="btnOffice" type="button" title="Doppio Esc per attivarla al volo">Modalità ufficio</button>
-    <button class="ghost" id="btnRules" type="button">Regole</button>
-    <button class="ghost" id="btnLeave" type="button" hidden>Esci</button>
+    <button class="ghost lang" id="btnLang" type="button" title="Cambia lingua" data-i18n-attr="title:top.lang_title"><span class="l-it">IT</span> | <span class="l-en">EN</span></button>
+    <button class="ghost" id="btnOffice" type="button" title="Doppio Esc per attivarla al volo" data-i18n-attr="title:top.office_title">Modalità ufficio</button>
+    <button class="ghost" id="btnRules" type="button" data-i18n="top.rules">Regole</button>
+    <button class="ghost" id="btnLeave" type="button" data-i18n="top.leave" hidden>Esci</button>
   </div>
 </header>
 
@@ -29,26 +30,26 @@
   <!-- ------------------------------------------------------------- HOME -->
   <section id="screenHome" class="screen home">
     <div class="hero">
-      <h1 data-office-text="Attività">DICHIARO</h1>
-      <p class="tagline" data-office-text="Coordinamento del gruppo di lavoro.">Dichiara quante prese farai. Sbagliare costa.</p>
+      <h1 data-office-key="office.brand">DICHIARO</h1>
+      <p class="tagline" data-office-key="office.tagline" data-i18n="home.tagline">Dichiara quante prese farai. Sbagliare costa.</p>
     </div>
 
     <div class="panels">
       <div class="panel">
-        <h2>Nuovo tavolo</h2>
-        <label for="nameNew">Il tuo nome</label>
+        <h2 data-i18n="home.new">Nuovo tavolo</h2>
+        <label for="nameNew" data-i18n="home.name">Il tuo nome</label>
         <input id="nameNew" maxlength="16" placeholder="Luigi" autocomplete="nickname">
-        <button class="primary" id="btnCreate" type="button">Crea tavolo</button>
-        <p class="hint">Ricevi un codice a 4 lettere da passare agli altri. Puoi riempire i posti liberi con i bot.</p>
+        <button class="primary" id="btnCreate" type="button" data-i18n="home.create">Crea tavolo</button>
+        <p class="hint" data-i18n="home.create_hint">Ricevi un codice a 4 lettere da passare agli altri. Puoi riempire i posti liberi con i bot.</p>
       </div>
 
       <div class="panel">
-        <h2>Entra in un tavolo</h2>
-        <label for="nameJoin">Il tuo nome</label>
+        <h2 data-i18n="home.join_title">Entra in un tavolo</h2>
+        <label for="nameJoin" data-i18n="home.name">Il tuo nome</label>
         <input id="nameJoin" maxlength="16" placeholder="Luigi" autocomplete="nickname">
-        <label for="codeJoin">Codice tavolo</label>
+        <label for="codeJoin" data-i18n="home.code">Codice tavolo</label>
         <input id="codeJoin" maxlength="4" placeholder="ABCD" class="code-input" autocapitalize="characters">
-        <button class="primary" id="btnJoin" type="button">Entra</button>
+        <button class="primary" id="btnJoin" type="button" data-i18n="home.join">Entra</button>
       </div>
     </div>
     <p class="status" id="homeStatus" hidden></p>
@@ -58,31 +59,31 @@
   <!-- ------------------------------------------------------------ LOBBY -->
   <section id="screenLobby" class="screen lobby" hidden>
     <div class="panel wide">
-      <h2>Tavolo <span class="code-badge" id="lobbyCode">----</span></h2>
-      <p class="hint">Condividi il codice, oppure <button class="linklike" id="btnCopyLink" type="button">copia il link d'invito</button>.</p>
+      <h2><span data-i18n="lobby.table">Tavolo</span> <span class="code-badge" id="lobbyCode">----</span></h2>
+      <p class="hint"><span data-i18n="lobby.share">Condividi il codice, oppure</span> <button class="linklike" id="btnCopyLink" type="button" data-i18n="lobby.copy">copia il link d'invito</button>.</p>
 
       <ul class="seats" id="seatList"></ul>
 
       <div class="lobby-controls">
         <div class="control-group" id="botControls">
-          <span class="label">Aggiungi bot</span>
+          <span class="label" data-i18n="lobby.add_bot">Aggiungi bot</span>
           <div class="btn-row">
-            <button class="ghost" data-level="facile" type="button">facile</button>
-            <button class="ghost" data-level="normale" type="button">normale</button>
-            <button class="ghost" data-level="esperto" type="button">esperto</button>
+            <button class="ghost" data-level="facile" type="button" data-i18n="level.facile">facile</button>
+            <button class="ghost" data-level="normale" type="button" data-i18n="level.normale">normale</button>
+            <button class="ghost" data-level="esperto" type="button" data-i18n="level.esperto">esperto</button>
           </div>
         </div>
 
         <div class="control-group" id="modeControls">
-          <span class="label">Durata</span>
+          <span class="label" data-i18n="lobby.length">Durata</span>
           <div class="btn-row">
-            <button class="ghost mode" data-mode="fast" type="button">Veloce · 10 round</button>
-            <button class="ghost mode" data-mode="long" type="button">Lunga · 20 round</button>
+            <button class="ghost mode" data-mode="fast" type="button" data-i18n="mode.fast">Veloce · 10 round</button>
+            <button class="ghost mode" data-mode="long" type="button" data-i18n="mode.long">Lunga · 20 round</button>
           </div>
         </div>
       </div>
 
-      <button class="primary big" id="btnStart" type="button">Inizia la partita</button>
+      <button class="primary big" id="btnStart" type="button" data-i18n="lobby.start">Inizia la partita</button>
       <p class="hint" id="lobbyHint"></p>
     </div>
   </section>
@@ -108,8 +109,8 @@
           <!-- Secondo passo: dichiarare e' irreversibile, un click storto no. -->
           <div class="bid-confirm" id="bidConfirm" hidden>
             <span class="bid-chosen" id="bidChosen"></span>
-            <button class="primary compact" id="btnBidConfirm" type="button">Confermo</button>
-            <button class="ghost compact" id="btnBidCancel" type="button">Annulla</button>
+            <button class="primary compact" id="btnBidConfirm" type="button" data-i18n="bid.confirm">Confermo</button>
+            <button class="ghost compact" id="btnBidCancel" type="button" data-i18n="bid.cancel">Annulla</button>
           </div>
         </div>
         <div class="hand-status" id="handStatus"></div>
@@ -119,16 +120,16 @@
 
     <aside class="sidebar">
       <div class="score-card">
-        <h3>Punteggio</h3>
+        <h3 data-i18n="side.scores">Punteggio</h3>
         <table class="scores" id="scoreTable"></table>
       </div>
       <div class="log-card">
-        <h3>Diario</h3>
+        <h3 data-i18n="side.log">Diario</h3>
         <div class="log" id="log"></div>
       </div>
       <form class="chat-form" id="chatForm">
-        <input id="chatInput" maxlength="200" placeholder="Scrivi al tavolo…" autocomplete="off">
-        <button class="ghost" type="submit">Invia</button>
+        <input id="chatInput" maxlength="200" placeholder="Scrivi al tavolo…" autocomplete="off" data-i18n-attr="placeholder:chat.placeholder">
+        <button class="ghost" type="submit" data-i18n="chat.send">Invia</button>
       </form>
     </aside>
   </section>
@@ -140,19 +141,19 @@
   <div class="dialog wide-dialog">
     <h2 id="resultTitle">Fine round</h2>
     <table class="result-table" id="resultTable"></table>
-    <button class="primary" id="btnNextRound" type="button">Prossimo round</button>
+    <button class="primary" id="btnNextRound" type="button" data-i18n="res.next">Prossimo round</button>
     <p class="hint" id="resultHint"></p>
   </div>
 </div>
 
 <div class="overlay" id="endOverlay" hidden>
   <div class="dialog wide-dialog">
-    <h2>Partita finita</h2>
+    <h2 data-i18n="end.title">Partita finita</h2>
     <p class="winner" id="endWinner"></p>
     <table class="result-table" id="endTable"></table>
     <div class="end-actions">
-      <button class="primary" id="btnRematch" type="button">Gioca di nuovo</button>
-      <button class="ghost" id="btnNewGame" type="button">Torna alla lobby</button>
+      <button class="primary" id="btnRematch" type="button" data-i18n="end.rematch">Gioca di nuovo</button>
+      <button class="ghost" id="btnNewGame" type="button" data-i18n="end.lobby">Torna alla lobby</button>
     </div>
     <p class="hint" id="endHint"></p>
   </div>
@@ -160,8 +161,8 @@
 
 <div class="overlay" id="rulesOverlay" hidden>
   <div class="dialog wide-dialog scrollable">
-    <h2>Le regole</h2>
-    <div class="rules-body">
+    <h2 data-i18n="rules.title">Le regole</h2>
+    <div class="rules-body" data-i18n-html="rules.body">
       <h3>Il mazzo</h3>
       <p>52 carte francesi, niente jolly. Valori dal 2 all'asso: <b>2 &lt; 3 &lt; … &lt; 10 &lt; J &lt; Q &lt; K &lt; A</b>. La briscola è sempre <b class="red">cuori ♥&#xFE0E;</b>.</p>
 
@@ -201,13 +202,14 @@
          <b>Partita lunga:</b> 20 round (la veloce, poi la risalita 1→7 e di nuovo i tre speciali).</p>
       <p>Vince chi ha più punti alla fine.</p>
     </div>
-    <button class="primary" id="btnCloseRules" type="button">Chiudi</button>
+    <button class="primary" id="btnCloseRules" type="button" data-i18n="rules.close">Chiudi</button>
   </div>
 </div>
 
 <div class="toast" id="toast" hidden></div>
-<div class="connection" id="connBanner" hidden>Connessione persa — riprovo…</div>
+<div class="connection" id="connBanner" data-i18n="conn.lost" hidden>Connessione persa — riprovo…</div>
 
+<script src="/static/i18n.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>

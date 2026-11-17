@@ -11,6 +11,13 @@
 
   const $ = (id) => document.getElementById(id);
 
+  // Le lingue stanno in i18n.js: t() per textContent, th() per innerHTML (protegge
+  // i parametri), tr() per le frasi che scrivono i motori e la rete.
+  const { t, th } = I18N;
+  const tr = I18N.engine;
+  const levelLabel = (level) =>
+    ["facile", "normale", "esperto"].includes(level) ? t("level." + level) : String(level);
+
   const store = {
     get(key, fallback = "") {
       try { return localStorage.getItem("trans." + key) || fallback; } catch { return fallback; }
@@ -20,13 +27,11 @@
     },
   };
 
-  const IDLE_TITLE = document.title;
   const GAME_ICON = document.querySelector('link[rel="icon"]').href;
 
   // In modalita' ufficio la scheda non deve dire cosa c'e' dentro. Il turno
   // si annuncia come un messaggio non letto, "(1)": e' il segnale che ogni app
   // da ufficio usa gia', quindi non stona.
-  const OFFICE_TITLE = "Riepilogo attività";
   const OFFICE_ICON =
     "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>" +
     "<rect width='32' height='32' rx='7' fill='%235B5FC7'/>" +
@@ -149,7 +154,7 @@
     app.room = room || "";
     app.name = name || app.name;
     store.set("name", app.name);
-    setBusy(app.room ? `Cerco il tavolo ${app.room}…` : "Apro il tavolo…");
+    setBusy(app.room ? t("home.looking", { room: app.room }) : t("home.opening"));
 
     const transport = window.TRANS_TRANSPORT || websocketTransport;
     app.link = transport.create({
@@ -181,8 +186,9 @@
           app.state = null;
           showScreen("home");
           clearBusy();
-          showHomeError(reason.message || "connessione chiusa");
-          toast(reason.message || "connessione chiusa");
+          const text = reason.message ? tr(reason.message) : t("conn.closed");
+          showHomeError(text);
+          toast(text);
           return;
         }
         $("connBanner").hidden = false;
@@ -212,7 +218,13 @@
       clearBusy();
       return;
     }
-    if (msg.type === "error") { clearBusy(); toast(msg.message); showHomeError(msg.message); return; }
+    if (msg.type === "error") {
+      clearBusy();
+      const text = tr(msg.message);
+      toast(text);
+      showHomeError(text);
+      return;
+    }
     if (msg.type === "state") { app.state = msg; render(); return; }
   }
 
@@ -277,9 +289,9 @@
   /* --- lobby --- */
 
   function renderLobby(state) {
-    $("chipRoom").textContent = "Tavolo " + state.room;
-    $("chipRound").textContent = state.mode_label;
-    $("chipTrump").innerHTML = "Briscola " + suitHtml("H");
+    $("chipRoom").textContent = t("chip.table", { room: state.room });
+    $("chipRound").textContent = tr(state.mode_label);
+    $("chipTrump").innerHTML = th("chip.trump", { suitHtml: suitHtml("H") });
     $("lobbyCode").textContent = state.room;
 
     const list = $("seatList");
@@ -292,16 +304,16 @@
       who.textContent = seat.name;
       row.appendChild(who);
 
-      if (seat.is_bot) row.appendChild(tag("bot · " + seat.bot_level));
+      if (seat.is_bot) row.appendChild(tag(t("tag.bot", { level: levelLabel(seat.bot_level) })));
       if (seat.is_host) row.appendChild(tag("host", "host"));
-      if (seat.id === state.you) row.appendChild(tag("tu"));
+      if (seat.id === state.you) row.appendChild(tag(t("tag.you")));
       if (!seat.is_bot && !seat.connected) row.appendChild(tag("offline", "off"));
 
       if (state.is_host && seat.is_bot) {
         const kick = document.createElement("button");
         kick.className = "kick";
         kick.type = "button";
-        kick.title = "Rimuovi";
+        kick.title = t("seat.remove");
         kick.textContent = "×";
         kick.onclick = () => send({ type: "remove_player", player_id: seat.id });
         row.appendChild(kick);
@@ -327,12 +339,12 @@
     $("btnStart").disabled = !state.is_host || !enough;
     const bots = state.seats.filter((s) => s.is_bot).length;
     $("lobbyHint").textContent = !state.is_host
-      ? "Aspetta che l'host faccia partire la partita."
+      ? t("lobby.wait_host")
       : !enough
-        ? `Servono almeno ${state.min_players} giocatori: aggiungi un bot o invita qualcuno.`
+        ? t("lobby.need", { n: num(state.min_players) })
         : bots
-          ? `${state.seats.length} giocatori al tavolo. Puoi partire quando vuoi: chi arriva dopo prende il posto di un bot.`
-          : `${state.seats.length} giocatori al tavolo, ${free} posti liberi. A partita iniziata si entra solo al posto di un bot.`;
+          ? t("lobby.ready_bots", { n: state.seats.length })
+          : t("lobby.ready_free", { n: state.seats.length, free });
   }
 
   function tag(text, extra = "") {
@@ -353,10 +365,14 @@
     const g = state.game;
     const me = g.you;
 
-    $("chipRoom").textContent = "Tavolo " + state.room;
-    $("chipRound").textContent = `Round ${g.round.number}/${g.round.total} · ${g.round.title}`;
+    $("chipRoom").textContent = t("chip.table", { room: state.room });
+    $("chipRound").textContent = t("chip.round", {
+      n: num(g.round.number), total: num(g.round.total), title: tr(g.round.title),
+    });
     const trumpChip = $("chipTrump");
-    trumpChip.innerHTML = g.round.trump ? "Briscola " + suitHtml(g.round.trump) : "Senza briscola";
+    trumpChip.innerHTML = g.round.trump
+      ? th("chip.trump", { suitHtml: suitHtml(g.round.trump) })
+      : th("chip.no_trump");
     trumpChip.classList.toggle("hot", !g.round.trump);
 
     markTurn(myTurnNow(g));
@@ -384,22 +400,22 @@
       el.style.top = pos.y + "%";
 
       const marks = [];
-      if (p.is_dealer) marks.push('<span class="dot dealer" title="mazziere">◆</span>');
+      if (p.is_dealer) marks.push(`<span class="dot dealer" title="${escapeHtml(t("seat.dealer"))}">◆</span>`);
 
       // Chi e' uscito resta al tavolo col suo nome e i suoi punti, ma deve
       // vedersi che al posto suo sta giocando il computer.
       const replaced = !p.is_bot && p.connected === false;
       if (replaced) el.classList.add("replaced");
       const who = p.is_bot
-        ? `bot · ${escapeHtml(p.bot_level)}`
+        ? escapeHtml(t("tag.bot", { level: levelLabel(p.bot_level) }))
         : replaced
-          ? `uscito · gioca un bot · ${num(p.score)} pt`
-          : `${num(p.score)} pt`;
+          ? th("seat.left", { score: num(p.score) })
+          : th("seat.score", { score: num(p.score) });
 
       const bid = renderBidBadge(g, p);
       el.innerHTML =
         `<div class="nm">${escapeHtml(p.name)} ${marks.join("")}</div>` +
-        `<div class="meta">${who}${p.cards_left ? " · " + num(p.cards_left) + " carte" : ""}</div>` +
+        `<div class="meta">${who}${p.cards_left ? th("seat.cards", { n: num(p.cards_left) }) : ""}</div>` +
         bid;
       ring.appendChild(el);
     });
@@ -408,7 +424,7 @@
   function renderBidBadge(g, p) {
     if (g.round.kind === "misere") {
       const cls = p.tricks > 0 ? "over" : "done";
-      return `<div class="bid-badge ${cls}">${num(p.tricks)} prese</div>`;
+      return `<div class="bid-badge ${cls}">${th("bid.tricks", { n: num(p.tricks) })}</div>`;
     }
     if (p.bid === null || p.bid === undefined) {
       return g.phase === "bidding" ? `<div class="bid-badge">…</div>` : "";
@@ -463,8 +479,8 @@
     if (view.plays.length) { center.innerHTML = ""; return; }
     const label = g.round.kind === "normal" ? "" : g.round.kind_label;
     center.innerHTML = label
-      ? `${escapeHtml(label)}<span class="sub">${num(g.round.cards)} carte</span>`
-      : `<span class="sub">Round ${num(g.round.number)} di ${num(g.round.total)}</span>`;
+      ? `${escapeHtml(tr(label))}<span class="sub">${th("center.cards", { n: num(g.round.cards) })}</span>`
+      : `<span class="sub">${th("center.round", { n: num(g.round.number), total: num(g.round.total) })}</span>`;
   }
 
   function renderHand(g) {
@@ -474,7 +490,7 @@
 
     if (g.hand_hidden) {
       for (let i = 0; i < g.round.cards; i++) hand.appendChild(backEl());
-      status.innerHTML = "<b>BUIO</b> — dichiara senza guardare le carte.";
+      status.innerHTML = th("hand.blind");
       return;
     }
 
@@ -491,25 +507,25 @@
   }
 
   function handStatusText(g, myTurn) {
-    if (g.phase === "game_over") return "Partita finita.";
-    if (g.phase === "round_over") return "Round concluso.";
+    if (g.phase === "game_over") return th("hand.game_over");
+    if (g.phase === "round_over") return th("hand.round_over");
     const actor = g.players.find((p) => p.is_turn);
     if (g.phase === "bidding") {
       if (!myTurnToBid(g)) {
-        return `In attesa della dichiarazione di <b>${escapeHtml(actor ? actor.name : "…")}</b>.`;
+        return th("hand.waiting", { name: actor ? actor.name : "…" });
       }
       // Il pannello sopra dice gia' "quante prese?": qui ricordiamo la briscola.
       return g.round.trump
-        ? `Queste sono le tue carte. Briscola ${suitHtml(g.round.trump)}.`
-        : "Queste sono le tue carte. <b>Nessuna briscola</b> in questo round.";
+        ? th("hand.cards_trump", { suitHtml: suitHtml(g.round.trump) })
+        : th("hand.cards_no_trump");
     }
     if (myTurn) {
       const lead = g.lead_suit
-        ? ` Seme di uscita: ${suitHtml(g.lead_suit)}.`
-        : " Esci tu: scegli il seme.";
-      return '<span class="turn-badge">Tocca a te</span>' + lead;
+        ? th("hand.lead", { suitHtml: suitHtml(g.lead_suit) })
+        : th("hand.you_lead");
+      return `<span class="turn-badge">${th("hand.your_turn")}</span>` + lead;
     }
-    return `Gioca <b>${escapeHtml(actor ? actor.name : "…")}</b>.`;
+    return th("hand.plays", { name: actor ? actor.name : "…" });
   }
 
   function myTurnToBid(g) {
@@ -527,8 +543,8 @@
     app.myTurn = mine;
     $("screenGame").classList.toggle("your-turn", mine);
     let wanted;
-    if (app.office) wanted = mine ? `(1) ${OFFICE_TITLE}` : OFFICE_TITLE;
-    else wanted = mine ? "\u25B6 Tocca a te \u00b7 Dichiaro" : IDLE_TITLE;
+    if (app.office) wanted = mine ? `(1) ${t("office.title")}` : t("office.title");
+    else wanted = mine ? t("title.turn") : t("title.idle");
     if (document.title !== wanted) document.title = wanted;
   }
 
@@ -539,15 +555,22 @@
     if (app.office) root.dataset.mode = "office";
     else delete root.dataset.mode;
 
-    // I testi che si leggono da lontano: marchio e titolone della home.
-    document.querySelectorAll("[data-office-text]").forEach((el) => {
-      if (el.dataset.gameHtml === undefined) el.dataset.gameHtml = el.innerHTML;
-      if (app.office) el.textContent = el.dataset.officeText;
-      else el.innerHTML = el.dataset.gameHtml;
+    // Prima i testi della pagina nella lingua scelta, poi, in ufficio, quelli
+    // neutri al loro posto: marchio e titolone della home, che si leggono da lontano.
+    I18N.apply(document);
+    document.querySelectorAll("[data-office-key]").forEach((el) => {
+      const translated = el.hasAttribute("data-i18n");
+      if (app.office) {
+        if (!translated && el.dataset.gameHtml === undefined) el.dataset.gameHtml = el.innerHTML;
+        el.textContent = t(el.dataset.officeKey);
+      } else if (!translated && el.dataset.gameHtml !== undefined) {
+        el.innerHTML = el.dataset.gameHtml;
+        delete el.dataset.gameHtml;
+      }
     });
 
     document.querySelector('link[rel="icon"]').href = app.office ? OFFICE_ICON : GAME_ICON;
-    $("btnOffice").textContent = app.office ? "Vista normale" : "Modalità ufficio";
+    $("btnOffice").textContent = app.office ? t("top.office_off") : t("top.office");
     markTurn(app.myTurn);
   }
 
@@ -577,7 +600,7 @@
     box.innerHTML = "";
     g.log.forEach((line) => {
       const div = document.createElement("div");
-      div.textContent = line;
+      div.textContent = tr(line);
       box.appendChild(div);
     });
     (chat || []).forEach((c) => {
@@ -598,19 +621,16 @@
     const bidding = myTurnToBid(g);
     $("bidPanel").hidden = !bidding;
     if (bidding) {
-      $("bidTitle").textContent = g.round.blind
-        ? "Al buio: quante prese?"
-        : "Quante prese farai?";
+      $("bidTitle").textContent = t(g.round.blind ? "bid.title_blind" : "bid.title");
       const declared = g.players.reduce((s, p) => s + (p.bid || 0), 0);
       const missing = g.players.filter((p) => p.bid === null).length - 1;
       const banned = g.forbidden_bid;
-      const context = g.round.blind
-        ? `${g.round.cards} carte coperte. Dichiarate finora: ${declared}.`
-        : `Round da ${g.round.cards} carte. Dichiarate finora: ${declared}.`;
+      const context = t(g.round.blind ? "bid.ctx_blind" : "bid.ctx", {
+        cards: num(g.round.cards), declared: num(declared),
+      });
       $("bidSub").textContent = banned === null || banned === undefined
-        ? context + (missing > 0 ? ` Dopo di te mancano ${missing} giocatori.` : "")
-        : `${context} Chiudi tu il giro: non puoi dire ${banned}, la somma farebbe` +
-          ` esattamente ${g.round.cards}.`;
+        ? context + (missing > 0 ? t(missing === 1 ? "bid.missing_one" : "bid.missing", { n: missing }) : "")
+        : context + t("bid.banned", { banned: num(banned), cards: num(g.round.cards) });
 
       // Il numero vietato resta visibile, barrato: sparire e basta confonde.
       const legal = new Set(g.legal_bids);
@@ -632,8 +652,7 @@
         } else {
           btn.disabled = true;
           btn.className = "banned";
-          btn.title = `Con ${value} la somma delle dichiarazioni farebbe esattamente ` +
-                      `${g.round.cards}: non e' permesso.`;
+          btn.title = t("bid.banned_title", { value, cards: num(g.round.cards) });
         }
         grid.appendChild(btn);
       }
@@ -647,9 +666,9 @@
     const roundOver = g.phase === "round_over" && !holding;
     $("resultOverlay").hidden = !roundOver;
     if (roundOver && g.last_result) {
-      $("resultTitle").textContent = `Round ${g.last_result.round} — ${g.round.title}`;
+      $("resultTitle").textContent = t("res.title", { n: num(g.last_result.round), title: tr(g.round.title) });
       fillResultTable($("resultTable"), g.last_result.rows, g.round.kind === "misere");
-      $("resultHint").textContent = "Se nessuno tocca niente, il round successivo parte da solo.";
+      $("resultHint").textContent = t("res.hint");
     }
 
     // Fine partita
@@ -667,7 +686,7 @@
     }
 
     if (over) {
-      $("endWinner").textContent = "Vince " + g.winner;
+      $("endWinner").textContent = t("end.winner", { name: g.winner });
       const rows = g.standings.map((s) => ({ name: s.name, total: s.score }));
       fillResultTable($("endTable"), rows, false, true);
 
@@ -678,10 +697,10 @@
       $("btnRematch").disabled = !canReplay;
       $("btnNewGame").disabled = !state.is_host;
       $("endHint").textContent = !state.is_host
-        ? "Aspetta che l'host decida se rigiocare."
+        ? t("end.wait")
         : canReplay
-          ? "Stessi giocatori e stessa durata, punteggi da zero."
-          : `Per rigiocare servono almeno ${state.min_players} giocatori: passa dalla lobby.`;
+          ? t("end.same")
+          : t("end.need", { n: num(state.min_players) });
     }
   }
 
@@ -693,8 +712,8 @@
     if (chosen === null) return;
     $("bidChosen").innerHTML =
       chosen === 0
-        ? "Dichiari <b>nessuna presa</b>?"
-        : `Dichiari <b>${chosen}</b> ${chosen === 1 ? "presa" : "prese"}?`;
+        ? th("bid.chosen_zero")
+        : th(chosen === 1 ? "bid.chosen_one" : "bid.chosen", { n: num(chosen) });
   }
 
   function confirmBid() {
@@ -715,8 +734,9 @@
     table.innerHTML = "";
     const head = document.createElement("tr");
     head.innerHTML = finalOnly
-      ? "<th>Giocatore</th><th>Punti</th>"
-      : `<th>Giocatore</th><th>${misere ? "—" : "Dichiarate"}</th><th>Prese</th><th>Round</th><th>Totale</th>`;
+      ? `<th>${th("tbl.player")}</th><th>${th("tbl.points")}</th>`
+      : `<th>${th("tbl.player")}</th><th>${misere ? "—" : th("tbl.declared")}</th>` +
+        `<th>${th("tbl.tricks")}</th><th>${th("tbl.round")}</th><th>${th("tbl.total")}</th>`;
     table.appendChild(head);
 
     rows.forEach((row) => {
@@ -772,7 +792,7 @@
 
     $("btnCreate").onclick = () => {
       const name = $("nameNew").value.trim();
-      if (!name) return toast("Scrivi il tuo nome.");
+      if (!name) return toast(t("toast.name"));
       $("homeError").hidden = true;
       connect("", name);
     };
@@ -780,8 +800,8 @@
     $("btnJoin").onclick = () => {
       const name = $("nameJoin").value.trim();
       const code = $("codeJoin").value.trim().toUpperCase();
-      if (!name) return toast("Scrivi il tuo nome.");
-      if (code.length !== 4) return toast("Il codice tavolo ha 4 caratteri.");
+      if (!name) return toast(t("toast.name"));
+      if (code.length !== 4) return toast(t("toast.code"));
       $("homeError").hidden = true;
       connect(code, name);
     };
@@ -806,9 +826,9 @@
       const url = (window.TRANS_SHARE_URL || location.origin + location.pathname) + "#" + app.room;
       try {
         await navigator.clipboard.writeText(url);
-        toast("Link copiato: " + url);
+        toast(t("toast.copied", { url }));
       } catch {
-        prompt("Copia il link:", url);
+        prompt(t("prompt.copy"), url);
       }
     };
 
@@ -828,6 +848,12 @@
     $("btnNewGame").onclick = () => send({ type: "new_game" });
 
     $("btnOffice").onclick = () => setOffice(!app.office);
+    $("btnLang").onclick = () => I18N.toggle();
+    // Cambiando lingua si rifa' tutto cio' che e' scritto dal client.
+    I18N.onChange(() => {
+      applyMode();
+      if (app.state) render();
+    });
     $("btnRules").onclick = () => { $("rulesOverlay").hidden = false; };
     $("btnCloseRules").onclick = () => { $("rulesOverlay").hidden = true; };
     $("rulesOverlay").onclick = (e) => { if (e.target === $("rulesOverlay")) $("rulesOverlay").hidden = true; };

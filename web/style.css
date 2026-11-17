@@ -93,6 +93,10 @@ h1, h2, h3 { margin: 0 0 .5rem; font-weight: 650; letter-spacing: .01em; }
 }
 .tagline { color: var(--ink-dim); margin: .3rem 0 0; font-size: 1.05rem; }
 
+/* Il pulsante delle lingue: la lingua in uso e' quella accesa. */
+.lang .l-it, .lang .l-en { opacity: .55; }
+html[lang="it"] .lang .l-it, html[lang="en"] .lang .l-en { opacity: 1; color: var(--gold); font-weight: 700; }
+
 .panels { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; }
 
 .panel {
