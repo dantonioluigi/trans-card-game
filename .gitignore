@@ -26,3 +26,9 @@ app/android/
 
 # APK/AAB costruiti da app/build.sh (e le firme .idsig di apksigner)
 app/dichiaro-*
+
+# Chiavi di firma: il keystore di rilascio non si committa mai. L'unico che sta
+# nel repo e' quello di debug (app/debug.keystore), che e' pubblico di proposito.
+*.keystore
+*.jks
+!app/debug.keystore
