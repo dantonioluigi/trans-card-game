@@ -17,3 +17,12 @@ site/dist/
 
 # pacchetti Helm generati da "helm package"
 *.tgz
+
+site/dist-app/
+
+# progetto Android generato da "cap add android" (vedi app/)
+app/node_modules/
+app/android/
+
+# APK/AAB costruiti da app/build.sh (e le firme .idsig di apksigner)
+app/dichiaro-*

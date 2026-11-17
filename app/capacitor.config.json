@@ -1,0 +1,9 @@
+{
+  "appId": "io.github.dantonioluigi.dichiaro",
+  "appName": "Dichiaro",
+  "webDir": "../site/dist-app",
+  "backgroundColor": "#0b1512",
+  "android": {
+    "allowMixedContent": false
+  }
+}

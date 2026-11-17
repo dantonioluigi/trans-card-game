@@ -1,4 +1,6 @@
-# TRANS
+# Dichiaro
+
+> **T**ra **R**e e **A**sso, **N**on **S**bagliare: il nome con cui è nato questo gioco, TRANS.
 
 [![ci](https://github.com/dantonioluigi/trans-card-game/actions/workflows/ci.yml/badge.svg)](https://github.com/dantonioluigi/trans-card-game/actions/workflows/ci.yml)
 [![release](https://github.com/dantonioluigi/trans-card-game/actions/workflows/release.yml/badge.svg)](https://github.com/dantonioluigi/trans-card-game/actions/workflows/release.yml)
@@ -111,6 +113,8 @@ Variabili d'ambiente utili:
 | `TRANS_HOST` | `0.0.0.0` | interfaccia di ascolto |
 | `TRANS_PORT` | `8000` | porta |
 | `TRANS_RELOAD` | *(vuoto)* | se valorizzata, ricarica a caldo durante lo sviluppo |
+| `TRANS_ALLOWED_ORIGINS` | *(vuoto)* | elenco, separato da virgole, delle pagine che possono aprire il WebSocket (es. `https://gioco.example`). Vuoto: solo pagine servite da questo stesso indirizzo |
+| `TRANS_FORWARDED_IPS` | `*` | da chi fidarsi per `X-Forwarded-For`. Con `*` chiunque può falsificare il proprio IP e aggirare il tetto di connessioni per IP: dietro un proxy mettici il suo indirizzo |
 
 Con Docker:
 
@@ -135,9 +139,120 @@ e vale solo per te, gli altri al tavolo non vedono differenze.
 
 ---
 
+## App Android
+
+Un involucro [Capacitor](https://capacitorjs.com) attorno alla versione senza
+server: stessa interfaccia, stessi tavoli, e chi ha l'app gioca con chi usa il
+browser.
+
+**Installarla.** Scarica l'APK dalla Release (`dichiaro-X.Y.Z.apk`) oppure, per
+l'ultimo `main`, dagli *Artifacts* dell'esecuzione del workflow `android`
+(Actions). Aprilo sul telefono e consenti l'installazione da quella fonte.
+
+Senza chiavi configurate l'APK è di **debug**, firmato con la chiave di debug del
+repo, che è pubblica: gli aggiornamenti si installano uno sopra l'altro, ma
+chiunque potrebbe costruire un APK con la stessa firma. Va bene per passarlo agli
+amici, non per altro. Per una build di rilascio imposta questi quattro segreti
+del repo (Settings → Secrets and variables → Actions → Secrets):
+
+| Segreto | Contenuto |
+|---|---|
+| `ANDROID_KEYSTORE_BASE64` | il keystore, in base64 (`base64 -w0 mio.keystore`) |
+| `ANDROID_KEYSTORE_PASSWORD` | la password del keystore |
+| `ANDROID_KEY_ALIAS` | l'alias della chiave |
+| `ANDROID_KEY_PASSWORD` | la password della chiave |
+
+Con quelli la CI produce un APK di rilascio firmato (non debuggable) e un
+**AAB**, che è quello da caricare su Google Play. Il keystore lo crei una volta
+(`keytool -genkeypair -v -keystore mio.keystore -alias dichiaro -keyalg RSA
+-keysize 2048 -validity 10000`) e **va conservato in due posti**: se lo perdi, gli
+APK installati fuori da Play non si aggiornano più (su Play, con Play App Signing,
+puoi chiedere a Google di sostituire la chiave di caricamento). Non committarlo.
+
+**Cosa cambia rispetto al sito:**
+
+- **Serve la rete anche contro i bot**: il tavolo passa comunque dal broker
+  PeerJS. L'app si apre offline, ma non si può aprire o entrare in un tavolo.
+- **Il link d'invito non apre l'app.** Punta al sito pubblico, quindi chi lo
+  riceve lo apre nel browser. Dentro l'app si entra col codice a 4 lettere.
+- **Lo schermo resta acceso** finché sei a un tavolo. Chi ospita è l'arbitro: se
+  il telefono si spegne, la partita finisce per tutti. Per lo stesso motivo
+  chi ospita deve tenere l'app in primo piano.
+- **Gira solo in orizzontale.** In verticale il tavolo non ci sta: lo schermo ha un
+  layout apposta per i telefoni in orizzontale (tavolo e mano a sinistra, punteggio
+  a destra; la chat e il diario restano nascosti). Il sito nel browser, invece,
+  continua a funzionare in entrambe le posizioni.
+- **Niente backup.** Sul telefono restano nome, id e segreto di rientro; il
+  segreto vale per un solo dispositivo e non deve finire in un backup.
+- **Il tasto indietro non fa niente**, apposta: uscire per sbaglio dal telefono
+  dell'host chiuderebbe il tavolo. Dal tavolo si esce con *Esci*, dall'app con
+  Home.
+- **Da 4G serve il relay.** L'APK usa le stesse variabili di repo di Pages
+  (`TURN_ICE_SERVERS`, `TURN_CREDENTIALS_URL`): senza, funziona solo fra
+  telefoni che riescono a vedersi, di solito sulla stessa Wi‑Fi.
+
+**Pubblicità.** L'app mostra annunci [Google AdMob](https://admob.google.com); il
+sito web no (non riceve nemmeno il codice). Le regole sono fatte rispettare da
+`site/js/ads.js` e provate in `site/tests/ads.mjs`:
+
+- prima il consenso (modulo di Google, UMP, nello Spazio economico europeo, nel
+  Regno Unito e in Svizzera) e solo dopo l'SDK; senza consenso non parte nessuna
+  richiesta. Il pulsante *Pubblicità: le tue scelte* nella home permette di
+  cambiarlo, dove la legge lo richiede;
+- **mai durante una partita** e mai subito dopo un tocco su un pulsante;
+- **interstitial** solo alla fine di una partita, quando la schermata dei punteggi
+  è già visibile e l'utente è ancora lì; mai alla prima partita dell'installazione
+  e al massimo uno ogni 5 minuti (anche dopo un riavvio dell'app);
+- **App Open** solo all'avvio a freddo, prima di qualunque tocco, mai al primo
+  avvio in assoluto; conta come annuncio per l'intervallo dei 5 minuti;
+- un errore dell'SDK non ferma mai il gioco.
+
+Di default escono gli **annunci di prova** di Google ("Test Ad"), che si possono
+cliccare senza rischi. Gli id veri si danno con queste variabili del repo
+(Settings → Secrets and variables → Actions → **Variables**) e la CI li usa
+**solo per un tag di produzione** (`v1.0.0`, senza trattino): il test chiuso
+(`v1.0.0-rc1`) mostra sempre annunci di prova, perché un tester che clicca
+annunci veri può far sospendere l'account AdMob.
+
+| Variabile | Esempio |
+|---|---|
+| `ADMOB_APP_ID` | `ca-app-pub-1234567890123456~1234567890` |
+| `ADMOB_INTERSTITIAL_ID` | `ca-app-pub-1234567890123456/1111111111` |
+| `ADMOB_APP_OPEN_ID` | `ca-app-pub-1234567890123456/2222222222` |
+
+Vanno date tutte e tre, dello stesso editore: altrimenti la build si ferma. In
+locale gli id veri valgono solo per una build di rilascio firmata; in debug sono
+ignorati. Il plugin è `@capacitor-community/admob` **8.2.1**, fissato apposta: dalla
+8.3.0 ha una dipendenza in più (`@webview-native-ui/engine`, 14 MB) che a noi non
+serve; se Dependabot propone un aggiornamento, guarda cosa porta dentro. Anche
+la versione dell'SDK di Google (`play-services-ads` 25.4.0) è fissata da
+`app/build.sh`. Il testo dell'informativa sulla privacy è `site/privacy.html`.
+
+**Costruirlo a mano:**
+
+```bash
+bash app/build.sh        # → app/dichiaro-1.0.0.apk (debug)
+
+# di rilascio, con la tua chiave: APK firmato e AAB per Play
+ANDROID_KEYSTORE=mio.keystore ANDROID_KEYSTORE_PASSWORD=… \
+ANDROID_KEY_ALIAS=dichiaro ANDROID_KEY_PASSWORD=… bash app/build.sh
+```
+
+Servono Python 3, Node ≥ 22, JDK 21 e l'Android SDK con le licenze accettate.
+`VERSION_NAME` e `VERSION_CODE` si passano come variabili d'ambiente; il codice
+deve crescere perché Android accetti l'APK sopra quello vecchio (la CI usa l'ora).
+
+Il sito è lo stesso di Pages, costruito con `python site/build.py --app`: il link
+d'invito punta al sito pubblico invece che a `https://localhost`. Il progetto Android non è nel
+repo, lo genera `cap add android` da `app/package.json` e
+`app/capacitor.config.json`; se un giorno servirà codice nativo si toglie
+`app/android/` dal `.gitignore` e si committa.
+
+---
+
 ## Dove farlo girare
 
-Ci sono due modi di far girare TRANS, e fanno cose diverse.
+Ci sono due modi di far girare Dichiaro, e fanno cose diverse.
 
 ### Senza server, su GitHub Pages
 
@@ -150,20 +265,27 @@ Due cose che non sono gratis, e vanno sapute:
 
 - **Chi apre la stanza deve restare collegato.** Se chiude la scheda, la partita
   finisce per tutti. Non c'è nessun altro che tenga lo stato.
-- **Serve un intermediario per la presentazione fra i browser.** TRANS usa il
+- **Serve un intermediario per la presentazione fra i browser.** Dichiaro usa il
   broker pubblico di PeerJS. Se è giù, o se la rete che stai usando blocca quel
   tipo di collegamento (capita in azienda), il gioco lo dice entro dodici
   secondi invece di restare lì. In quel caso puoi puntare a un broker tuo:
-  `?broker=https://tuo-broker` nell'indirizzo, e
+  imposta la variabile di repo `BROKER_URL` (`https://tuo-broker`), e
   [peerjs-server](https://github.com/peers/peerjs-server) è un container da due
-  righe.
+  righe. Si imposta in pubblicazione e non nell'indirizzo, di proposito: con un
+  `?broker=` in un link, chiunque potrebbe portare chi lo apre su un falso tavolo.
+  (In locale, su `localhost:PORTA`, `?broker=`, `?turn=`, `?ice=` e `?relay=1`
+  funzionano ancora, per provare.)
 - **Il browser dell'host conosce le carte di tutti.** La UI non gliele mostra,
   ma sono nella memoria della sua pagina: chi sa aprire la console può
   guardarle. Fra amici è irrilevante; non è a prova di baro come il server.
 
 Serve comunque un intermediario per la presentazione fra i browser — due
-computer non si trovano da soli. TRANS usa il broker pubblico di PeerJS, che
+computer non si trovano da soli. Dichiaro usa il broker pubblico di PeerJS, che
 vede solo la stretta di mano: le carte poi viaggiano dirette.
+
+**Privacy.** In un collegamento peer-to-peer ogni giocatore può vedere l'indirizzo
+IP degli altri (è come funziona WebRTC), e il broker pubblico vede i codici dei
+tavoli e gli IP di chi si collega. Fra amici è irrilevante; con sconosciuti, no.
 
 **Fra reti diverse serve un relay.** Sulla stessa Wi‑Fi i browser si parlano
 direttamente. Da reti diverse spesso no — 4G, hotspot del telefono, reti
@@ -284,11 +406,11 @@ python -m trans.simulate --games 200 --levels esperto normale normale facile
 ```
 200 partite · Partita veloce (10 round) · 4 giocatori
 
-giocatore       vittorie   punti medi   scommesse ok
-esperto-0             71         69.7          56.4%
-normale-2             61         67.9          51.3%
-normale-1             62         66.9          53.0%
-facile-3              10         39.5          33.7%
+giocatore       vittorie   punti medi   dichiarazioni ok
+esperto-0             71         69.7             56.4%
+normale-2             61         67.9             51.3%
+normale-1             62         66.9             53.0%
+facile-3              10         39.5             33.7%
 ```
 
 `facile` sta trenta punti sotto agli altri, mentre fra `normale` ed `esperto` il
@@ -296,6 +418,47 @@ divario resta piccolo: su dieci round il caso delle carte pesa ancora parecchio.
 
 Quel 56% va letto ricordando che il mazziere non può pareggiare il conto: **almeno
 un giocatore per round sbaglia sempre**, quindi in quattro il tetto teorico è 75%.
+
+---
+
+## Sicurezza
+
+Cosa è protetto, e cosa no (è un gioco fra amici, non una banca: le cose sono
+dette per quello che sono).
+
+- **L'id di un giocatore è pubblico, il segreto no.** L'id compare in ogni stato
+  del tavolo, quindi non può provare chi sei. Al primo ingresso ricevi anche un
+  segreto casuale (solo nel tuo "benvenuto", mai negli stati), che il tuo
+  dispositivo conserva e presenta per rientrare. Chi conosce solo l'id non prende
+  il posto di nessuno, nemmeno quello dell'host. Chi ha ancora una pagina aperta
+  sul codice precedente a questa modifica non può rientrare dopo un
+  aggiornamento: entra come giocatore nuovo.
+- **Quello che arriva dalla rete non entra nell'HTML.** Nel peer-to-peer l'host è
+  un avversario, e lo stato che manda finisce nel DOM dell'ospite: carte e numeri
+  sono validati prima di essere scritti, nomi e chat sono sempre con escape. In
+  più la pagina ha una Content-Security-Policy (anche il server Python manda la
+  sua): senza script in linea né risorse esterne, un campo dimenticato non basta
+  a eseguire codice.
+- **L'host peer-to-peer ha dei limiti.** Al massimo 12 connessioni, 30 messaggi di
+  colpo poi 8 al secondo per ospite, 2 KB a messaggio, e chi non legge i propri
+  stati viene escluso (il suo posto passa a un bot). Un ospite non può
+  decomprimere più di 1 MiB di stato. Il riassemblaggio dei pacchetti grandi lo
+  fa PeerJS prima che il nostro codice li veda: lì il limite sono le connessioni.
+- **Il server Python** rifiuta campi del tipo sbagliato, messaggi oltre 2 KB,
+  raffiche oltre 30 messaggi + 10 al secondo, più di 12 connessioni per IP, più
+  di 500 tavoli, e pagine che non siano la sua. Entrare con un codice che non
+  esiste dà errore invece di creare un tavolo.
+- **I codici tavolo** (4 caratteri, 2²⁰ combinazioni) vengono da un generatore
+  sicuro, ma sono corti: a partita iniziata chi indovina un codice si siede su un
+  bot e ne vede la mano. Per un gioco fra amici basta; per altro, allungali.
+- **Pubblico per scelta:** le credenziali TURN statiche (finiscono nella pagina e
+  nell'app: usa `TURN_CREDENTIALS_URL` se vuoi credenziali a scadenza) e la chiave
+  di debug dell'APK (vedi *App Android*).
+- **Non protetto:** l'host peer-to-peer conosce le carte di tutti, e ogni
+  giocatore vede l'IP degli altri.
+
+Le azioni di GitHub sono bloccate a un commit preciso e Dependabot le tiene
+aggiornate; ogni job ha solo i permessi che usa.
 
 ---
 
@@ -318,12 +481,15 @@ site/           versione senza server, per GitHub Pages
   js/room.js    il tavolo, dentro il browser dell'host
   js/net-p2p.js WebRTC fra i giocatori
   build.py      assembla site/dist: ?v= sugli asset, Open Graph, sitemap, robots
+                (con --app: site/dist-app, per l'app Android)
+  vendor/       PeerJS, copia locale per l'app
   tests/        confronto JS↔Python e test dell'arbitro
-tests/          93 test su regole, engine e server
+app/            involucro Android (Capacitor): config, icone, build.sh
+tests/          118 test su regole, engine, server, privacy e build della pubblicità
 helm/           chart Kubernetes
 render.yaml     blueprint Render (va in radice, lo cerca lì)
 deploy/         fly.toml, docker-compose
-.github/        ci, release su tag, pubblicazione su Pages
+.github/        ci, release su tag, pubblicazione su Pages, APK Android
 ```
 
 Tre scelte che vale la pena conoscere:
@@ -379,6 +545,10 @@ Il lato JavaScript ha i suoi:
 python site/tests/make_fixtures.py   # registra le partite dal motore Python
 node site/tests/run.mjs              # il motore JS deve dare gli stessi risultati
 node site/tests/table.mjs            # arbitro P2P: permessi, mani private, partita intera
+node site/tests/limits.mjs           # limiti dell'host, tetto alla decompressione
+node site/tests/params.mjs           # parametri di prova solo in locale
+node site/tests/host.mjs             # l'host con un finto PeerJS: flood, furto del posto
+node site/tests/ads.mjs              # pubblicità: consenso, frequenza, quando non mostrarla
 ```
 
 ---

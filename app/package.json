@@ -1,0 +1,22 @@
+{
+  "name": "trans-android",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TRANS per Android: la versione senza server dentro una WebView, con Capacitor.",
+  "scripts": {
+    "build": "bash build.sh"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/android": "8.6.2",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "4.0.0",
+    "@capacitor/cli": "8.6.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

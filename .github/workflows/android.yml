@@ -1,0 +1,118 @@
+name: android
+
+# Costruisce l'app Android e la lascia fra gli artefatti dell'esecuzione
+# (Actions → l'esecuzione → Artifacts). Sui tag vX.Y.Z la chiama release.yml, che
+# la allega alla Release.
+#
+# Senza segreti esce un APK di debug (firmato con la chiave di debug pubblica del
+# repo). Con questi quattro segreti del repo esce invece una build di rilascio
+# firmata con la tua chiave, APK piu' AAB per Play:
+#   ANDROID_KEYSTORE_BASE64     il file .jks/.keystore, in base64 (base64 -w0 file)
+#   ANDROID_KEYSTORE_PASSWORD   la password del keystore
+#   ANDROID_KEY_ALIAS           l'alias della chiave
+#   ANDROID_KEY_PASSWORD        la password della chiave
+# Le PR da fork non ricevono i segreti: lì esce sempre il debug.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "site/**"
+      - "app/**"
+      - ".github/workflows/android.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - "site/**"
+      - "app/**"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: versione
+        id: version
+        run: |
+          # Sui tag il numero e' quello del tag. Il VERSION_CODE e' l'ora: sale
+          # sempre, qualunque workflow costruisca l'app, e Android lo vuole
+          # crescente per installare sopra la versione precedente.
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            name="${GITHUB_REF_NAME#v}"
+          else
+            name="0.0.0-dev.${GITHUB_RUN_NUMBER}"
+          fi
+          # Il nome del tag arriva da fuori e finisce in comandi e nomi di file.
+          if ! [[ "$name" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$ ]]; then
+            echo "::error::versione non valida: '$name'"
+            exit 1
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "code=$(date +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: chiave di firma (solo se i segreti ci sono)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            chmod 600 "$RUNNER_TEMP/release.keystore"
+            echo "ANDROID_KEYSTORE=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+            echo "Build di rilascio firmata."
+          else
+            echo "Nessuna chiave di firma: build di debug."
+          fi
+
+      - name: costruisci l'app
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          # Le stesse variabili di pages.yml: senza relay, da 4G l'app non
+          # riesce a collegarsi a chi e' su un'altra rete. Finiscono nell'app,
+          # come finiscono nella pagina pubblica.
+          TRANS_TURN_ICE: ${{ vars.TURN_ICE_SERVERS }}
+          TRANS_TURN_URL: ${{ vars.TURN_CREDENTIALS_URL }}
+          TRANS_BROKER: ${{ vars.BROKER_URL }}
+          # Gli id AdMob VERI entrano solo nella build di un tag di produzione
+          # (vX.Y.Z, senza trattino). Tutto il resto, test chiuso compreso
+          # (v1.0.0-rc1), mostra gli annunci di prova di Google: i tester che
+          # cliccano annunci veri possono far sospendere l'account AdMob.
+          ADMOB_APP_ID: ${{ github.ref_type == 'tag' && !contains(github.ref_name, '-') && vars.ADMOB_APP_ID || '' }}
+          ADMOB_INTERSTITIAL_ID: ${{ github.ref_type == 'tag' && !contains(github.ref_name, '-') && vars.ADMOB_INTERSTITIAL_ID || '' }}
+          ADMOB_APP_OPEN_ID: ${{ github.ref_type == 'tag' && !contains(github.ref_name, '-') && vars.ADMOB_APP_OPEN_ID || '' }}
+        run: bash app/build.sh
+
+      - name: togli la chiave dal disco
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.keystore"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: android
+          path: |
+            app/dichiaro-*.apk
+            app/dichiaro-*.aab
+          if-no-files-found: error

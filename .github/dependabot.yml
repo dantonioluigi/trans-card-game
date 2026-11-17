@@ -1,0 +1,21 @@
+# Le azioni di GitHub, le dipendenze e l'immagine di base sono bloccate a una
+# versione precisa (le azioni a un commit): senza qualcuno che le aggiorni,
+# restano indietro. Dependabot apre una PR a settimana con le novita'.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: npm
+    directory: /app
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly

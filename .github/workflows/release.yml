@@ -8,28 +8,46 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+-*"   # pre-release: v1.0.0-rc1
 
+# Di base nessun permesso di scrittura: ogni job chiede solo quello che usa.
 permissions:
-  contents: write   # per creare la Release
-  packages: write   # per pubblicare immagine e chart su GHCR
+  contents: read
 
 env:
   REGISTRY: ghcr.io
 
 jobs:
+  # Il nome del tag arriva da fuori e finisce in comandi, nomi di file e tag
+  # delle immagini: il glob qui sopra lascia passare qualsiasi carattere dopo il
+  # trattino. Prima di tutto si controlla che abbia la forma di una versione.
+  tag:
+    name: controllo del tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: il tag e' una versione
+        run: |
+          if ! [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$ ]]; then
+            echo "::error::il tag '$GITHUB_REF_NAME' non e' una versione (vX.Y.Z o vX.Y.Z-rc1)"
+            exit 1
+          fi
+
   # image e chart non dipendono l'uno dall'altro: partono insieme.
   image:
     name: immagine docker
+    needs: tag
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # per pubblicare l'immagine su GHCR
     outputs:
       digest: ${{ steps.build.outputs.digest }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - name: login su ghcr
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -37,7 +55,7 @@ jobs:
 
       - name: tag e label
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository }}
           tags: |
@@ -47,7 +65,7 @@ jobs:
 
       - name: build e push
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
@@ -59,11 +77,15 @@ jobs:
 
   chart:
     name: helm chart
+    needs: tag
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # per pubblicare il chart su GHCR
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4
         with:
           version: v3.16.2
 
@@ -72,10 +94,11 @@ jobs:
         run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: allinea Chart.yaml al tag
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
         run: |
-          version='${{ steps.version.outputs.value }}'
-          sed -i "s/^version: .*/version: ${version}/" helm/trans-card-game/Chart.yaml
-          sed -i "s/^appVersion: .*/appVersion: \"${version}\"/" helm/trans-card-game/Chart.yaml
+          sed -i "s/^version: .*/version: ${VERSION}/" helm/trans-card-game/Chart.yaml
+          sed -i "s/^appVersion: .*/appVersion: \"${VERSION}\"/" helm/trans-card-game/Chart.yaml
           grep -E "^(version|appVersion):" helm/trans-card-game/Chart.yaml
 
       - run: helm lint helm/trans-card-game
@@ -83,33 +106,55 @@ jobs:
       - name: package
         run: helm package helm/trans-card-game --destination dist/
 
+      # Token e nome utente passano da variabili d'ambiente, non scritti nel comando.
       - name: login su ghcr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACTOR: ${{ github.actor }}
         run: |
-          echo '${{ secrets.GITHUB_TOKEN }}' \
-            | helm registry login ${{ env.REGISTRY }} \
-                --username '${{ github.actor }}' --password-stdin
+          echo "$GH_TOKEN" | helm registry login "$REGISTRY" --username "$GH_ACTOR" --password-stdin
 
       - name: push del chart come artefatto OCI
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+          OWNER: ${{ github.repository_owner }}
         run: |
-          helm push dist/trans-card-game-${{ steps.version.outputs.value }}.tgz \
-            oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/charts
+          helm push "dist/trans-card-game-${VERSION}.tgz" "oci://${REGISTRY}/${OWNER}/charts"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: helm-chart
           path: dist/*.tgz
           if-no-files-found: error
 
+  # Anche questo parte insieme agli altri: e' il workflow android.yml, lo stesso
+  # che gira sui push, richiamato per costruire l'app del tag. I segreti della
+  # firma (se li hai impostati) gli passano in eredita'.
+  apk:
+    name: app android
+    needs: tag
+    uses: ./.github/workflows/android.yml
+    permissions:
+      contents: read
+    secrets: inherit
+
   release:
     name: github release
-    needs: [image, chart]
+    needs: [image, chart, apk]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # per creare la Release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: helm-chart
+          path: dist/
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: android
           path: dist/
 
       - name: versione dal tag
@@ -117,13 +162,20 @@ jobs:
         run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: crea la release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}
-          files: dist/*.tgz
+          files: |
+            dist/*.tgz
+            dist/*.apk
+            dist/*.aab
           body: |
             ## Come si usa
+
+            Android: scarica l'`.apk` qui sotto e aprilo sul telefono (Android chiede di
+            consentire l'installazione da questa fonte). Se la Release contiene anche il
+            `.aab`, e' quello da caricare su Google Play.
 
             Immagine:
 
