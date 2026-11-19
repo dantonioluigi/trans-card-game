@@ -28,7 +28,9 @@ def test_ci_sono_italiano_e_inglese_e_un_contatto():
     assert 'id="it"' in PAGE and 'lang="it"' in PAGE
     assert 'id="en"' in PAGE and 'lang="en"' in PAGE
     assert "mailto:" in PAGE
-    assert "AdMob" in PAGE
+    # L'app non ha pubblicita' (tests/test_build.py lo garantisce): l'informativa lo dice.
+    assert "non mostrano pubblicità" in PAGE and "show no ads" in PAGE
+    assert "AdMob" not in PAGE
 
 
 def test_la_pagina_non_carica_nulla_da_fuori():

@@ -96,13 +96,6 @@ jobs:
           TRANS_TURN_ICE: ${{ vars.TURN_ICE_SERVERS }}
           TRANS_TURN_URL: ${{ vars.TURN_CREDENTIALS_URL }}
           TRANS_BROKER: ${{ vars.BROKER_URL }}
-          # Gli id AdMob VERI entrano solo nella build di un tag di produzione
-          # (vX.Y.Z, senza trattino). Tutto il resto, test chiuso compreso
-          # (v1.0.0-rc1), mostra gli annunci di prova di Google: i tester che
-          # cliccano annunci veri possono far sospendere l'account AdMob.
-          ADMOB_APP_ID: ${{ github.ref_type == 'tag' && !contains(github.ref_name, '-') && vars.ADMOB_APP_ID || '' }}
-          ADMOB_INTERSTITIAL_ID: ${{ github.ref_type == 'tag' && !contains(github.ref_name, '-') && vars.ADMOB_INTERSTITIAL_ID || '' }}
-          ADMOB_APP_OPEN_ID: ${{ github.ref_type == 'tag' && !contains(github.ref_name, '-') && vars.ADMOB_APP_OPEN_ID || '' }}
         run: bash app/build.sh
 
       - name: togli la chiave dal disco

@@ -79,9 +79,6 @@ jobs:
           node site/tests/params.mjs
           node site/tests/host.mjs
 
-      - name: le regole sulla pubblicita' (consenso, frequenza, quando non mostrarla)
-        run: node site/tests/ads.mjs
-
       - name: le frasi dei motori da tradurre sono quelle registrate
         # Le scrivono i motori e la rete in italiano; il client le traduce con
         # una tabella (web/i18n.js). Se cambi una frase, rigenera l'elenco.

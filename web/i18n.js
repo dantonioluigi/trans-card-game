@@ -32,7 +32,7 @@
 
     /* modalità ufficio: testi che non devono dire cosa c'è dentro */
     "office.brand": ["Attività", "Activity"],
-    "office.tagline": ["Coordinamento del gruppo di lavoro.", "Work group coordination."],
+    "office.tagline": ["Riepilogo settimanale delle attività del team.", "Weekly team activity summary."],
     "office.title": ["Riepilogo attività", "Activity summary"],
 
     /* titolo della scheda */
@@ -49,7 +49,6 @@
     "home.code": [null, "Table code"],
     "home.join": [null, "Join"],
     "home.p2p_note": [null, "No-server version: games go straight from browser to browser."],
-    "home.ads_choices": [null, "Ad choices"],
     "home.looking": ["Cerco il tavolo {room}…", "Looking for table {room}…"],
     "home.opening": ["Apro il tavolo…", "Opening the table…"],
     "toast.name": ["Scrivi il tuo nome.", "Enter your name."],

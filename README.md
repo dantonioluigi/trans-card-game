@@ -215,42 +215,12 @@ puoi chiedere a Google di sostituire la chiave di caricamento). Non committarlo.
   (`TURN_ICE_SERVERS`, `TURN_CREDENTIALS_URL`): senza, funziona solo fra
   telefoni che riescono a vedersi, di solito sulla stessa Wi‑Fi.
 
-**Pubblicità.** L'app mostra annunci [Google AdMob](https://admob.google.com); il
-sito web no (non riceve nemmeno il codice). Le regole sono fatte rispettare da
-`site/js/ads.js` e provate in `site/tests/ads.mjs`:
-
-- prima il consenso (modulo di Google, UMP, nello Spazio economico europeo, nel
-  Regno Unito e in Svizzera) e solo dopo l'SDK; senza consenso non parte nessuna
-  richiesta. Il pulsante *Pubblicità: le tue scelte* nella home permette di
-  cambiarlo, dove la legge lo richiede;
-- **mai durante una partita** e mai subito dopo un tocco su un pulsante;
-- **interstitial** solo alla fine di una partita, quando la schermata dei punteggi
-  è già visibile e l'utente è ancora lì; mai alla prima partita dell'installazione
-  e al massimo uno ogni 5 minuti (anche dopo un riavvio dell'app);
-- **App Open** solo all'avvio a freddo, prima di qualunque tocco, mai al primo
-  avvio in assoluto; conta come annuncio per l'intervallo dei 5 minuti;
-- un errore dell'SDK non ferma mai il gioco.
-
-Di default escono gli **annunci di prova** di Google ("Test Ad"), che si possono
-cliccare senza rischi. Gli id veri si danno con queste variabili del repo
-(Settings → Secrets and variables → Actions → **Variables**) e la CI li usa
-**solo per un tag di produzione** (`v1.0.0`, senza trattino): il test chiuso
-(`v1.0.0-rc1`) mostra sempre annunci di prova, perché un tester che clicca
-annunci veri può far sospendere l'account AdMob.
-
-| Variabile | Esempio |
-|---|---|
-| `ADMOB_APP_ID` | `ca-app-pub-1234567890123456~1234567890` |
-| `ADMOB_INTERSTITIAL_ID` | `ca-app-pub-1234567890123456/1111111111` |
-| `ADMOB_APP_OPEN_ID` | `ca-app-pub-1234567890123456/2222222222` |
-
-Vanno date tutte e tre, dello stesso editore: altrimenti la build si ferma. In
-locale gli id veri valgono solo per una build di rilascio firmata; in debug sono
-ignorati. Il plugin è `@capacitor-community/admob` **8.2.1**, fissato apposta: dalla
-8.3.0 ha una dipendenza in più (`@webview-native-ui/engine`, 14 MB) che a noi non
-serve; se Dependabot propone un aggiornamento, guarda cosa porta dentro. Anche
-la versione dell'SDK di Google (`play-services-ads` 25.4.0) è fissata da
-`app/build.sh`. Il testo dell'informativa sulla privacy è `site/privacy.html`.
+**Niente pubblicità.** L'app non ha pubblicità né librerie pubblicitarie, e quindi
+non raccoglie l'ID pubblicitario di Android: la scheda di Play e l'informativa sulla
+privacy lo dichiarano, e `tests/test_build.py` fa fallire la CI se un SDK
+pubblicitario rientra nell'app. Il lavoro già fatto per AdMob (consenso UMP,
+interstitial a fine partita con intervallo minimo, App Open all'avvio, ID di prova
+contro quelli veri) sta nella storia di git, commit `7e2da1b`, se un giorno servirà.
 
 **Costruirlo a mano:**
 
@@ -509,7 +479,7 @@ site/           versione senza server, per GitHub Pages
   vendor/       PeerJS, copia locale per l'app
   tests/        confronto JS↔Python e test dell'arbitro
 app/            involucro Android (Capacitor): config, icone, build.sh
-tests/          118 test su regole, engine, server, privacy e build della pubblicità
+tests/          115 test su regole, engine, server, privacy e build del sito
 helm/           chart Kubernetes
 render.yaml     blueprint Render (va in radice, lo cerca lì)
 deploy/         fly.toml, docker-compose
@@ -572,7 +542,6 @@ node site/tests/table.mjs            # arbitro P2P: permessi, mani private, part
 node site/tests/limits.mjs           # limiti dell'host, tetto alla decompressione
 node site/tests/params.mjs           # parametri di prova solo in locale
 node site/tests/host.mjs             # l'host con un finto PeerJS: flood, furto del posto
-node site/tests/ads.mjs              # pubblicità: consenso, frequenza, quando non mostrarla
 node site/tests/i18n.mjs             # lingue: dizionario completo, ogni frase tradotta
 python site/tests/make_messages.py   # se cambi una frase nel codice: rigenera messages.json
 ```

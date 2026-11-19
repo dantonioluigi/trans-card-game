@@ -46,16 +46,6 @@ PEERJS_CLOUD_HOST = "0.peerjs.com"
 
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "[::1]"}
 
-#: Le unita' pubblicitarie di PROVA di Google: pubbliche, stanno nella documentazione
-#: di AdMob e mostrano sempre annunci finti ("Test Ad"). Sono il default: gli id veri
-#: si danno solo con le variabili ADMOB_*, e app/build.sh lo permette solo in una
-#: build di rilascio firmata. Cliccare i propri annunci veri puo' costare l'account.
-ADMOB_TEST_UNITS = {
-    "interstitial": "ca-app-pub-3940256099942544/1033173712",
-    "appOpen": "ca-app-pub-3940256099942544/9257395921",
-}
-ADMOB_UNIT_RE = re.compile(r"^ca-app-pub-[0-9]{16}/[0-9]{10}$")
-
 # Un raw string: niente ambiguita' di doppio escaping. E' la sequenza JS
 # per '<', usata per evitare che un "</script>" dentro un valore incorporato
 # chiuda il blocco prima del tempo.
@@ -114,23 +104,17 @@ LOBBY_NOTE = """      <p class="hint warn" id="p2pHostNote" data-i18n="lobby.hos
 """
 
 def home_links() -> str:
-    """Privacy sempre; nell'app anche il pulsante delle scelte sulla pubblicita'
-    (nascosto: lo mostra ads.js solo dove il consenso lo richiede)."""
+    """Il link all'informativa sulla privacy, sotto la nota della home."""
     href = SITE_URL + "privacy.html" if APP else "privacy.html"
-    button = (
-        '<button class="linklike" id="btnAdsPrivacy" type="button" data-i18n="home.ads_choices" hidden>'
-        "Pubblicità: le tue scelte</button>"
-        if APP else ""
-    )
-    return f'    <p class="tagline small links"><a href="{href}">Privacy</a>{button}</p>\n'
+    return f'    <p class="tagline small links"><a href="{href}">Privacy</a></p>\n'
 
 
 EXTRA_CSS = """
 /* --- aggiunte della versione peer-to-peer --- */
 .tagline.small { font-size: .85rem; opacity: .75; margin-top: .6rem; }
 .hint.warn { color: var(--gold); }
-/* Privacy e scelte sulla pubblicita': devono restare raggiungibili anche nel
-   layout compatto da telefono in orizzontale, che nasconde le altre note. */
+/* Il link alla privacy deve restare raggiungibile anche nel layout compatto da
+   telefono in orizzontale, che nasconde le altre note. */
 .tagline.small.links { display: flex; flex-wrap: wrap; gap: .2rem 1.2rem; justify-content: center; }
 .tagline.small.links a, .tagline.small.links .linklike { color: inherit; font-size: inherit; }
 [data-mode="office"] .tagline.small.links { display: none; }
@@ -220,26 +204,6 @@ def broker_config() -> str:
     return _inline_script("TRANS_BROKER", url)
 
 
-def ads_config() -> str:
-    """Gli id delle unita' pubblicitarie, solo per la build dell'app.
-
-    ADMOB_INTERSTITIAL_ID e ADMOB_APP_OPEN_ID vanno dati insieme o per niente:
-    una build mezza di prova e mezza vera sarebbe un errore difficile da vedere.
-    Senza, si usano quelli di prova di Google.
-    """
-    given = {
-        "interstitial": os.environ.get("ADMOB_INTERSTITIAL_ID", "").strip(),
-        "appOpen": os.environ.get("ADMOB_APP_OPEN_ID", "").strip(),
-    }
-    if any(given.values()) and not all(given.values()):
-        raise SystemExit("ADMOB_INTERSTITIAL_ID e ADMOB_APP_OPEN_ID vanno impostati insieme")
-    units = given if all(given.values()) else dict(ADMOB_TEST_UNITS)
-    for name, value in units.items():
-        if not ADMOB_UNIT_RE.match(value):
-            raise SystemExit(f"id AdMob non valido per {name}: {value!r} (atteso ca-app-pub-0000000000000000/0000000000)")
-    return _inline_script("TRANS_ADS_IDS", units)
-
-
 def content_security_policy(inline_scripts: str) -> str:
     """La CSP della pagina, con gli hash degli script in linea di questa build."""
     hashes = [
@@ -284,7 +248,7 @@ def transform_index(html: str, version: str) -> str:
     # Nell'app la pagina vive su https://localhost: il link d'invito deve
     # puntare al sito pubblico, dove chi lo riceve puo' aprirlo.
     share = _inline_script("TRANS_SHARE_URL", SITE_URL) if APP else ""
-    inline = share + relay_config() + broker_config() + (ads_config() if APP else "")
+    inline = share + relay_config() + broker_config()
 
     swap(
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n',
@@ -299,7 +263,6 @@ def transform_index(html: str, version: str) -> str:
         f'<script src="{PEERJS_FILE}"></script>\n'
         + inline
         + f'<script type="module" src="js/net-p2p.js?v={version}"></script>\n'
-        + (f'<script type="module" src="js/ads.js?v={version}"></script>\n' if APP else "")
         + f'<script src="app.js?v={version}"></script>',
     )
 
@@ -321,8 +284,7 @@ def version_imports(source: str, version: str) -> str:
 
 
 def main() -> None:
-    # La pubblicita' esiste solo nell'app: il sito web non riceve nemmeno il file.
-    modules = [m for m in sorted((SITE / "js").glob("*.js")) if APP or m.name != "ads.js"]
+    modules = sorted((SITE / "js").glob("*.js"))
     version = build_id([WEB / "index.html", WEB / "style.css", WEB / "app.js", WEB / "i18n.js", *modules])
 
     if DIST.exists():
@@ -338,10 +300,13 @@ def main() -> None:
         (DIST / "js" / module.name).write_text(version_imports(module.read_text(), version))
 
     shutil.copy2(PEERJS_LOCAL, DIST / PEERJS_FILE)
+    # La licenza MIT chiede che l'avviso viaggi con la libreria: il file minimizzato
+    # non ha l'intestazione, quindi il testo va distribuito accanto, sito e app.
+    shutil.copy2(SITE / "vendor" / "peerjs-LICENSE", DIST / "peerjs-LICENSE.txt")
     if not APP:
         shutil.copy2(ROOT / "docs" / "social.png", DIST / "anteprima.png")
 
-        # L'informativa sulla privacy: Play e AdMob ne vogliono un indirizzo pubblico.
+        # L'informativa sulla privacy: Play ne vuole un indirizzo pubblico.
         shutil.copy2(SITE / "privacy.html", DIST / "privacy.html")
 
         # Una pagina sola, ma Search Console la sitemap la chiede lo stesso.

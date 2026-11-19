@@ -675,16 +675,6 @@
     const over = g.phase === "game_over";
     $("endOverlay").hidden = !over;
 
-    // Nell'app Android c'e' la pubblicita' (site/js/ads.js): la schermata dei
-    // punteggi e' una pausa naturale. Una volta sola per partita; l'annuncio
-    // parte solo se l'utente e' ancora li' quando scade l'attesa.
-    if (over && !app.gameOverSeen) {
-      app.gameOverSeen = true;
-      if (window.TRANS_ADS) window.TRANS_ADS.gameOver(() => app.gameOverSeen && !$("endOverlay").hidden);
-    } else if (!over) {
-      app.gameOverSeen = false;
-    }
-
     if (over) {
       $("endWinner").textContent = t("end.winner", { name: g.winner });
       const rows = g.standings.map((s) => ({ name: s.name, total: s.score }));

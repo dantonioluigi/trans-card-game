@@ -16,14 +16,6 @@
 # (quest'ultimo e' quello che si carica su Play). Le password restano in
 # variabili d'ambiente: non compaiono mai fra gli argomenti dei comandi.
 #
-# Pubblicita' (Google AdMob). Di default l'app mostra annunci di PROVA di Google
-# ("Test Ad"): sono sicuri da cliccare. Gli id veri si danno con ADMOB_APP_ID
-# (ca-app-pub-...~...), ADMOB_INTERSTITIAL_ID e ADMOB_APP_OPEN_ID
-# (ca-app-pub-.../...), tutti e tre insieme, e solo una build di RILASCIO firmata
-# li usa: in debug vengono ignorati. Cliccare i propri annunci veri puo' far
-# sospendere l'account AdMob, quindi gli id veri vanno solo nella build che va
-# in produzione.
-#
 # VERSION_NAME e VERSION_CODE finiscono nell'app. Android installa un APK sopra
 # quello precedente solo se il VERSION_CODE e' uguale o piu' alto: la CI usa l'ora,
 # in locale alzalo a mano.
@@ -45,40 +37,6 @@ die() { echo "ERRORE: $*" >&2; exit 1; }
   || die "VERSION_NAME non valido: '$VERSION_NAME' (atteso 1.2.3 o 1.2.3-rc1)"
 [[ "$VERSION_CODE" =~ ^[0-9]{1,10}$ ]] && [ "$VERSION_CODE" -le 2100000000 ] \
   || die "VERSION_CODE non valido: '$VERSION_CODE' (intero fino a 2100000000)"
-
-# ------------------------------------------------------------------ AdMob
-# ID app di prova di Google (pubblico, nella documentazione di AdMob).
-TEST_ADMOB_APP_ID="ca-app-pub-3940256099942544~3347511713"
-
-if [ -z "${ANDROID_KEYSTORE:-}" ]; then
-  # Build di debug: sempre annunci di prova, qualunque cosa sia impostata.
-  if [ -n "${ADMOB_APP_ID:-}${ADMOB_INTERSTITIAL_ID:-}${ADMOB_APP_OPEN_ID:-}" ]; then
-    echo "Nota: build di debug, ignoro gli id AdMob veri e uso quelli di PROVA." >&2
-  fi
-  unset ADMOB_APP_ID ADMOB_INTERSTITIAL_ID ADMOB_APP_OPEN_ID
-fi
-
-if [ -n "${ADMOB_APP_ID:-}${ADMOB_INTERSTITIAL_ID:-}${ADMOB_APP_OPEN_ID:-}" ]; then
-  # Tutti e tre, validi, e dello stesso editore: una build mezza di prova e mezza
-  # vera sarebbe un errore che non si vede finche' non e' in produzione.
-  : "${ADMOB_APP_ID:?manca ADMOB_APP_ID}"
-  : "${ADMOB_INTERSTITIAL_ID:?manca ADMOB_INTERSTITIAL_ID}"
-  : "${ADMOB_APP_OPEN_ID:?manca ADMOB_APP_OPEN_ID}"
-  [[ "$ADMOB_APP_ID" =~ ^ca-app-pub-([0-9]{16})~[0-9]{10}$ ]] \
-    || die "ADMOB_APP_ID non valido (atteso ca-app-pub-0000000000000000~0000000000)"
-  PUBLISHER="${BASH_REMATCH[1]}"
-  for unit in "$ADMOB_INTERSTITIAL_ID" "$ADMOB_APP_OPEN_ID"; do
-    [[ "$unit" =~ ^ca-app-pub-${PUBLISHER}/[0-9]{10}$ ]] \
-      || die "id unita' AdMob non valido o di un altro editore: '$unit'"
-  done
-  ADS_MODE="VERI (ca-app-pub-${PUBLISHER})"
-else
-  ADMOB_APP_ID="$TEST_ADMOB_APP_ID"
-  ADS_MODE="di PROVA di Google"
-fi
-# build.py legge dall'ambiente i due id delle unita' (senza, usa quelli di prova).
-export ADMOB_APP_ID
-[ -n "${ADMOB_INTERSTITIAL_ID:-}" ] && export ADMOB_INTERSTITIAL_ID ADMOB_APP_OPEN_ID
 
 # Il sito, nella variante per l'app: link d'invito pubblico, PeerJS e CSP.
 python3 ../site/build.py --app
@@ -109,26 +67,6 @@ grep -q 'android:screenOrientation="sensorLandscape"' "$MANIFEST" \
 sed -i 's|android:allowBackup="true"|android:allowBackup="false"|' "$MANIFEST"
 grep -q 'android:allowBackup="false"' "$MANIFEST" \
   || die "non riesco a disattivare il backup in $MANIFEST"
-
-# AdMob vuole l'id dell'app nel manifest: senza, l'SDK ferma l'app all'avvio.
-# Si toglie l'eventuale riga di una build precedente e si rimette quella giusta.
-sed -i '/com.google.android.gms.ads.APPLICATION_ID/d' "$MANIFEST"
-sed -i "s|    </application>|        <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"${ADMOB_APP_ID}\" />\n    </application>|" "$MANIFEST"
-grep -q "android:value=\"${ADMOB_APP_ID}\"" "$MANIFEST" \
-  || die "non riesco a mettere l'id AdMob in $MANIFEST"
-
-# Il plugin AdMob chiede play-services-ads "25.4.+" (qualunque 25.4.x del
-# momento): lo fisso, cosi' due build dello stesso codice usano lo stesso SDK.
-VARS=android/variables.gradle
-sed -i '/playServicesAdsVersion\|userMessagingPlatformVersion/d' "$VARS"
-sed -i "\$s|^}\$|    playServicesAdsVersion = '25.4.0'\n    userMessagingPlatformVersion = '4.0.0'\n}|" "$VARS"
-grep -q "playServicesAdsVersion = '25.4.0'" "$VARS" \
-  || die "non riesco a fissare la versione dell'SDK pubblicitario in $VARS"
-
-echo "Annunci: ${ADS_MODE}"
-if [ -n "${ANDROID_KEYSTORE:-}" ] && [ -z "${ADMOB_INTERSTITIAL_ID:-}" ]; then
-  echo "ATTENZIONE: rilascio con annunci di PROVA. Va bene per il test chiuso, NON per la produzione (mancano le variabili ADMOB_*)." >&2
-fi
 
 if [ -n "${ANDROID_KEYSTORE:-}" ]; then
   # ----------------------------------------------------------- rilascio firmato
