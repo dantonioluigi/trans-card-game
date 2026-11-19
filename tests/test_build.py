@@ -53,6 +53,16 @@ def test_privacy_nel_sito_e_nell_app():
     assert not (app / "privacy.html").exists()  # l'informativa sta online, non nell'app
 
 
+def test_il_blocco_orizzontale_non_restringe_i_dispositivi():
+    # "sensorLandscape" fa dedurre a Play il requisito screen.landscape: senza la
+    # dichiarazione esplicita "required=false" la scheda perde dispositivi.
+    script = (ROOT / "app" / "build.sh").read_text(encoding="utf-8")
+    assert 'android:screenOrientation="sensorLandscape"' in script
+    assert (
+        'android:name="android.hardware.screen.landscape" android:required="false"' in script
+    )
+
+
 def test_la_licenza_di_peerjs_viaggia_con_la_libreria():
     # PeerJS e' MIT e il file minimizzato non ha l'intestazione: l'avviso va distribuito.
     for args in ((), ("--app",)):

@@ -483,7 +483,7 @@ site/           versione senza server, per GitHub Pages
   vendor/       PeerJS, copia locale per l'app
   tests/        confronto JS↔Python e test dell'arbitro
 app/            involucro Android (Capacitor): config, icone, build.sh
-tests/          139 test su regole, engine, server, privacy, build del sito e versioni
+tests/          140 test su regole, engine, server, privacy, build del sito e versioni
 helm/           chart Kubernetes
 render.yaml     blueprint Render (va in radice, lo cerca lì)
 deploy/         fly.toml, docker-compose

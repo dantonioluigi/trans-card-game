@@ -62,6 +62,14 @@ grep -q 'android:screenOrientation' "$MANIFEST" \
 grep -q 'android:screenOrientation="sensorLandscape"' "$MANIFEST" \
   || die "non riesco a bloccare l'orientamento in $MANIFEST"
 
+# Play ricava da "sensorLandscape" un requisito hardware (schermo orizzontale) e
+# toglie la scheda ai dispositivi che non lo dichiarano. Il blocco e' una scelta
+# dell'app, non un limite del telefono: il requisito si dichiara facoltativo.
+grep -q 'android.hardware.screen.landscape' "$MANIFEST" \
+  || sed -i 's|<application|<uses-feature android:name="android.hardware.screen.landscape" android:required="false" />\n\n    <application|' "$MANIFEST"
+grep -q 'android:name="android.hardware.screen.landscape" android:required="false"' "$MANIFEST" \
+  || die "non riesco a rendere facoltativo l'orientamento in $MANIFEST"
+
 # Niente backup: sul telefono ci sono nome, id e segreto di rientro. Il segreto
 # serve a un solo dispositivo: ripristinarlo da un backup su un altro lo
 # duplicherebbe.
