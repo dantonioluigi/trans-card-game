@@ -25,8 +25,8 @@ jobs:
     steps:
       - name: il tag e' una versione
         run: |
-          if ! [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$ ]]; then
-            echo "::error::il tag '$GITHUB_REF_NAME' non e' una versione (vX.Y.Z o vX.Y.Z-rc1)"
+          if ! [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$ ]]; then
+            echo "::error::il tag '$GITHUB_REF_NAME' non e' una versione (vX.Y.Z o vX.Y.Z-rcN)"
             exit 1
           fi
 

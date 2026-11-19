@@ -17,8 +17,9 @@
 # variabili d'ambiente: non compaiono mai fra gli argomenti dei comandi.
 #
 # VERSION_NAME e VERSION_CODE finiscono nell'app. Android installa un APK sopra
-# quello precedente solo se il VERSION_CODE e' uguale o piu' alto: la CI usa l'ora,
-# in locale alzalo a mano.
+# quello precedente solo se il VERSION_CODE e' uguale o piu' alto: la CI lo ricava
+# dal tag (X.Y.Z-rcN -> X*1000000 + Y*10000 + Z*100 + N, la finale +99); in locale
+# alzalo a mano.
 #
 # Il progetto Android (app/android/) non e' nel repo: lo genera "cap add"
 # partendo da package.json e capacitor.config.json, quindi e' sempre quello che

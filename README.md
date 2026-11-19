@@ -234,7 +234,11 @@ ANDROID_KEY_ALIAS=dichiaro ANDROID_KEY_PASSWORD=… bash app/build.sh
 
 Servono Python 3, Node ≥ 22, JDK 21 e l'Android SDK con le licenze accettate.
 `VERSION_NAME` e `VERSION_CODE` si passano come variabili d'ambiente; il codice
-deve crescere perché Android accetti l'APK sopra quello vecchio (la CI usa l'ora).
+deve crescere perché Android accetti l'APK sopra quello vecchio. La CI lo ricava dal tag:
+`vX.Y.Z-rcN` → `X·1000000 + Y·10000 + Z·100 + N`, e la finale `vX.Y.Z` usa `+99`, quindi
+supera ogni rc (`v1.1.0-rc2` → 1010002, `v1.1.0` → 1010099). Per una build nuova serve un
+tag nuovo: Play rifiuta due caricamenti con lo stesso codice. I tag accettati sono solo
+`vX.Y.Z` e `vX.Y.Z-rcN`.
 
 Il sito è lo stesso di Pages, costruito con `python site/build.py --app`: il link
 d'invito punta al sito pubblico invece che a `https://localhost`. Il progetto Android non è nel
@@ -479,7 +483,7 @@ site/           versione senza server, per GitHub Pages
   vendor/       PeerJS, copia locale per l'app
   tests/        confronto JS↔Python e test dell'arbitro
 app/            involucro Android (Capacitor): config, icone, build.sh
-tests/          115 test su regole, engine, server, privacy e build del sito
+tests/          139 test su regole, engine, server, privacy, build del sito e versioni
 helm/           chart Kubernetes
 render.yaml     blueprint Render (va in radice, lo cerca lì)
 deploy/         fly.toml, docker-compose

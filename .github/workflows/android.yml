@@ -54,21 +54,35 @@ jobs:
       - name: versione
         id: version
         run: |
-          # Sui tag il numero e' quello del tag. Il VERSION_CODE e' l'ora: sale
-          # sempre, qualunque workflow costruisca l'app, e Android lo vuole
-          # crescente per installare sopra la versione precedente.
+          # Sui tag il numero di versione e' quello del tag e il VERSION_CODE se ne
+          # ricava: piccolo e crescente con la versione, come Play lo vuole (il tetto
+          # e' 2,1 miliardi: con l'ora in secondi, ~1,8 miliardi, Play avvisa).
+          #   X.Y.Z-rcN -> X*1000000 + Y*10000 + Z*100 + N
+          #   X.Y.Z     -> X*1000000 + Y*10000 + Z*100 + 99   (la finale supera ogni rc)
+          # Un build rifatto dallo stesso tag ha lo stesso codice, e Play lo rifiuta:
+          # per una build nuova serve un tag nuovo (rc2, rc3...).
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             name="${GITHUB_REF_NAME#v}"
+            re='^([0-9]+)\.([0-9]+)\.([0-9]+)(-rc([0-9]+))?$'
+            if ! [[ "$name" =~ $re ]]; then
+              echo "::error::il tag deve essere vX.Y.Z o vX.Y.Z-rcN, non '$GITHUB_REF_NAME'"
+              exit 1
+            fi
+            major=$((10#${BASH_REMATCH[1]})); minor=$((10#${BASH_REMATCH[2]})); patch=$((10#${BASH_REMATCH[3]}))
+            # La finale prende 99: un rc non puo' arrivare a 99, o avrebbe lo stesso codice.
+            if [ -n "${BASH_REMATCH[5]}" ]; then stage=$((10#${BASH_REMATCH[5]})); else stage=99; fi
+            if [ "$major" -gt 2000 ] || [ "$minor" -gt 99 ] || [ "$patch" -gt 99 ] || [ "$stage" -lt 1 ] || [ "$stage" -gt 99 ] \
+               || { [ -n "${BASH_REMATCH[5]}" ] && [ "$stage" -gt 98 ]; }; then
+              echo "::error::versione fuori dai limiti del codice (major<=2000, minor e patch<=99, rc 1-98): '$name'"
+              exit 1
+            fi
+            code=$(( major * 1000000 + minor * 10000 + patch * 100 + stage ))
           else
             name="0.0.0-dev.${GITHUB_RUN_NUMBER}"
-          fi
-          # Il nome del tag arriva da fuori e finisce in comandi e nomi di file.
-          if ! [[ "$name" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$ ]]; then
-            echo "::error::versione non valida: '$name'"
-            exit 1
+            code="${GITHUB_RUN_NUMBER}"
           fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
-          echo "code=$(date +%s)" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
 
       - name: chiave di firma (solo se i segreti ci sono)
         env:
