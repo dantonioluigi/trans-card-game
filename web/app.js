@@ -275,11 +275,14 @@
     $("screenLobby").hidden = which !== "lobby";
     $("screenGame").hidden = which !== "game";
     $("topbarInfo").hidden = which === "home";
-    if (which !== "game") markTurn(false);
-    if (which === "home") {
-      $("btnLeave").hidden = true;
+    if (which !== "game") {
+      markTurn(false);
+      // Fuori dal tavolo di gioco nessun pannello deve restare aperto: dopo
+      // "Torna alla lobby" quello della fine partita copriva la lobby e non
+      // lasciava toccare niente. In partita li decide renderGame.
       hideOverlays();
     }
+    if (which === "home") $("btnLeave").hidden = true;
   }
 
   function hideOverlays() {

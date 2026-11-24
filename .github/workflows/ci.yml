@@ -89,6 +89,9 @@ jobs:
       - name: le due lingue (dizionario, chiavi usate, ogni frase tradotta)
         run: node site/tests/i18n.mjs
 
+      - name: l'interfaccia mostra e nasconde i pannelli giusti mentre il tavolo cambia
+        run: node site/tests/app.mjs
+
       - name: il sito statico si assembla
         run: python site/build.py
 

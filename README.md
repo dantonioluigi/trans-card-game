@@ -547,6 +547,7 @@ node site/tests/limits.mjs           # limiti dell'host, tetto alla decompressio
 node site/tests/params.mjs           # parametri di prova solo in locale
 node site/tests/host.mjs             # l'host con un finto PeerJS: flood, furto del posto
 node site/tests/i18n.mjs             # lingue: dizionario completo, ogni frase tradotta
+node site/tests/app.mjs              # web/app.js contro il tavolo vero: quali pannelli si vedono
 python site/tests/make_messages.py   # se cambi una frase nel codice: rigenera messages.json
 ```
 
