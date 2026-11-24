@@ -774,6 +774,52 @@
     }
   }
 
+  /* ------------------------------------------- aggiornamento dell'app -- */
+
+  // Solo nell'app Android: la build include il plugin AppUpdate, che chiede a Play
+  // se esiste una versione piu' nuova. Sul sito il plugin non c'e', in un APK
+  // installato a mano Play non vede aggiornamenti: in entrambi i casi non si
+  // mostra niente.
+  const PLAY_UPDATE_AVAILABLE = 2; // updateAvailability
+  const UPDATE_DONE = 0;           // esiti di performImmediateUpdate
+  const UPDATE_DECLINED = 1;
+
+  async function checkForUpdate() {
+    const plugin = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AppUpdate;
+    if (!plugin) return;
+    try {
+      const info = await plugin.getAppUpdateInfo();
+      // La risposta di Play puo' arrivare a tavolo gia' aperto: niente finestre
+      // addosso a chi sta giocando.
+      if (info.updateAvailability !== PLAY_UPDATE_AVAILABLE) return;
+      if ($("screenHome").hidden || app.wantConnection) return;
+      $("btnUpdate").onclick = () => startUpdate(plugin, info);
+      $("btnUpdateLater").onclick = () => { $("updateOverlay").hidden = true; };
+      $("updateOverlay").hidden = false;
+    } catch (err) {
+      // Senza Play o senza i servizi Google non c'e' nessuno a cui chiedere.
+      console.warn("Dichiaro: controllo aggiornamenti non riuscito", err);
+    }
+  }
+
+  async function startUpdate(plugin, info) {
+    $("updateOverlay").hidden = true;
+    try {
+      // L'aggiornamento "immediato" e' la schermata di Play: scarica, installa e
+      // riavvia l'app. Il risultato arriva solo se l'app non viene riavviata.
+      const result = info.immediateUpdateAllowed ? await plugin.performImmediateUpdate() : null;
+      if (result && (result.code === UPDATE_DONE || result.code === UPDATE_DECLINED)) return;
+    } catch (err) {
+      console.warn("Dichiaro: aggiornamento in app non riuscito", err);
+    }
+    // Play non lo consente o e' fallito: resta la scheda dell'app nello store.
+    try {
+      await plugin.openAppStore();
+    } catch (err) {
+      console.warn("Dichiaro: non riesco ad aprire lo store", err);
+    }
+  }
+
   /* -------------------------------------------------------------- init -- */
 
   function wire() {
@@ -891,6 +937,8 @@
     const previous = store.get("room");
     if (hash && app.playerId && app.name) connect(hash, app.name);
     else if (previous && app.playerId && app.name && !hash) showScreen("home");
+
+    checkForUpdate();
   }
 
   window.addEventListener("beforeunload", () => { app.wantConnection = false; });

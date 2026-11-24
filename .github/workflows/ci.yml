@@ -89,7 +89,7 @@ jobs:
       - name: le due lingue (dizionario, chiavi usate, ogni frase tradotta)
         run: node site/tests/i18n.mjs
 
-      - name: l'interfaccia mostra e nasconde i pannelli giusti mentre il tavolo cambia
+      - name: l'interfaccia mostra i pannelli giusti e l'avviso di aggiornamento solo dove serve
         run: node site/tests/app.mjs
 
       - name: il sito statico si assembla

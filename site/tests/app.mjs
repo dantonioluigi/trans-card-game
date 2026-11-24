@@ -71,7 +71,8 @@ define("localStorage", {
   getItem: (k) => (localStore.has(k) ? localStore.get(k) : null),
   setItem: (k, v) => localStore.set(k, String(v)),
 });
-define("location", { hash: "#ABCD", pathname: "/", origin: "https://gioco.example", search: "", hostname: "gioco.example", port: "" });
+const loc = { hash: "#ABCD", pathname: "/", origin: "https://gioco.example", search: "", hostname: "gioco.example", port: "" };
+define("location", loc);
 define("history", { replaceState() {} });
 define("Peer", class {});
 define("requestAnimationFrame", (fn) => setTimeout(fn, 0));
@@ -99,8 +100,16 @@ window.TRANS_TRANSPORT = {
   },
 };
 
-vm.runInThisContext(fs.readFileSync(path.join(root, "web", "app.js"), "utf8"), { filename: "web/app.js" });
-for (const fn of listeners.DOMContentLoaded || []) fn();
+// L'app si puo' "riaprire" piu' volte nello stesso processo: ogni volta parte
+// da una pagina nuova, come dopo aver chiuso e riaperto l'app sul telefono.
+const appSource = fs.readFileSync(path.join(root, "web", "app.js"), "utf8");
+function loadApp() {
+  stores.clear();
+  element("screenHome").hidden = false; // come in index.html: la home e' lo schermo di partenza
+  listeners.DOMContentLoaded = [];
+  vm.runInThisContext(appSource, { filename: "web/app.js" });
+  for (const fn of listeners.DOMContentLoaded) fn();
+}
 
 /* ----------------------------------------------------------------- il test */
 
@@ -121,9 +130,79 @@ async function until(condition, ms = 5000) {
 }
 const click = (id) => prop(id, "onclick")();
 
+/* ------------------------------------------------ avviso di aggiornamento */
+
+// Play parla solo con l'app installata dallo store: qui un plugin finto che
+// annota cosa gli si chiede. Sul sito (window.Capacitor assente) non esiste.
+function playSays(info, { result = { code: 0 }, failInfo = false } = {}) {
+  const calls = [];
+  globalThis.Capacitor = {
+    Plugins: {
+      AppUpdate: {
+        getAppUpdateInfo: async () => { calls.push("info"); if (failInfo) throw new Error("niente Play"); return info; },
+        performImmediateUpdate: async () => { calls.push("immediato"); return result; },
+        openAppStore: async () => { calls.push("store"); },
+      },
+    },
+  };
+  return calls;
+}
+async function openOnHome() { loc.hash = ""; loadApp(); await sleep(30); }
+const updateShown = () => prop("updateOverlay", "hidden") === false;
+const AVAILABLE = { updateAvailability: 2, immediateUpdateAllowed: true };
+
+delete globalThis.Capacitor;
+await openOnHome();
+check(!updateShown(), "sul sito (senza plugin) e' comparso l'avviso di aggiornamento");
+
+let calls = playSays({ updateAvailability: 1 });
+await openOnHome();
+check(calls.join() === "info" && !updateShown(), "senza aggiornamenti e' comparso l'avviso");
+
+calls = playSays(AVAILABLE);
+await openOnHome();
+check(updateShown(), "con un aggiornamento disponibile l'avviso non compare");
+await click("btnUpdateLater");
+check(!updateShown() && calls.join() === "info", "\"Piu' tardi\" non chiude l'avviso o avvia l'aggiornamento");
+
+calls = playSays(AVAILABLE);
+await openOnHome();
+await click("btnUpdate");
+check(!updateShown() && calls.join() === "info,immediato", `"Aggiorna" doveva avviare l'aggiornamento di Play, ha fatto: ${calls}`);
+
+calls = playSays(AVAILABLE, { result: { code: 1 } });
+await openOnHome();
+await click("btnUpdate");
+check(calls.join() === "info,immediato", `chi annulla la schermata di Play non deve finire nello store, ha fatto: ${calls}`);
+
+calls = playSays(AVAILABLE, { result: { code: 2 } });
+await openOnHome();
+await click("btnUpdate");
+check(calls.join() === "info,immediato,store", `se Play non riesce si apre lo store, ha fatto: ${calls}`);
+
+calls = playSays({ updateAvailability: 2, immediateUpdateAllowed: false });
+await openOnHome();
+await click("btnUpdate");
+check(calls.join() === "info,store", `senza aggiornamento immediato si apre lo store, ha fatto: ${calls}`);
+
+{
+  const warn = console.warn;
+  console.warn = () => {}; // l'app lo segnala, ed e' quello che deve fare
+  calls = playSays(AVAILABLE, { failInfo: true });
+  await openOnHome();
+  console.warn = warn;
+  check(calls.join() === "info" && !updateShown(), "senza i servizi di Play l'app dovrebbe restare muta");
+}
+
+// Con un tavolo che si apre da solo non si butta una finestra addosso a chi gioca.
+calls = playSays(AVAILABLE);
+loc.hash = "#ABCD";
+loadApp();
+
 // L'app entra al tavolo da sola (indirizzo #ABCD, nome e id gia' salvati).
 check(await until(() => prop("screenLobby", "hidden") === false), "l'app non e' arrivata alla lobby");
 check(prop("screenGame", "hidden") === true, "in lobby lo schermo di gioco dovrebbe essere nascosto");
+check(!updateShown(), "l'avviso di aggiornamento e' comparso mentre l'app entrava al tavolo");
 
 table.addBot(table.hostId, "normale");
 table.broadcast();

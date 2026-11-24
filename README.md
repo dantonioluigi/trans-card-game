@@ -208,12 +208,28 @@ puoi chiedere a Google di sostituire la chiave di caricamento). Non committarlo.
   continua a funzionare in entrambe le posizioni.
 - **Niente backup.** Sul telefono restano nome, id e segreto di rientro; il
   segreto vale per un solo dispositivo e non deve finire in un backup.
+- **Avvisa degli aggiornamenti.** All'avvio, dalla home, l'app chiede a Google Play
+  se c'è una versione più nuova e, se c'è, mostra «C'è un aggiornamento da fare»:
+  *Aggiorna* apre la schermata di Play, che scarica, installa e riavvia l'app.
+  Lo fa il plugin [`@capawesome/capacitor-app-update`](https://github.com/capawesome-team/capacitor-plugins/tree/main/packages/app-update),
+  e funziona solo con l'app installata da Play (non con un APK a mano, che non
+  riceve mai l'avviso). Sul sito non esiste: la pagina si aggiorna ricaricandola.
 - **Il tasto indietro non fa niente**, apposta: uscire per sbaglio dal telefono
   dell'host chiuderebbe il tavolo. Dal tavolo si esce con *Esci*, dall'app con
   Home.
 - **Da 4G serve il relay.** L'APK usa le stesse variabili di repo di Pages
   (`TURN_ICE_SERVERS`, `TURN_CREDENTIALS_URL`): senza, funziona solo fra
   telefoni che riescono a vedersi, di solito sulla stessa Wi‑Fi.
+
+**Versione del tavolo.** Il tavolo vive sul telefono di chi lo crea e le regole le
+applica lui, quindi chi gioca insieme deve vederle uguali. Chi entra manda la sua
+`PROTOCOL` (`site/js/net-p2p.js`) e l'host la confronta con la propria: se è diversa
+rifiuta l'ospite dicendo chi deve aggiornare; un ospite più nuovo di un host che non
+manda la versione (fino alla rc6) lo capisce dal benvenuto e non entra. Il numero va
+**alzato a mano** quando cambia qualcosa che due versioni al tavolo vedrebbero in modo
+diverso (una regola, un punteggio, un messaggio del protocollo), e **non** per quello
+che resta sul telefono di chi lo ha (grafica, margini, avvisi): altrimenti ogni
+correzione costringerebbe tutti ad aggiornare.
 
 **Niente pubblicità.** L'app non ha pubblicità né librerie pubblicitarie, e quindi
 non raccoglie l'ID pubblicitario di Android: la scheda di Play e l'informativa sulla
@@ -545,9 +561,9 @@ node site/tests/run.mjs              # il motore JS deve dare gli stessi risulta
 node site/tests/table.mjs            # arbitro P2P: permessi, mani private, partita intera
 node site/tests/limits.mjs           # limiti dell'host, tetto alla decompressione
 node site/tests/params.mjs           # parametri di prova solo in locale
-node site/tests/host.mjs             # l'host con un finto PeerJS: flood, furto del posto
+node site/tests/host.mjs             # l'host con un finto PeerJS: flood, furto del posto, versione
 node site/tests/i18n.mjs             # lingue: dizionario completo, ogni frase tradotta
-node site/tests/app.mjs              # web/app.js contro il tavolo vero: quali pannelli si vedono
+node site/tests/app.mjs              # web/app.js contro il tavolo vero: pannelli e avviso di aggiornamento
 python site/tests/make_messages.py   # se cambi una frase nel codice: rigenera messages.json
 ```
 

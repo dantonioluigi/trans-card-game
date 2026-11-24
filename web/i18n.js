@@ -58,6 +58,12 @@
     "conn.closed": ["connessione chiusa", "connection closed"],
     "conn.lost": [null, "Connection lost — retrying…"],
 
+    /* avviso di aggiornamento (solo app Android, da Play) */
+    "update.title": [null, "An update is available"],
+    "update.text": [null, "There's a newer version of Dichiaro. Update it to get the latest fixes and to play with people who already have it."],
+    "update.now": [null, "Update"],
+    "update.later": [null, "Later"],
+
     /* sala d'attesa */
     "lobby.table": [null, "Table"],
     "lobby.share": [null, "Share the code, or"],
@@ -321,6 +327,18 @@
     [
       "l'host non risponde piu': ha chiuso la scheda o ha perso la connessione",
       "the host is no longer responding: they closed the tab or lost the connection",
+    ],
+    [
+      "la tua versione di Dichiaro e' piu' vecchia di quella di chi ha creato il tavolo: " +
+        "aggiornala (dal Play Store, o ricarica la pagina nel browser) e riprova.",
+      "your version of Dichiaro is older than the one of whoever created the table: " +
+        "update it (from the Play Store, or reload the page in your browser) and try again.",
+    ],
+    [
+      "chi ha creato il tavolo ha una versione di Dichiaro piu' vecchia della tua: " +
+        "digli di aggiornarla (dal Play Store, o di ricaricare la pagina nel browser).",
+      "whoever created the table has an older version of Dichiaro than yours: " +
+        "tell them to update it (from the Play Store, or to reload the page in their browser).",
     ],
     ["questo browser non supporta WebRTC", "this browser doesn't support WebRTC"],
     ["libreria di connessione non caricata", "connection library not loaded"],

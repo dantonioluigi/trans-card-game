@@ -32,10 +32,17 @@ class Emitter {
 class FakePeer extends Emitter {
   constructor(id, options) {
     super();
-    this.id = id;
-    this.options = options;
+    // L'host crea il Peer con un id, l'ospite solo con le opzioni.
+    this.id = typeof id === "string" ? id : null;
+    this.options = typeof id === "string" ? options : id;
     FakePeer.last = this;
     setTimeout(() => this.emit("open"), 0);
+  }
+  connect() {
+    const conn = new FakeConn();
+    FakePeer.lastConn = conn;
+    setTimeout(() => conn.emit("open"), 0);
+    return conn;
   }
   destroy() {
     this.destroyed = true;
@@ -70,7 +77,7 @@ globalThis.Peer = FakePeer;
 const warnings = [];
 console.warn = (...args) => warnings.push(args.join(" "));
 
-await import("../js/net-p2p.js");
+const { PROTOCOL, MESSAGES } = await import("../js/net-p2p.js");
 
 function openHost() {
   const received = [];
@@ -85,7 +92,7 @@ function openHost() {
 async function connectGuest(name, extra = {}) {
   const conn = new FakeConn();
   FakePeer.last.emit("connection", conn);
-  conn.emit("data", { type: "join", name, ...extra });
+  conn.emit("data", { type: "join", name, proto: PROTOCOL, ...extra });
   await sleep(5);
   return conn;
 }
@@ -153,6 +160,91 @@ async function connectGuest(name, extra = {}) {
   check(!anna.closed, "messaggi senza forma hanno chiuso una connessione che si comporta bene");
 
   host.link.close();
+}
+
+{
+  // Versioni diverse al tavolo: chi non parla lo stesso "protocollo" viene
+  // rifiutato con il motivo, senza sedersi, e smette di essere ascoltato.
+  const host = openHost();
+  await sleep(20);
+  const seated = () => host.last("state").seats.length;
+  const before = seated();
+
+  const same = await connectGuest("Anna");
+  check(same.last("welcome")?.proto === PROTOCOL, "il benvenuto non porta la versione del tavolo");
+  check(seated() === before + 1, "un ospite della stessa versione non si e' seduto");
+
+  // Fino alla rc6 il "join" non portava nessuna versione: vale 1, quindi e' piu' vecchia.
+  const old = await connectGuest("Vecchio", { proto: undefined });
+  check(old.last("welcome") === null, "un ospite senza versione si e' seduto");
+  check(old.last("error")?.message === MESSAGES.guestOutdated && old.last("error")?.fatal === true,
+        "all'ospite vecchio non e' stato detto di aggiornare");
+  check(!old.closed, "l'ospite vecchio e' stato chiuso subito: la sua app scriverebbe 'l'host ha chiuso la stanza'");
+  check(seated() === before + 1, "un ospite rifiutato ha preso un posto");
+
+  // Rifiutato, non viene piu' ascoltato: ne' chat, ne' un secondo tentativo.
+  const heard = host.received.length;
+  old.emit("data", { type: "chat", text: "ci sono" });
+  old.emit("data", { type: "join", name: "Vecchio", proto: PROTOCOL });
+  await sleep(10);
+  check(host.received.length === heard && old.last("welcome") === null && old.sent.length === 1,
+        "un ospite rifiutato ha continuato a essere ascoltato");
+
+  const older = await connectGuest("Anziano", { proto: PROTOCOL - 1 });
+  check(older.last("error")?.message === MESSAGES.guestOutdated, "una versione piu' bassa non e' stata rifiutata");
+
+  // Una versione piu' nuova della nostra: ad aggiornare e' chi ha creato il tavolo.
+  const newer = await connectGuest("Futuro", { proto: PROTOCOL + 1 });
+  check(newer.last("welcome") === null && newer.last("error")?.message === MESSAGES.hostOutdated,
+        "una versione piu' nuova non ha fatto dire all'host di aggiornare");
+
+  // Una versione scritta in un altro modo non vale: e' un valore preso da fuori.
+  const text = await connectGuest("Testo", { proto: String(PROTOCOL) });
+  check(text.last("welcome") === null && text.last("error")?.message === MESSAGES.guestOutdated,
+        "una versione che non e' un numero e' stata accettata");
+
+  check(seated() === before + 1, "gli ospiti rifiutati hanno preso posto");
+  host.link.close();
+}
+
+{
+  // Dal lato dell'ospite: la versione parte nel "join", e un host che non la
+  // dichiara (fino alla rc6) o che ci rifiuta chiude la partita col suo motivo.
+  const join = async () => {
+    const out = { received: [], closed: null };
+    const link = window.TRANS_TRANSPORT.create({
+      room: "ABCD",
+      onOpen: () => link.send({ type: "join", room: "ABCD", name: "Anna", player_id: null, secret: null }),
+      onMessage: (m) => out.received.push(m),
+      onClose: (reason) => { out.closed = reason; },
+    });
+    await sleep(20);
+    out.conn = FakePeer.lastConn;
+    out.hears = async (msg) => { out.conn.emit("data", msg); await sleep(10); };
+    return out;
+  };
+  const welcome = { type: "welcome", room: "ABCD", player_id: "p1", secret: "s", name: "Anna" };
+
+  let guest = await join();
+  check(guest.conn.sent[0]?.type === "join" && guest.conn.sent[0].proto === PROTOCOL,
+        "il join dell'ospite non porta la sua versione");
+  await guest.hears({ ...welcome, proto: PROTOCOL });
+  check(guest.received.some((m) => m.type === "welcome") && guest.closed === null,
+        "un host della stessa versione non viene accettato");
+  await guest.hears({ type: "error", message: "mossa non valida" });
+  check(guest.received.some((m) => m.type === "error") && guest.closed === null,
+        "un errore di gioco normale ha chiuso la partita");
+
+  guest = await join();
+  await guest.hears(welcome); // un host fino alla rc6: nessuna versione
+  check(guest.closed?.fatal === true && guest.closed.message === MESSAGES.hostOutdated,
+        "un host senza versione non e' stato riconosciuto come vecchio");
+  check(!guest.received.some((m) => m.type === "welcome"), "l'app e' stata fatta entrare a un tavolo di una versione vecchia");
+
+  guest = await join();
+  await guest.hears({ type: "error", message: MESSAGES.guestOutdated, fatal: true });
+  check(guest.closed?.fatal === true && guest.closed.message === MESSAGES.guestOutdated,
+        "il rifiuto dell'host non e' arrivato come motivo della chiusura");
 }
 
 {

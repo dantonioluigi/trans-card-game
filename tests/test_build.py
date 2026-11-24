@@ -91,3 +91,19 @@ def test_la_licenza_di_peerjs_viaggia_con_la_libreria():
         licence = (dist / "peerjs-LICENSE.txt").read_text(encoding="utf-8")
         assert "MIT" in licence and "Copyright" in licence and "peerjs" in licence.lower()
         assert (dist / "peerjs-1.5.4.min.js").exists()
+
+
+def test_l_app_avvisa_degli_aggiornamenti_di_play():
+    # Il plugin e' nativo: senza, window.Capacitor.Plugins.AppUpdate non esiste e
+    # l'app non avvisa mai nessuno. Versione esatta, come le altre dipendenze.
+    package = json.loads((ROOT / "app" / "package.json").read_text(encoding="utf-8"))
+    version = package["dependencies"].get("@capawesome/capacitor-app-update", "")
+    assert re.fullmatch(r"\d+\.\d+\.\d+", version), f"versione non fissata: {version!r}"
+    lock = json.loads((ROOT / "app" / "package-lock.json").read_text(encoding="utf-8"))
+    assert lock["packages"]["node_modules/@capawesome/capacitor-app-update"]["version"] == version
+
+    assert "Capacitor.Plugins.AppUpdate" in (ROOT / "web" / "app.js").read_text(encoding="utf-8")
+    # L'avviso e' nascosto di default: sul sito nessuno lo accende, quindi non deve mai vedersi.
+    for args in ((), ("--app",)):
+        html = (build(*args) / "index.html").read_text(encoding="utf-8")
+        assert 'id="updateOverlay" hidden' in html

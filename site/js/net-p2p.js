@@ -41,6 +41,19 @@ const STUN_SERVERS = [
   { urls: "stun:stun.cloudflare.com:3478" },
 ];
 
+/* La versione del tavolo: chi gioca insieme deve vedere le stesse regole. Il
+ * tavolo vive sul telefono di chi lo crea, e le regole e i punteggi li calcola
+ * lui: un ospite con una versione diversa vedrebbe un testo delle regole, o dei
+ * messaggi, che non corrisponde a quello che succede davvero.
+ *
+ * Va ALZATO a mano quando cambia qualcosa che due versioni al tavolo vedrebbero
+ * in modo diverso (una regola, un punteggio, un messaggio del protocollo). NON
+ * serve per quello che resta sul telefono di chi lo ha (grafica, margini, avvisi).
+ *
+ * Chi non lo manda e' una versione fino alla rc6: per quelle vale 1. */
+export const PROTOCOL = 2;
+const LEGACY_PROTOCOL = 1;
+
 export const MESSAGES = {
   broker:
     "non riesco a raggiungere il servizio che mette in contatto i browser. " +
@@ -54,6 +67,12 @@ export const MESSAGES = {
     "probabilmente la rete che stai usando blocca anche quello.",
   hostClosed: "l'host ha chiuso la stanza",
   hostLost: "l'host non risponde piu': ha chiuso la scheda o ha perso la connessione",
+  guestOutdated:
+    "la tua versione di Dichiaro e' piu' vecchia di quella di chi ha creato il tavolo: " +
+    "aggiornala (dal Play Store, o ricarica la pagina nel browser) e riprova.",
+  hostOutdated:
+    "chi ha creato il tavolo ha una versione di Dichiaro piu' vecchia della tua: " +
+    "digli di aggiornarla (dal Play Store, o di ricaricare la pagina nel browser).",
 };
 
 /* ----------------------------------------------------------- configurazione */
@@ -260,15 +279,30 @@ function hostTable(handlers) {
       conn.close();
     };
 
+    // Versione diversa dalla nostra: gli si dice perche' e non lo si ascolta piu'.
+    // Non si chiude subito: una versione vecchia, vedendo la chiusura, scriverebbe
+    // "l'host ha chiuso la stanza" al posto del motivo. Chi tace senza essersi
+    // seduto lo toglie comunque sweepSilentGuests, dopo mezzo minuto.
+    const refuse = (message) => {
+      guest.banned = true;
+      post(guest, { type: "error", message, fatal: true });
+    };
+
     conn.on("data", (msg) => {
       if (guest.banned) return;
       guest.lastHeard = Date.now();
       if (!table || !msg || typeof msg !== "object") return;
       if (!guest.bucket.take()) return kick("troppi messaggi");
       if (!smallEnough(msg)) return kick("messaggio troppo grande");
+      if (msg.type === "join" && !guest.playerId) {
+        const theirs = Number.isInteger(msg.proto) ? msg.proto : LEGACY_PROTOCOL;
+        if (theirs !== PROTOCOL) return refuse(theirs < PROTOCOL ? MESSAGES.guestOutdated : MESSAGES.hostOutdated);
+      }
       if (msg.type === "join" && msg.compress && CAN_COMPRESS) guest.compress = true;
       if (guest.away) comeBack(guest);
-      handleClientMessage(table, guest, msg, (out) => post(guest, out));
+      // Il benvenuto porta la nostra versione: un ospite piu' nuovo di un host che
+      // non controlla nulla (fino alla rc6) la vede mancare e se ne accorge da solo.
+      handleClientMessage(table, guest, msg, (out) => post(guest, out.type === "welcome" ? { ...out, proto: PROTOCOL } : out));
     });
 
     guest.kick = kick;
@@ -396,7 +430,15 @@ function joinAsGuest(handlers) {
           .then(() => (msg.z ? unpack(msg.z) : msg))
           .then((plain) => {
             if (!plain || typeof plain !== "object" || typeof plain.type !== "string") return;
-            if (!closed && plain.type !== "pong") handlers.onMessage(plain);
+            if (closed || plain.type === "pong") return;
+            // L'host ci rifiuta per la versione: il motivo e' l'ultima cosa che dice.
+            if (plain.type === "error" && plain.fatal) return finish(String(plain.message || MESSAGES.hostClosed));
+            // Un host fino alla rc6 non manda la versione ne' controlla la nostra:
+            // se la nostra e' piu' nuova, a non capirsi sarebbero le regole.
+            if (plain.type === "welcome" && (Number.isInteger(plain.proto) ? plain.proto : LEGACY_PROTOCOL) < PROTOCOL) {
+              return finish(MESSAGES.hostOutdated);
+            }
+            handlers.onMessage(plain);
           })
           .catch((err) => console.warn("TRANS: messaggio dall'host illeggibile", err));
       });
@@ -446,7 +488,9 @@ function joinAsGuest(handlers) {
   return {
     send(message) {
       if (!conn) return;
-      const wanted = message.type === "join" && CAN_COMPRESS ? { ...message, compress: true } : message;
+      const wanted = message.type === "join"
+        ? { ...message, proto: PROTOCOL, ...(CAN_COMPRESS ? { compress: true } : {}) }
+        : message;
       safeSend(conn, wanted);
     },
     close() {
