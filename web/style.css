@@ -20,6 +20,16 @@
   --radius: 14px;
   --shadow: 0 10px 30px rgba(0, 0, 0, .45);
   --font: "Segoe UI", Roboto, "Helvetica Neue", system-ui, sans-serif;
+
+  /* Quanto lo schermo e' coperto da barra di stato, barra dei gesti e notch.
+     L'app Android disegna a tutto schermo e lascia alla pagina il compito di
+     starne fuori: senza, i tasti in alto finiscono sotto l'orario e non si
+     toccano. env() vale nei browser e nelle WebView recenti, le variabili
+     --safe-area-inset-* le imposta Capacitor; max() evita di contare due volte. */
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --safe-right: max(env(safe-area-inset-right, 0px), var(--safe-area-inset-right, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+  --safe-left: max(env(safe-area-inset-left, 0px), var(--safe-area-inset-left, 0px));
 }
 
 * { box-sizing: border-box; }
@@ -38,7 +48,10 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-body { display: flex; flex-direction: column; overflow: hidden; }
+body {
+  display: flex; flex-direction: column; overflow: hidden;
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+}
 
 button { font-family: inherit; cursor: pointer; }
 h1, h2, h3 { margin: 0 0 .5rem; font-weight: 650; letter-spacing: .01em; }
@@ -437,7 +450,9 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
   position: fixed; inset: 0; z-index: 50;
   background: rgba(4, 12, 9, .78);
   backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  padding: calc(1rem + var(--safe-top)) calc(1rem + var(--safe-right))
+           calc(1rem + var(--safe-bottom)) calc(1rem + var(--safe-left));
   animation: fade .18s ease-out;
 }
 @keyframes fade { from { opacity: 0; } }
@@ -448,7 +463,10 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
   width: min(420px, 94vw); box-shadow: var(--shadow); text-align: center;
 }
 .wide-dialog { width: min(560px, 94vw); }
-.scrollable { max-height: 86vh; overflow-y: auto; text-align: left; }
+.scrollable {
+  max-height: min(86vh, calc(100vh - 2rem - var(--safe-top) - var(--safe-bottom)));
+  overflow-y: auto; text-align: left;
+}
 .dialog-sub { color: var(--ink-dim); font-size: .88rem; margin: 0 0 1rem; }
 
 .bid-grid { display: flex; gap: .45rem; flex-wrap: wrap; justify-content: center; }
@@ -487,12 +505,12 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 .rules-body ul { padding-left: 1.1rem; }
 
 .toast {
-  position: fixed; left: 50%; bottom: 2rem; transform: translateX(-50%);
+  position: fixed; left: 50%; bottom: calc(2rem + var(--safe-bottom)); transform: translateX(-50%);
   background: var(--bad); color: #fff; padding: .6rem 1rem; border-radius: 10px;
   z-index: 90; font-size: .9rem; box-shadow: var(--shadow);
 }
 .connection {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 95;
+  position: fixed; top: var(--safe-top); left: 0; right: 0; z-index: 95;
   background: var(--bad); color: #fff; text-align: center;
   padding: .35rem; font-size: .85rem;
 }
@@ -571,7 +589,10 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
   .scores td { padding: .12rem 0; }
   .log-card, .chat-form { display: none; }
 
-  .dialog { padding: .8rem 1rem; max-height: 94vh; overflow-y: auto; }
+  .dialog {
+    padding: .8rem 1rem; overflow-y: auto;
+    max-height: calc(100vh - 2rem - var(--safe-top) - var(--safe-bottom));
+  }
   .dialog h2 { font-size: 1.05rem; margin-bottom: .2rem; }
   .result-table { margin: .3rem 0 .6rem; font-size: .8rem; }
   .result-table td { padding: .15rem 0; }

@@ -8,6 +8,7 @@ diventerebbe falsa: questi test lo fanno vedere subito.
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
 
@@ -61,6 +62,26 @@ def test_il_blocco_orizzontale_non_restringe_i_dispositivi():
     assert (
         'android:name="android.hardware.screen.landscape" android:required="false"' in script
     )
+
+
+def test_la_pagina_resta_fuori_dalle_barre_di_sistema():
+    # L'app Android disegna a tutto schermo ("viewport-fit=cover"): se la pagina non
+    # tiene un margine, i tasti in alto finiscono sotto l'orario e non si toccano.
+    css = (ROOT / "web" / "style.css").read_text(encoding="utf-8")
+    for lato in ("top", "right", "bottom", "left"):
+        assert f"env(safe-area-inset-{lato}" in css  # browser e WebView recenti
+        assert f"var(--safe-area-inset-{lato}" in css  # variabili iniettate da Capacitor
+    body = re.search(r"\nbody\s*\{([^}]*)\}", css)
+    assert body and "padding: var(--safe-top) var(--safe-right)" in body.group(1)
+
+
+def test_l_app_android_sceglie_colore_di_sfondo_e_icone_delle_barre():
+    config = json.loads((ROOT / "app" / "capacitor.config.json").read_text(encoding="utf-8"))
+    # Icone chiare: l'app e' scura, con icone scure l'orario sparirebbe.
+    assert config["plugins"]["SystemBars"]["style"] == "DARK"
+    script = (ROOT / "app" / "build.sh").read_text(encoding="utf-8")
+    assert 'android:windowBackground">#0b1512' in script
+    assert config["backgroundColor"] == "#0b1512"
 
 
 def test_la_licenza_di_peerjs_viaggia_con_la_libreria():

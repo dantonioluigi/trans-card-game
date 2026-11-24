@@ -77,6 +77,16 @@ sed -i 's|android:allowBackup="true"|android:allowBackup="false"|' "$MANIFEST"
 grep -q 'android:allowBackup="false"' "$MANIFEST" \
   || die "non riesco a disattivare il backup in $MANIFEST"
 
+# L'app disegna a tutto schermo e la pagina resta fuori dalle barre di sistema
+# con un margine. Dove la WebView e' piu' vecchia quel margine lo mette Android, e
+# sotto le barre si vede lo sfondo della finestra: il tema e' "giorno/notte", quindi
+# sul telefono in modo chiaro sarebbe una fascia bianca. Lo sfondo e' quello dell'app.
+STYLES=android/app/src/main/res/values/styles.xml
+grep -q 'android:windowBackground' "$STYLES" \
+  || sed -i 's|<item name="android:background">@null</item>|<item name="android:background">@null</item>\n        <item name="android:windowBackground">#0b1512</item>|' "$STYLES"
+grep -q 'android:windowBackground">#0b1512' "$STYLES" \
+  || die "non riesco a impostare lo sfondo della finestra in $STYLES"
+
 if [ -n "${ANDROID_KEYSTORE:-}" ]; then
   # ----------------------------------------------------------- rilascio firmato
   : "${ANDROID_KEYSTORE_PASSWORD:?manca ANDROID_KEYSTORE_PASSWORD}"
