@@ -204,7 +204,7 @@
         <li><b>NO TRUMP</b> — there is no trump; the highest card of the led suit always wins.</li>
         <li><b>BLIND</b> — you declare <i>without looking at your cards</i>. You only see them once everyone has declared.</li>
         <li><b>MISÈRE</b> — nobody declares: every trick you take is worth <b class="red">−5 points</b>.
-        But if you take <b>all</b> of them you turn the round around and score <b>+30</b>: all or nothing.</li>
+        But if you take <b>all</b> of them you turn the round around and score <b>+35</b>: all or nothing.</li>
       </ul>
       <h3>Latecomers</h3>
       <p>You need at least two players to start, so games often begin with bots. Anyone who joins

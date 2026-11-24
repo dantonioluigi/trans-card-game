@@ -36674,7 +36674,7 @@
    "bid": null,
    "tricks": 1,
    "cards": 1,
-   "score": 30
+   "score": 35
   },
   {
    "kind": "misere",
@@ -36702,7 +36702,7 @@
    "bid": null,
    "tricks": 3,
    "cards": 3,
-   "score": 30
+   "score": 35
   },
   {
    "kind": "misere",
@@ -36744,7 +36744,7 @@
    "bid": null,
    "tricks": 5,
    "cards": 5,
-   "score": 30
+   "score": 35
   },
   {
    "kind": "misere",
@@ -36800,7 +36800,7 @@
    "bid": null,
    "tricks": 7,
    "cards": 7,
-   "score": 30
+   "score": 35
   }
  ]
 }

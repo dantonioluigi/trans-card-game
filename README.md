@@ -60,7 +60,7 @@ il giro diventa la posizione più scomoda del tavolo.
 
 Nel round **A PERDERE** non si dichiara: si pagano 5 punti per ogni presa
 incassata. L'eccezione è la *luna*: chi le prende **tutte** non paga niente e
-incassa **+30**. È una via di fuga stretta — sbagliarne una sola dà il peggior
+incassa **+35**. È una via di fuga stretta — sbagliarne una sola dà il peggior
 punteggio del round — e infatti nelle simulazioni fra bot riesce in meno dell'1%
 dei round a perdere.
 
@@ -78,7 +78,7 @@ e poi arrivano i tre round speciali, tutti da 7 carte:
 |---|---|
 | **NO BRISCOLA** | Non c'è briscola. Vince sempre la carta più alta del seme di uscita. |
 | **BUIO** | Dichiari **senza guardare le tue carte**. Le vedi solo dopo che hanno parlato tutti. |
-| **A PERDERE** | Non si dichiara: ogni presa che incassi vale **−5 punti**. Ma chi le prende **tutte** ribalta il round e incassa **+30**. |
+| **A PERDERE** | Non si dichiara: ogni presa che incassi vale **−5 punti**. Ma chi le prende **tutte** ribalta il round e incassa **+35**. |
 
 **Durata.**
 

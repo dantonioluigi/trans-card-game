@@ -118,7 +118,7 @@ export const HIT_BASE = 10;
 export const HIT_PER_TRICK = 5;
 export const MISS_PER_TRICK = 1;
 export const MISERE_PER_TRICK = -5;
-export const MISERE_SWEEP_BONUS = 30;
+export const MISERE_SWEEP_BONUS = 35;
 
 export const MIN_PLAYERS = 2;
 // Il tetto lo decide il mazzo: la mano piu' lunga e' di 7 carte, e 7 giocatori
@@ -160,7 +160,7 @@ export const MODE_LABELS = {
 
 /**
  * A PERDERE: -5 per presa, ma chi le prende tutte ribalta il round e incassa
- * +30. Dichiarazione centrata: 10 + 5 per presa dichiarata. Dichiarazione
+ * +35. Dichiarazione centrata: 10 + 5 per presa dichiarata. Dichiarazione
  * sbagliata: 1 punto per presa fatta.
  *
  * `cards` e' il numero di prese in palio: serve a riconoscere l'en plein.

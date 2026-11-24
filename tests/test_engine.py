@@ -245,7 +245,7 @@ def test_blind_round_hides_your_own_hand_until_bids_are_in():
     assert len(snap["hand"]) == 7 and snap["hand_hidden"] is False
 
 
-def test_sweeping_the_misere_round_pays_fifteen():
+def test_sweeping_the_misere_round_pays_the_bonus():
     """La luna: chi prende tutte le prese a perdere incassa invece di pagare."""
     game = make_game(n=2)
     while game.spec.kind is not RoundKind.MISERE:
@@ -267,7 +267,7 @@ def test_sweeping_the_misere_round_pays_fifteen():
         game.play_card(pid, game.legal_cards(actor)[0])
 
     assert game.players[1].tricks == 7 and game.players[0].tricks == 0
-    assert game.players[1].score - before[1] == 30   # le ha prese tutte
+    assert game.players[1].score - before[1] == 35   # le ha prese tutte
     assert game.players[0].score - before[0] == 0    # non ne ha prese
 
 
