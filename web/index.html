@@ -122,6 +122,7 @@
       <div class="score-card">
         <h3 data-i18n="side.scores">Punteggio</h3>
         <table class="scores" id="scoreTable"></table>
+        <button class="ghost compact last-trick-btn" id="btnLastTrick" type="button" data-i18n="last.button" hidden>Ultima presa</button>
       </div>
       <div class="log-card">
         <h3 data-i18n="side.log">Diario</h3>
@@ -137,6 +138,17 @@
 </main>
 
 <!-- ---------------------------------------------------------- OVERLAYS -->
+<!-- Prima degli altri pannelli: se intanto finisce il round, quello gli sta sopra. -->
+<div class="overlay" id="lastTrickOverlay" hidden>
+  <div class="dialog wide-dialog">
+    <h2 data-i18n="last.title">Ultima presa</h2>
+    <p class="winner" id="lastTrickWinner"></p>
+    <div class="last-trick-cards" id="lastTrickCards"></div>
+    <p class="dialog-sub" data-i18n="last.order">Nell'ordine in cui sono state giocate.</p>
+    <button class="primary" id="btnCloseLastTrick" type="button" data-i18n="rules.close">Chiudi</button>
+  </div>
+</div>
+
 <div class="overlay" id="resultOverlay" hidden>
   <div class="dialog wide-dialog">
     <h2 id="resultTitle">Fine round</h2>

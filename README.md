@@ -31,6 +31,12 @@ ce l'hai in mano; se non ce l'hai giochi quello che vuoi, briscola compresa.
 Vince la briscola più alta, altrimenti la carta più alta del seme di uscita.
 Chi prende esce nella presa successiva.
 
+**Ultima presa.** La presa chiusa resta sul tavolo meno di due secondi, poi i bot
+continuano: per rivederla c'è il pulsante *Ultima presa* sotto il punteggio, che
+mostra le carte nell'ordine in cui sono state giocate, di chi sono e quale ha vinto.
+Compare dalla prima presa del round e sparisce al round nuovo. È solo grafica: le
+regole e il protocollo del tavolo non cambiano, quindi `PROTOCOL` resta com'è.
+
 **Chi arriva tardi.** Per iniziare servono almeno due giocatori, quindi spesso si
 parte con dei bot. Chi entra col codice a partita già cominciata **prende il posto
 di un bot**, con le sue carte e il suo punteggio: nessuno resta fuori per aver
@@ -563,7 +569,7 @@ node site/tests/limits.mjs           # limiti dell'host, tetto alla decompressio
 node site/tests/params.mjs           # parametri di prova solo in locale
 node site/tests/host.mjs             # l'host con un finto PeerJS: flood, furto del posto, versione
 node site/tests/i18n.mjs             # lingue: dizionario completo, ogni frase tradotta
-node site/tests/app.mjs              # web/app.js contro il tavolo vero: pannelli e avviso di aggiornamento
+node site/tests/app.mjs              # web/app.js contro il tavolo vero: pannelli, ultima presa e avviso di aggiornamento
 python site/tests/make_messages.py   # se cambi una frase nel codice: rigenera messages.json
 ```
 

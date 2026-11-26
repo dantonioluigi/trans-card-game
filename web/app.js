@@ -59,6 +59,7 @@
     heldSignature: "",
     heldUntil: 0,
     holdTimer: null,
+    lastTrick: null,   // la presa mostrata nel riquadro "Ultima presa", se aperto
   };
 
   /* ------------------------------------------------------------ carte -- */
@@ -287,6 +288,7 @@
 
   function hideOverlays() {
     ["bidPanel", "resultOverlay", "endOverlay"].forEach((id) => { $(id).hidden = true; });
+    closeLastTrick();
   }
 
   /* --- lobby --- */
@@ -386,6 +388,7 @@
     renderScores(g, me);
     renderLog(g, state.chat);
     renderOverlays(state, g);
+    $("btnLastTrick").hidden = !g.last_trick;
   }
 
   function renderSeats(g, me) {
@@ -697,6 +700,47 @@
     }
   }
 
+  /* --- ultima presa --- */
+
+  // Una foto al momento del tocco: se intanto se ne chiude un'altra, il
+  // riquadro non cambia sotto gli occhi di chi sta leggendo.
+  function openLastTrick(g) {
+    if (!g.last_trick) return;
+    app.lastTrick = {
+      plays: g.last_trick.plays,
+      winner: g.last_trick.winner,
+      names: g.players.map((p) => p.name),
+      me: g.you,
+    };
+    fillLastTrick();
+    $("lastTrickOverlay").hidden = false;
+  }
+
+  function closeLastTrick() {
+    $("lastTrickOverlay").hidden = true;
+    app.lastTrick = null;
+  }
+
+  function fillLastTrick() {
+    const shot = app.lastTrick;
+    if (!shot) return;
+    const box = $("lastTrickCards");
+    box.innerHTML = "";
+    shot.plays.forEach((play) => {
+      const won = play.player === shot.winner;
+      const figure = document.createElement("figure");
+      if (won) figure.className = "winner-seat";
+      figure.appendChild(cardEl(play.card, won ? "winning" : ""));
+      const caption = document.createElement("figcaption");
+      caption.textContent = shot.names[play.player] ?? "?"; // il nome e' di un altro: mai come HTML
+      figure.appendChild(caption);
+      box.appendChild(figure);
+    });
+    $("lastTrickWinner").textContent = shot.winner === shot.me
+      ? t("last.winner_you")
+      : t("last.winner", { name: shot.names[shot.winner] ?? "?" });
+  }
+
   /* Dichiarare non si disfa: prima si sceglie, poi si conferma. */
   function renderBidConfirm(g) {
     const row = $("bidConfirm");
@@ -892,7 +936,11 @@
     I18N.onChange(() => {
       applyMode();
       if (app.state) render();
+      fillLastTrick();
     });
+    $("btnLastTrick").onclick = () => { if (app.state && app.state.game) openLastTrick(app.state.game); };
+    $("btnCloseLastTrick").onclick = closeLastTrick;
+    $("lastTrickOverlay").onclick = (e) => { if (e.target === $("lastTrickOverlay")) closeLastTrick(); };
     $("btnRules").onclick = () => { $("rulesOverlay").hidden = false; };
     $("btnCloseRules").onclick = () => { $("rulesOverlay").hidden = true; };
     $("rulesOverlay").onclick = (e) => { if (e.target === $("rulesOverlay")) $("rulesOverlay").hidden = true; };
@@ -911,6 +959,7 @@
         if (now - app.lastEscape < PANIC_WINDOW_MS) setOffice(true);
         app.lastEscape = now;
         $("rulesOverlay").hidden = true;
+        closeLastTrick();
         cancelBid();
         return;
       }

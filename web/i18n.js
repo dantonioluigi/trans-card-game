@@ -64,6 +64,13 @@
     "update.now": [null, "Update"],
     "update.later": [null, "Later"],
 
+    /* ultima presa */
+    "last.button": [null, "Last trick"],
+    "last.title": [null, "Last trick"],
+    "last.order": [null, "In the order they were played."],
+    "last.winner": ["Ha preso {name}", "{name} took it"],
+    "last.winner_you": ["L'hai presa tu", "You took it"],
+
     /* sala d'attesa */
     "lobby.table": [null, "Table"],
     "lobby.share": [null, "Share the code, or"],

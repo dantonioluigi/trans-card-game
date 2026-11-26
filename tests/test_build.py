@@ -107,3 +107,12 @@ def test_l_app_avvisa_degli_aggiornamenti_di_play():
     for args in ((), ("--app",)):
         html = (build(*args) / "index.html").read_text(encoding="utf-8")
         assert 'id="updateOverlay" hidden' in html
+
+
+def test_l_ultima_presa_c_e_ma_non_si_vede_finche_non_serve():
+    # Il pulsante e il riquadro nascono nascosti: li accende solo app.js, dopo la
+    # prima presa. Se partissero visibili coprirebbero la home e la lobby.
+    for args in ((), ("--app",)):
+        html = (build(*args) / "index.html").read_text(encoding="utf-8")
+        assert 'id="btnLastTrick" type="button" data-i18n="last.button" hidden' in html
+        assert 'id="lastTrickOverlay" hidden' in html

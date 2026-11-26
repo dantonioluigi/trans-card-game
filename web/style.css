@@ -339,7 +339,9 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
   animation: drop .22s ease-out;
 }
-.trick .card.winning { box-shadow: 0 0 0 2px var(--gold), 0 8px 20px rgba(0, 0, 0, .5); }
+.trick .card.winning, .last-trick-cards .card.winning {
+  box-shadow: 0 0 0 2px var(--gold), 0 8px 20px rgba(0, 0, 0, .5);
+}
 @keyframes drop {
   from { opacity: 0; transform: translate(-50%, -70%) scale(.85) rotate(var(--rot, 0deg)); }
   to   { opacity: 1; }
@@ -439,6 +441,21 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 .log div { padding: .1rem 0; border-bottom: 1px solid rgba(255, 255, 255, .04); }
 .log .chat-line { color: var(--ink); }
 .log .chat-line b { color: var(--gold); }
+
+.ghost.last-trick-btn { width: 100%; margin-top: .5rem; }  /* pari al .ghost.compact, ma dopo */
+
+/* L'ultima presa nel riquadro: una carta per giocatore, il nome sotto. */
+.last-trick-cards {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem .5rem;
+  margin: .4rem 0 .6rem;
+}
+.last-trick-cards .card { --cw: clamp(40px, 9vw, 62px); }
+.last-trick-cards figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: .35rem; }
+.last-trick-cards figcaption {
+  max-width: 5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: .72rem; color: var(--ink-dim);
+}
+.last-trick-cards figure.winner-seat figcaption { color: var(--gold); font-weight: 700; }
 
 .chat-form { display: flex; gap: .4rem; }
 .chat-form input { padding: .5rem .6rem; font-size: .85rem; }
@@ -594,6 +611,11 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
     max-height: calc(100vh - 2rem - var(--safe-top) - var(--safe-bottom));
   }
   .dialog h2 { font-size: 1.05rem; margin-bottom: .2rem; }
+  #lastTrickWinner { font-size: 1rem; margin-bottom: .2rem; }
+  .last-trick-cards { gap: .4rem .3rem; margin: .2rem 0 .3rem; }
+  .last-trick-cards .card { --cw: 38px; }
+  .last-trick-cards figcaption { font-size: .62rem; max-width: 3.6rem; }
+  .ghost.last-trick-btn { margin-top: .3rem; }
   .result-table { margin: .3rem 0 .6rem; font-size: .8rem; }
   .result-table td { padding: .15rem 0; }
   .primary { margin-top: .5rem; }
@@ -717,7 +739,8 @@ input:focus { outline: 2px solid var(--gold-dim); outline-offset: 1px; }
 }
 [data-mode="office"] .card .pip-big { display: none; }
 [data-mode="office"] .card.back { background: var(--panel-line); }
-[data-mode="office"] .trick .card.winning { box-shadow: 0 0 0 2px var(--gold); }
+[data-mode="office"] .trick .card.winning,
+[data-mode="office"] .last-trick-cards .card.winning { box-shadow: 0 0 0 2px var(--gold); }
 
 /* Il turno resta chiaro, ma fermo: qualcosa che lampeggia si nota da lontano. */
 [data-mode="office"] .turn-badge,

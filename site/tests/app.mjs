@@ -48,6 +48,7 @@ function element(id) {
 }
 const prop = (id, name) => (stores.get(id) || { store: {} }).store[name];
 
+const created = []; // gli elementi che l'app crea (carte, didascalie...) con quello che gli assegna
 const listeners = {};
 const localStore = new Map([["trans.pid", "p-test"], ["trans.name", "Luigi"]]);
 
@@ -57,7 +58,7 @@ const define = (name, value) => Object.defineProperty(globalThis, name, { value,
 define("window", globalThis);
 define("document", {
   getElementById: element,
-  createElement: () => ghost(),
+  createElement: () => { const store = {}; created.push(store); return ghost(store); },
   querySelector: () => ghost({ href: "" }),
   querySelectorAll: () => [],
   addEventListener: (type, fn) => { (listeners[type] ||= []).push(fn); },
@@ -209,15 +210,13 @@ table.broadcast();
 click("btnStart");
 check(await until(() => prop("screenGame", "hidden") === false), "la partita non e' partita");
 
-// Si gioca fino in fondo: l'umano con la prima mossa legale, il bot col suo cervello.
-let guard = 0;
-while (!table.game.isOver) {
-  if (++guard > 20000) throw new Error("la partita non finisce");
+// Una mossa di chi tocca: l'umano con la prima mossa legale, il bot col suo cervello.
+function step() {
   const game = table.game;
-  if (game.phase === "round_over") { handleClientMessage(table, session, { type: "next_round" }, deliver); continue; }
+  if (game.phase === "round_over") { handleClientMessage(table, session, { type: "next_round" }, deliver); return; }
   const actor = game.currentActor();
   const seat = table.seats[actor];
-  if (seat.isBot) { bots.act(game, actor); table.broadcast(); continue; }
+  if (seat.isBot) { bots.act(game, actor); table.broadcast(); return; }
   const view = table.snapshotFor(seat.id).game;
   const move = view.legal_bids.length
     ? { type: "bid", value: view.legal_bids[0] }
@@ -225,12 +224,73 @@ while (!table.game.isOver) {
   handleClientMessage(table, session, move, deliver);
 }
 
+/* ------------------------------------------------------------ ultima presa */
+
+// A inizio round non c'e' ancora niente da rivedere.
+check(prop("btnLastTrick", "hidden") === true, "il pulsante \"Ultima presa\" compare prima che si chiuda una presa");
+
+let guard = 0;
+while (!table.game.lastTrick) {
+  if (++guard > 200) throw new Error("la prima presa non si chiude");
+  step();
+}
+check(await until(() => prop("btnLastTrick", "hidden") === false, 500), "chiusa una presa il pulsante \"Ultima presa\" non compare");
+
+// Da qui niente attese: il bot del tavolo ha i suoi timer e farebbe altre prese.
+{
+  const shot = table.game.lastTrick;
+  const mine = table.snapshotFor(table.hostId).game;
+  created.length = 0;
+  click("btnLastTrick");
+  check(prop("lastTrickOverlay", "hidden") === false, "\"Ultima presa\" non apre il riquadro");
+
+  const cards = created.filter((s) => typeof s.className === "string" && s.className.startsWith("card"));
+  const names = created.filter((s) => "textContent" in s && !("className" in s)).map((s) => s.textContent);
+  check(cards.length === shot.plays.length, `il riquadro ha ${cards.length} carte, la presa ne aveva ${shot.plays.length}`);
+  check(
+    JSON.stringify(names) === JSON.stringify(shot.plays.map((p) => mine.players[p.player].name)),
+    `i nomi sotto le carte non seguono l'ordine di gioco: ${names}`,
+  );
+  const ringed = cards.map((s, i) => (s.className.includes("winning") ? i : -1)).filter((i) => i >= 0);
+  check(
+    ringed.length === 1 && shot.plays[ringed[0]].player === shot.winner,
+    `la carta evidenziata non e' quella di chi ha vinto: ${ringed}`,
+  );
+  const winnerName = mine.players[shot.winner].name;
+  const line = shot.winner === mine.you ? "L'hai presa tu" : `Ha preso ${winnerName}`;
+  check(prop("lastTrickWinner", "textContent") === line, `chi ha preso: atteso "${line}", scritto "${prop("lastTrickWinner", "textContent")}"`);
+
+  // Cambiando lingua col riquadro aperto cambia anche la frase scritta dal client.
+  I18N.toggle();
+  const english = shot.winner === mine.you ? "You took it" : `${winnerName} took it`;
+  check(prop("lastTrickWinner", "textContent") === english, `in inglese: atteso "${english}", scritto "${prop("lastTrickWinner", "textContent")}"`);
+  I18N.toggle();
+
+  click("btnCloseLastTrick");
+  check(prop("lastTrickOverlay", "hidden") === true, "\"Chiudi\" non chiude il riquadro dell'ultima presa");
+}
+
+// Si gioca fino in fondo.
+let sawNewRound = false;
+while (!table.game.isOver) {
+  if (++guard > 20000) throw new Error("la partita non finisce");
+  const passing = table.game.phase === "round_over";
+  step();
+  // Col round nuovo la presa di prima non vale piu': il pulsante sparisce.
+  if (passing && !sawNewRound) {
+    sawNewRound = true;
+    check(prop("btnLastTrick", "hidden") === true, "nel round nuovo il pulsante \"Ultima presa\" mostra ancora la presa del round prima");
+  }
+}
+
 check(await until(() => prop("endOverlay", "hidden") === false), "a fine partita il pannello finale non si vede");
 check(prop("btnNewGame", "disabled") === false, "chi ha creato il tavolo non puo' tornare alla lobby");
 
 // "Torna alla lobby": il pannello finale deve sparire e la lobby deve restare libera.
+click("btnLastTrick"); // anche il riquadro dell'ultima presa, se e' aperto
 click("btnNewGame");
 check(await until(() => prop("screenLobby", "hidden") === false), "non si e' tornati alla lobby");
+check(prop("lastTrickOverlay", "hidden") === true, "il riquadro dell'ultima presa copre ancora la lobby");
 check(prop("endOverlay", "hidden") === true, "il pannello della fine partita copre ancora la lobby");
 check(prop("resultOverlay", "hidden") === true, "il pannello del round copre la lobby");
 check(prop("bidPanel", "hidden") === true, "il pannello delle dichiarazioni copre la lobby");
